@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+  Options +FollowSymlinks
+  RewriteEngine On
+
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.*)\.html$ index.php?md=$1 [QSA,PT,L]
+  RewriteRule ^(.*)\.htm$ index.php?md=$1 [QSA,PT,L]
+</IfModule>

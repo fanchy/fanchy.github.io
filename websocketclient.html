@@ -79,65 +79,71 @@ var _hmt = _hmt || [];
     <div class="container" style="margin-top:100px;">
         <div class="row">
             <textarea id="text-input" name="text-input" style="display:none;">
-# H2Engine 服务器引擎 
-　　H2Engine服务器引擎架构是轻量级的，与其说是引擎，个人觉得称之为平台更为合适。因为它封装的功能非常精简，但是提供了非常简洁方便的扩展机制，使得可以用C++、python、lua、js、php来开发具体的服务器功能。H2引擎的灵感来源于web服务器Apache。
+# WebSocket 客户端测试功能
+　　websocket是有标准的通信协议，在h2engine服务器引擎中继承了websocket通信协议，使用websocket通信协议的好处是很多语言或框架
+都内置了websocket的支持，工具也非常多，可以非常方便的测试。比如在逻辑开发过程中，有时候协议定好了，但是由于客户端还没有及时
+完成相应功能，那么如果有个模拟的客户端就会非常的方便，这个模拟的客户端只要能够收发协议就好。websocket浏览器天然支持，所以用
+浏览器websocket实现模拟客户端非常的方便，使用的人直接省掉了按照客户端的麻烦，直接放到一个webserver上，所有人都能用。
 
-1.  H2引擎集成了websocket，也推荐大家在长连接应用中，逐渐使用websocket。
-2.  协议的封包pb、thrift已经很够用了，H2引擎支持pb、thrift、json以及传统二进制struct，但是推荐thrift，主要是效率和多语言支持都更好。
-3.  基于网游服务器的场景，H2引擎考虑到单台物理机的处理能力当前足以应付单服的需求，所以将H2的架构设计为部署在同机上，这样大大简化了服务器的架构，多gate的架构其实来源于rpg刚兴起的年代，那时候服务器的内存有限，cpu多核也还没流行，但是今非昔比，单机模式也就是伪分布式模式其实更符合实际。
-4. 脚本化：c++封装数据结构，提供接口给脚本操作，脚本无状态处理逻辑，非常像php+memcached的思路。这样既可以利用了脚本的开发高效率，运行稳定无crash，又利用了c++运行效率高的特点。
-5.  针对传统网游服务器架构中多进程数据共享的痛点，H2做了特殊的设计，由于H2Worker在同一台机器上，得以使H2可以通过共享内存共享数据。
-　　大家知道，Apache+php之所以在web领域里流行，还有很大一个原因是php的框架又多又好用，相比而言，网游服务器领域的引擎、框架都太落后了，主要原因还是服务器没有形成标准。从web的成熟经验来看，功能开发的快，就要有好多框架，要有好的框架，就要有成熟标准的引擎，现在市面上有些游戏服务器引擎就经常会糅合引擎和框架的功能，有的甚至夹杂了游戏服务器的数据结构和游戏逻辑。H2Engine的设计哲学，引擎的归引擎，框架的归框架，虽然跟Apache相比距离“引擎”的称号相距甚远，但是这是H2的目标。另外，基于H2的框架也会不断的增加完善。举个例子，针对rpg游戏，我们可以设计出一套c++的框架，比如封装地图管理、角色管理、道具管理、任务系统、成就系统、副本系统、npc系统等，想想看，2d rpg领域相关的系统还是很好抽象的。问题是没有标准的、成熟的引擎作为基础。相关从业人员应该有共鸣，比如A团队开发一套任务系统，给B团队也是用不了啊，大家的定时器、数据库接口都不一样，无法做到拿来就用。如果大家都用H2，别人开源的系统分分钟就可以拿来用，想象下还是挺美好的。不同的游戏类型框架实现是不一样的，不同语言实现细节也会不同，使用H2Engine引擎后可以根据不同游戏类型、不同语言分类框架。
-***
-## Features
-- [多协议：支 持WebSocket / Socket](./protocol.html)。
-- [多语言支持：C++、python、lua、js、php，c++引擎加脚本处理逻辑，符合当下潮流](./scriptintro.html)。
-- [数据库:集成了对Mysql和Sqlite的支持，提供同步异步以及连接池的封装](./databaseintro.html)。
-- [分布式：基于ffrpc的分布式调用设计，异步rpc](./ffrpcintro.html)。
-- [多进程数据共享：h2engine封装了非常方便的进程数据共享机制，解决例如行会、排名等全局数据难处理的特点](./sharedintro.html)。
-- [非侵入是扩展：h2engine提供了非常方便的扩展机制，包括注册c++函数给脚本，增加新模块，增加client新消息处理函数等](./extintro.html)。
-***
-## Further Reading
-- [H2Engine的架构和设计哲学](./intro.html)
-- [H2Engine的示例](./tutorial.html)
-- [H2Engine的接口文档](./docs.html)
-- [H2Engine的下载相关](./docs.html)
-- [游戏服务器脚本的设计与选择](./scriptdesign.html)
-- [websocket模拟客户端](./client.html)
-- [websocket模拟客户端源码](./websocketclient.html)
-
-## 构建
-H2Engine目前只有Linux版本，使用cmake，确保系统安装了cmake
-> ```cpp
-$ cmake  
+## WebSocket 与服务器通信实现
+　　协议设计，websocket与h2engine服务器引擎通信，协议头的格式是cmd:协议号(整型)\n数据,这里参考了http头的协议设计，以\n区别
+协议头和协议体，协议头可以有多个参数，逗号分隔，这里只用了cmd，保留了其他协议参数的能力。用字符串的协议头对js这种脚本
+语言更友好，更容易兼容其他语言。
+> ```javascript
+var ws = undefined;
+var gHost = '';
+function Log(Text, MessageType) {
+    if (MessageType == "OK") Text = "<span style='color: green;'>" + Text + "</span>";
+    else if (MessageType == "ERROR") Text = "<span style='color: red;'>" + Text + "</span>";
+    else if (MessageType == "SEND") Text = "<span style='color: orange;'>" + Text + "</span>";
+    document.getElementById("LogContainer").innerHTML = document.getElementById("LogContainer").innerHTML + Text + "<br />";
+    var LogContainer = document.getElementById("LogContainer");
+    LogContainer.scrollTop = LogContainer.scrollHeight;
+};
+function btnConnect(){
+    if (ws){
+        Log("连接已经建立!!。", "ERROR");
+        return;
+    }
+    gHost = document.getElementById("ip").value + ":" + document.getElementById("port").value;
+    Log("begin connect:"+gHost)
+    gHost +=  "/chat";
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://" + gHost);
+    }
+    else if("MozWebSocket" in window) {
+        ws = new MozWebSocket("ws://" + gHost);
+    }
+    ws.onopen    = WSonOpen;
+    ws.onmessage = WSonMessage;
+    ws.onclose   = WSonClose;
+    ws.onerror   = WSonError;
+}
+function btnClose(){
+    if (ws)
+        ws.close();
+}
+function WSonOpen() {
+    Log("连接已经建立。", "OK");
+};
+function btnSend(){
+    var cmdReq  = $('#cmdSelect').val();
+    var dataReq = $('#dataReq').val();
+    var reqMsg   = 'cmd:' + cmdReq + '\n'+dataReq;
+    ws.send(reqMsg);
+}
 ```
 
-H2Engine进程分另个，h2engine 和h2worker ,其中h2worker根据使用语言的不同，分h2workerpy、h2workerlua、h2workerjs、h2workerphp,根据你使用的语言构建你需要的h2worker即可。
-> ```cpp
-$make h2engine 
-$make h2workerpy 
-$make h2workerlua
-$make h2workerjs
-$make h2workerphp
-```
+## WebSocket 基于浏览器实现的模拟客户端截图
+1.  ip port 设置服务器ip端口
+2.  协议号用于填写协议号，整型
+3.  协议数据这里只是作为延时只输入字符串，这个正式的应该是根据协议号显示不同的协议结构，然后根据结构字段分别填写。
 
-## 依赖说明：
-- cmake:构建的时候需要
-- python2.6或python2.7:构建h2workerpy的时候需要
-- lua5:构建h2workerlua的时候需要
-- js v8:构建h2workerjs的时候需要
-- libphp5:构建h2workerphp的时候需要,注意需要下载php源码编译出来允许嵌入的版本，./configure --enable-embed  --prefix=~/php5dir - --with-iconv=/usr/local/libiconv
-## 运行
+![Alt text](./images/intro/webclient.png)
 
-> ```cpp
-$ ./h2engine -d
-$ ./h2workerpy
-$ ./h2workerlua
-$ ./h2workerjs
-$ ./h2workerphp
-```
-
-h2engine是核心，需要首先启动，woker进程根据你需要的语言，启动你需要的版本即可。
+## 相关连接
+- 文档 [http://h2cloud.org](http://h2cloud.org)
+- 源码 [https://github.com/fanchy/h2engine](https://github.com/fanchy/h2engine)
 
             </textarea>
             <div id="markdown-preview" class="mkfont"> </div>

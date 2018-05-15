@@ -79,67 +79,29 @@ var _hmt = _hmt || [];
     <div class="container" style="margin-top:100px;">
         <div class="row">
             <textarea id="text-input" name="text-input" style="display:none;">
-# H2Engine 服务器引擎 
-　　H2Engine服务器引擎架构是轻量级的，与其说是引擎，个人觉得称之为平台更为合适。因为它封装的功能非常精简，但是提供了非常简洁方便的扩展机制，使得可以用C++、python、lua、js、php来开发具体的服务器功能。H2引擎的灵感来源于web服务器Apache。
+# H2Engine 数据共享的解决方案 
+　　如果你也设计过游戏服务器架构，你肯定碰到过全局数据访问的难题。不同角色按照地图等策略分配到不同进程，这个都是easy work，全局数据比如行会数据，宗族数据，排行榜，如何保证数据一致性，同时又便捷的访问呢？以行会数据为例，一般的做法都是把行会数据放到一个全局的进程，比如centerServer,当要修改行会数据时发消息给centerServer，修改后再同步给多进程，这个做法的好处是，gameServer并不阻塞线程，把操作丢该了centerServer，坏处是数据一致性的维护相当头疼，首先centerServer的数据维护就比较难，因为游戏的大部分数据都在gameServer，任何行会需要的数据，都需要gameServer用消息的形式发给centerserver，这个从软件实际上属于强耦合，进程间耦合到这种程度是相当可怕的。H2engine提供了一个完美的解决方案，主要实现方式如下：
 
-1.  H2引擎集成了websocket，也推荐大家在长连接应用中，逐渐使用websocket。
-2.  协议的封包pb、thrift已经很够用了，H2引擎支持pb、thrift、json以及传统二进制struct，但是推荐thrift，主要是效率和多语言支持都更好。
-3.  基于网游服务器的场景，H2引擎考虑到单台物理机的处理能力当前足以应付单服的需求，所以将H2的架构设计为部署在同机上，这样大大简化了服务器的架构，多gate的架构其实来源于rpg刚兴起的年代，那时候服务器的内存有限，cpu多核也还没流行，但是今非昔比，单机模式也就是伪分布式模式其实更符合实际。
-4. 脚本化：c++封装数据结构，提供接口给脚本操作，脚本无状态处理逻辑，非常像php+memcached的思路。这样既可以利用了脚本的开发高效率，运行稳定无crash，又利用了c++运行效率高的特点。
-5.  针对传统网游服务器架构中多进程数据共享的痛点，H2做了特殊的设计，由于H2Worker在同一台机器上，得以使H2可以通过共享内存共享数据。
-　　大家知道，Apache+php之所以在web领域里流行，还有很大一个原因是php的框架又多又好用，相比而言，网游服务器领域的引擎、框架都太落后了，主要原因还是服务器没有形成标准。从web的成熟经验来看，功能开发的快，就要有好多框架，要有好的框架，就要有成熟标准的引擎，现在市面上有些游戏服务器引擎就经常会糅合引擎和框架的功能，有的甚至夹杂了游戏服务器的数据结构和游戏逻辑。H2Engine的设计哲学，引擎的归引擎，框架的归框架，虽然跟Apache相比距离“引擎”的称号相距甚远，但是这是H2的目标。另外，基于H2的框架也会不断的增加完善。举个例子，针对rpg游戏，我们可以设计出一套c++的框架，比如封装地图管理、角色管理、道具管理、任务系统、成就系统、副本系统、npc系统等，想想看，2d rpg领域相关的系统还是很好抽象的。问题是没有标准的、成熟的引擎作为基础。相关从业人员应该有共鸣，比如A团队开发一套任务系统，给B团队也是用不了啊，大家的定时器、数据库接口都不一样，无法做到拿来就用。如果大家都用H2，别人开源的系统分分钟就可以拿来用，想象下还是挺美好的。不同的游戏类型框架实现是不一样的，不同语言实现细节也会不同，使用H2Engine引擎后可以根据不同游戏类型、不同语言分类框架。
-***
-## Features
-- [多协议：支 持WebSocket / Socket](./protocol.html)。
-- [多语言支持：C++、python、lua、js、php，c++引擎加脚本处理逻辑，符合当下潮流](./scriptintro.html)。
-- [数据库:集成了对Mysql和Sqlite的支持，提供同步异步以及连接池的封装](./databaseintro.html)。
-- [分布式：基于ffrpc的分布式调用设计，异步rpc](./ffrpcintro.html)。
-- [多进程数据共享：h2engine封装了非常方便的进程数据共享机制，解决例如行会、排名等全局数据难处理的特点](./sharedintro.html)。
-- [非侵入是扩展：h2engine提供了非常方便的扩展机制，包括注册c++函数给脚本，增加新模块，增加client新消息处理函数等](./extintro.html)。
-***
-## Further Reading
-- [H2Engine的架构和设计哲学](./intro.html)
-- [H2Engine的示例](./tutorial.html)
-- [H2Engine的接口文档](./docs.html)
-- [H2Engine的下载相关](./docs.html)
-- [游戏服务器脚本的设计与选择](./scriptdesign.html)
-- [websocket模拟客户端](./client.html)
-- [websocket模拟客户端源码](./websocketclient.html)
+- H2Engine中所有worker都起在一个服务器上，这样他们就可以使用共享内存，共享内存的高效性，使得我们可以方便的交换数据。
+- H2Engine的数据共享主要分写、读两个操作。
+- 写操作时，首先获得全局锁，因为有共享内存，所有进程使用一个写锁，这样比如要修改行会数据，获得写锁后直接就可以修改了。保证了数据的一致性。同时基于共享内存的锁以及内存修改都是效率极高的，写操作又是属于少数操作，性能上完全没有问题。
+- 写操作修改数据完成后，将修改同步给每个进程，得益于共享内存的操作，进程可以立即获得写操作的数据，这样写操作释放锁操作完毕后，所有worker进程都是缓存了当前最新的行会数据，记住这个特性，当写操作锁释放的时候，每个进程都已经获得本次写操作的数据。可以认为写操作是同步的修改了所有worker进程的数据。
+- 读操作就简单了，本进程有所有最新的共享数据的一份拷贝，直接读取，不需要任何锁，效率杠杠的。
+- 使用这个机制，实现行会、排行榜是不是容易了N倍？
 
-## 构建
-H2Engine目前只有Linux版本，使用cmake，确保系统安装了cmake
+## 使用共享内存需要实现自己的数据共享后的逻辑操作
 > ```cpp
-$ cmake  
+static void when_syncSharedData(int32_t cmd, const string& data){
+    //!todo logic code
+}
+getSharedMem().setNotifyFunc(when_syncSharedData);
 ```
 
-H2Engine进程分另个，h2engine 和h2worker ,其中h2worker根据使用语言的不同，分h2workerpy、h2workerlua、h2workerjs、h2workerphp,根据你使用的语言构建你需要的h2worker即可。
+　　当要修改数据时，先获得写锁，然后直接发送要修改的数据，每个进程的when_syncSharedData都会被调用，然后写锁才会被释放。
 > ```cpp
-$make h2engine 
-$make h2workerpy 
-$make h2workerlua
-$make h2workerjs
-$make h2workerphp
-```
-
-## 依赖说明：
-- cmake:构建的时候需要
-- python2.6或python2.7:构建h2workerpy的时候需要
-- lua5:构建h2workerlua的时候需要
-- js v8:构建h2workerjs的时候需要
-- libphp5:构建h2workerphp的时候需要,注意需要下载php源码编译出来允许嵌入的版本，./configure --enable-embed  --prefix=~/php5dir - --with-iconv=/usr/local/libiconv
-## 运行
-
-> ```cpp
-$ ./h2engine -d
-$ ./h2workerpy
-$ ./h2workerlua
-$ ./h2workerjs
-$ ./h2workerphp
-```
-
-h2engine是核心，需要首先启动，woker进程根据你需要的语言，启动你需要的版本即可。
-
-            </textarea>
+getSharedMem().writeLockGuard();
+getSharedMem().syncSharedData(cmd, data);
+```            </textarea>
             <div id="markdown-preview" class="mkfont"> </div>
             
             
