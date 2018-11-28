@@ -17,6 +17,7 @@ function MySocket(arg) {
     };
     
     function WSonMessage(event) {
+        //console.log(event.data);
         //var tmpArg = event.data.split('\n');
         //var obj = JSON.parse(tmpArg[1]);
         var obj = JSON.parse(event.data);
@@ -95,12 +96,13 @@ pc.script.create('client', function (context) {
             // Get query-string parameters (à la `URLSearchParams`).
             var uri = new pc.URI(window.location.href);
             var query = uri.getQuery();
-            var socketPort = 'wsport' in query ? query.wsport : 80;
+            var socketPort = 'wsport' in query ? query.wsport : 44000;
+            var socketIP = 'wsip' in query ? query.wsip : '47.101.179.174';
 
             var socketUrl = (window.location.protocol + '//' +
                              window.location.hostname + ':' + socketPort + '/socket');
-            var socketUrl2 = 'ws://127.0.0.1:44000/socket';
-            console.log(socketUrl);
+            var socketUrl2 = 'ws://'+socketIP+':'+socketPort+'/socket';
+            console.log(socketUrl2);
             if (socketPort != 30043){
                 var socket = this.socket = new MySocket({ url: socketUrl2 });
             }
