@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>TANX</title>
+    <style>
+      * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      iframe {
+        border: 0;
+        height: 50vh;
+        position: absolute;
+        width: 50vw;
+        border: 1px solid black;
+      }
+      .p1 {
+        left: 0;
+        top: 0;
+      }
+      .p2 {
+        right: 0;
+        top: 0;
+      }
+      .p3 {
+        bottom: 0;
+        left: 0;
+      }
+      .p4 {
+        bottom: 0;
+        right: 0;
+      }
+      .minimap {
+         display: block;
+         position: absolute;
+         z-index: 1;
+         background-color: #212224;
+         box-shadow: 0 0 0 2px #000;
+         cursor: default;
+         transition: opacity 200ms, visibility 200ms;
+         -webkit-transform: translate(-50%, -50%) rotate(45deg);
+         -moz-transform: translate(-50%, -50%) rotate(45deg);
+         -ms-transform: translate(-50%, -50%) rotate(45deg);
+         transform: translate(-50%, -50%) rotate(45deg);
+         border: 4px solid #5e7578;
+         top: 50%;
+         left: 50%;
+      }
+      .logo {
+          position: absolute;
+          bottom: 4vmin;
+          left: 4vmin;
+          pointer-events: none;
+          opacity: .7;
+      }
+    </style>
+    <link rel="manifest" href="/manifests/standard.json">
+  </head>
+  <body>
+    <iframe class="p1" src="/?player=1&amp;multi=1"></iframe>
+    <iframe class="p2" src="/?player=2&amp;multi=1"></iframe>
+    <iframe class="p3" src="/?gamepad=1&amp;multi=1"></iframe>
+    <iframe class="p4" src="/?gamepad=2&amp;multi=1"></iframe>
+    <canvas class="minimap"></canvas>
+    <img class="logo" src="../playcanvas.png">
+    <script>
+        var qs_wsport = /[\?&]wsport=([\w\-]+)/i.exec(window.location.search);
+        var socketPort = qs_wsport ? qs_wsport[1] : 80;
+
+        var iframes = document.querySelectorAll('iframe');
+        for (var i = 0; i < iframes.length; i++) {
+            var iframe = iframes[i];
+            if (iframe.src.indexOf('&wsport=') === -1) {
+                iframe.setAttribute('src', iframe.src + '&wsport=' + socketPort);
+            }
+        }
+
+        function launchIntoFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        var itemColors = {
+            'repair': '#6f6',
+            'damage': '#f60',
+            'shield': '#06f'
+        };
+
+        var unit = 48;
+        var canvas = document.querySelector('.minimap');
+        var ctx = canvas.getContext('2d');
+        var size = Math.min(window.innerWidth, window.innerHeight) / 140 | 0;
+        canvas.width = size * unit;
+        canvas.height = size * unit;
+
+        ctx.font = size * 6 + 'px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        canvas.addEventListener('click', function () {
+            launchIntoFullscreen(document.body);
+        });
+
+        var chosen = false;
+
+        var level;
+        var state = {
+            bullets: [],
+            items: [],
+            tanks: [],
+            teams: []
+        };
+        window.addEventListener('message', function (e) {
+            var data = e.data;
+            var type = e.data.type;
+            if (!type) {
+                return;
+            }
+            if (type === 'level' && !chosen) {
+                level = data.data;
+                e.source.postMessage('map.chosen', '*');
+                chosen = true;
+                draw();
+            }
+            if (type === 'state') {
+                state = data.data;
+                draw();
+            }
+        });
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#5e7578';
+            level.forEach(function (rect) {
+                ctx.fillRect((rect[0] - rect[2] / 2) * size, (rect[1] - rect[3] / 2) * size, rect[2] * size, rect[3] * size);
+            });
+            state.tanks.forEach(function (t) {
+                ctx.save();
+                ctx.translate(size * t[0], size * t[1]);
+                ctx.rotate(t[2]);
+                ctx.fillStyle = t[3];
+                ctx.fillRect(-size, -2 * size, 2 * size, 4 * size);
+                ctx.restore();
+            });
+            state.items.forEach(function (i) {
+                ctx.save();
+                ctx.translate(size * i[0], size * i[1]);
+                ctx.fillStyle = itemColors[i[2]];
+                ctx.fillRect(-size/2, -size/2, size, size);
+                ctx.restore();
+            });
+            ctx.strokeStyle = 'rgba(255, 255, 255, .8)';
+            ctx.beginPath();
+            state.bullets.forEach(function (b) {
+                ctx.save();
+                ctx.moveTo(size * b[0], size * b[1]);
+                ctx.lineTo(size * b[2], size * b[3]);
+                ctx.restore();
+            });
+            ctx.stroke();
+
+            state.teams.forEach(function (t, i) {
+                ctx.save();
+                var x = (6 + 36 * (i % 2)) * size;
+                var y = (6 + 36 * (i / 2 | 0)) * size;
+                ctx.save();
+                ctx.beginPath();
+                ctx.translate(x, y);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillStyle = 'rgb(' + t[0].join(',') + ')';
+                ctx.fillText(t[1], 0, 0);
+                ctx.restore();
+            });
+        }
+    </script>
+  </body>
+</html>
