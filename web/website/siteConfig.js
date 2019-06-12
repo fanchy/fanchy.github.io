@@ -24,7 +24,7 @@ const siteConfig = {
   title: 'h2cloud', // Title for your website.
   tagline: 'framework for game server',
   url: 'https://fanchy.github.io', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  baseUrl: '/web/website/build/h2cloud/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
