@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>朴素贝叶斯python代码实现</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="朴素贝叶斯也是机器学习中一种非常常见的分类方法，对于二分类问题，并且数据集特征为离散型属性的时候， 使用起来非常的方便。原理简单，训练效率高，拟合效果好。
+" />
+
+
+
+  <meta name="keywords" itemprop="categories" content="ai" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="朴素贝叶斯python代码实现" />
+<meta name="twitter:description" content="朴素贝叶斯也是机器学习中一种非常常见的分类方法，对于二分类问题，并且数据集特征为离散型属性的时候， 使用起来非常的方便。原理简单，训练效率高，拟合效果好。
+" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="/ai/2019/08/19/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AFpython%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="朴素贝叶斯python代码实现" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/ai/2019/08/19/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AFpython%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0.html" />
+
+
+  <meta property="og:image" content="/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="朴素贝叶斯也是机器学习中一种非常常见的分类方法，对于二分类问题，并且数据集特征为离散型属性的时候， 使用起来非常的方便。原理简单，训练效率高，拟合效果好。
+" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2019-08-19T00:00:00+08:00" />
+
+
+
+
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="ai" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="/ai/2019/08/19/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AFpython%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0.html">
+    
+    
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">朴素贝叶斯python代码实现</h1>
+            <h2 class="project-tagline">朴素贝叶斯对于二分类问题，数据集特征为离散型属性，原理简单，训练效率高，拟合效果好。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2019-08-19T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Aug 19, 2019
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">朴素贝叶斯python代码实现</h1>
+    <p class="post-meta">
+      <time datetime="2019-08-19T00:00:00+08:00" itemprop="datePublished">
+        
+        Aug 19, 2019
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h1 id="朴素贝叶斯python代码实现西瓜书">朴素贝叶斯python代码实现（西瓜书）</h1>
+<h2 id="摘要">摘要：</h2>
+<p>朴素贝叶斯也是机器学习中一种非常常见的分类方法，对于二分类问题，并且数据集特征为离散型属性的时候，
+使用起来非常的方便。原理简单，训练效率高，拟合效果好。</p>
+
+<h2 id="朴素贝叶斯">朴素贝叶斯</h2>
+<p>贝叶斯公式：
+<img src="/assets/img/bys/bys1.png" alt="" /></p>
+
+<p>朴素贝叶斯之所以称这为朴素，是因为假设了各个特征是相互独立的，因此假定下公式成立：
+<img src="/assets/img/bys/bys2.png" alt="" /></p>
+
+<p>则朴素贝叶斯算法的计算公式如下：
+<img src="/assets/img/bys/bys3.png" alt="" /></p>
+
+<p>在实际计算中，上面的公式会做如下略微改动：</p>
+
+<ol>
+  <li>由于某些特征属性的值P(Xi|Ci)可能很小，多个特征的p值连乘后可能被约等于0。可以公式两边取log然后变乘法为加法，避免类乘问题。</li>
+  <li>P(Ci) 和P(Xi|Ci) 一般不直接使用样本的频率计算出来，一般会使用拉普拉斯平滑。</li>
+</ol>
+
+<p><img src="/assets/img/bys/bys4.png" alt="" /></p>
+
+<p>上面公式中，Dc为该类别的频数，N表示所有类别的可能数。
+<img src="/assets/img/bys/bys5.png" alt="" /></p>
+
+<p>上面公式中，Dc,xi为该特征对应属性的频数，Dc为该类别的频数，Ni表示该特征的可能的属性数。</p>
+
+<h2 id="对应的西瓜书数据集为">对应的西瓜书数据集为</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>色泽	根蒂	敲声	纹理	脐部	触感	好瓜
+青绿	蜷缩	浊响	清晰	凹陷	硬滑	是
+乌黑	蜷缩	沉闷	清晰	凹陷	硬滑	是
+乌黑	蜷缩	浊响	清晰	凹陷	硬滑	是
+青绿	蜷缩	沉闷	清晰	凹陷	硬滑	是
+浅白	蜷缩	浊响	清晰	凹陷	硬滑	是
+青绿	稍蜷	浊响	清晰	稍凹	软粘	是
+乌黑	稍蜷	浊响	稍糊	稍凹	软粘	是
+乌黑	稍蜷	浊响	清晰	稍凹	硬滑	是
+乌黑	稍蜷	沉闷	稍糊	稍凹	硬滑	否
+青绿	硬挺	清脆	清晰	平坦	软粘	否
+浅白	硬挺	清脆	模糊	平坦	硬滑	否
+浅白	蜷缩	浊响	模糊	平坦	软粘	否
+青绿	稍蜷	浊响	稍糊	凹陷	硬滑	否
+浅白	稍蜷	沉闷	稍糊	凹陷	硬滑	否
+乌黑	稍蜷	浊响	清晰	稍凹	软粘	否
+浅白	蜷缩	浊响	模糊	平坦	硬滑	否
+青绿	蜷缩	沉闷	稍糊	稍凹	硬滑	否
+</code></pre></div></div>
+<h2 id="python实现">python实现</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#encoding:utf-8</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span>  <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">class</span> <span class="nc">NaiveBayes</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="p">{}</span><span class="c">#key 为类别名 val 为字典PClass表示该类的该类，PFeature:{}对应对于各个特征的概率</span>
+    <span class="k">def</span> <span class="nf">calEntropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="c"># 计算熵</span>
+        <span class="n">valRate</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="c"># 频次汇总 得到各个特征对应的概率</span>
+        <span class="n">valEntropy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">valRate</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">valRate</span><span class="p">))</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">valEntropy</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xTrain</span><span class="p">,</span> <span class="n">yTrain</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">yTrain</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span><span class="c">#如果不传，自动选择最后一列作为分类标签</span>
+            <span class="n">xTrain</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">xTrain</span><span class="p">,</span> <span class="n">yTrain</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildNaiveBayes</span><span class="p">(</span><span class="n">xTrain</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+    <span class="k">def</span> <span class="nf">buildNaiveBayes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xTrain</span><span class="p">):</span>
+        <span class="n">yTrain</span> <span class="o">=</span> <span class="n">xTrain</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="n">yTrainCounts</span> <span class="o">=</span> <span class="n">yTrain</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="c"># 频次汇总 得到各个特征对应的概率</span>
+
+        <span class="n">yTrainCounts</span> <span class="o">=</span> <span class="n">yTrainCounts</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">yTrain</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">yTrainCounts</span><span class="o">.</span><span class="n">size</span><span class="p">))</span> <span class="c">#使用了拉普拉斯平滑</span>
+        <span class="n">retModel</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">nameClass</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">yTrainCounts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">retModel</span><span class="p">[</span><span class="n">nameClass</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">'PClass'</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span> <span class="s">'PFeature'</span><span class="p">:{}}</span>
+
+        <span class="n">propNamesAll</span> <span class="o">=</span> <span class="n">xTrain</span><span class="o">.</span><span class="n">columns</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">allPropByFeature</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">nameFeature</span> <span class="ow">in</span> <span class="n">propNamesAll</span><span class="p">:</span>
+            <span class="n">allPropByFeature</span><span class="p">[</span><span class="n">nameFeature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">xTrain</span><span class="p">[</span><span class="n">nameFeature</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="c">#print(allPropByFeature)</span>
+        <span class="k">for</span> <span class="n">nameClass</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">xTrain</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">xTrain</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">nameFeature</span> <span class="ow">in</span> <span class="n">propNamesAll</span><span class="p">:</span>
+                <span class="n">eachClassPFeature</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">propDatas</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="n">nameFeature</span><span class="p">]</span>
+                <span class="n">propClassSummary</span> <span class="o">=</span> <span class="n">propDatas</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="c"># 频次汇总 得到各个特征对应的概率</span>
+                <span class="k">for</span> <span class="n">propName</span> <span class="ow">in</span> <span class="n">allPropByFeature</span><span class="p">[</span><span class="n">nameFeature</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">propClassSummary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">propName</span><span class="p">):</span>
+                        <span class="n">propClassSummary</span><span class="p">[</span><span class="n">propName</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="c">#如果有属性灭有，那么自动补0</span>
+                <span class="n">Ni</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">allPropByFeature</span><span class="p">[</span><span class="n">nameFeature</span><span class="p">])</span>
+                <span class="n">propClassSummary</span> <span class="o">=</span> <span class="n">propClassSummary</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">propDatas</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">Ni</span><span class="p">))</span><span class="c">#使用了拉普拉斯平滑</span>
+                <span class="k">for</span> <span class="n">nameFeatureProp</span><span class="p">,</span> <span class="n">valP</span> <span class="ow">in</span> <span class="n">propClassSummary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">eachClassPFeature</span><span class="p">[</span><span class="n">nameFeatureProp</span><span class="p">]</span> <span class="o">=</span> <span class="n">valP</span>
+                <span class="n">retModel</span><span class="p">[</span><span class="n">nameClass</span><span class="p">][</span><span class="s">'PFeature'</span><span class="p">][</span><span class="n">nameFeature</span><span class="p">]</span> <span class="o">=</span> <span class="n">eachClassPFeature</span>
+
+        <span class="k">return</span> <span class="n">retModel</span>
+    <span class="k">def</span> <span class="nf">predictBySeries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">curMaxRate</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">curClassSelect</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">nameClass</span><span class="p">,</span> <span class="n">infoModel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rate</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">rate</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">infoModel</span><span class="p">[</span><span class="s">'PClass'</span><span class="p">])</span>
+            <span class="n">PFeature</span> <span class="o">=</span> <span class="n">infoModel</span><span class="p">[</span><span class="s">'PFeature'</span><span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">nameFeature</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">propsRate</span> <span class="o">=</span> <span class="n">PFeature</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nameFeature</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">propsRate</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">rate</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">propsRate</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="c">#使用log加法避免很小的小数连续乘，接近零</span>
+                <span class="c">#print(nameFeature, val, propsRate.get(val, 0))</span>
+            <span class="c">#print(nameClass, rate)</span>
+            <span class="k">if</span> <span class="n">curMaxRate</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="n">curMaxRate</span><span class="p">:</span>
+                <span class="n">curMaxRate</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">curClassSelect</span> <span class="o">=</span> <span class="n">nameClass</span>
+            
+        <span class="k">return</span> <span class="n">curClassSelect</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictBySeries</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictBySeries</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">dataTrain</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"xiguadata.csv"</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">"gbk"</span><span class="p">)</span>
+
+<span class="n">naiveBayes</span> <span class="o">=</span> <span class="n">NaiveBayes</span><span class="p">()</span>
+<span class="n">treeData</span> <span class="o">=</span> <span class="n">naiveBayes</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataTrain</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">treeData</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+
+<span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'预测值'</span><span class="p">:</span><span class="n">naiveBayes</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dataTrain</span><span class="p">),</span> <span class="s">'正取值'</span><span class="p">:</span><span class="n">dataTrain</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'正确率:</span><span class="si">%</span><span class="s">f</span><span class="si">%%</span><span class="s">'</span><span class="o">%</span><span class="p">(</span><span class="n">pd</span><span class="p">[</span><span class="n">pd</span><span class="p">[</span><span class="s">'预测值'</span><span class="p">]</span> <span class="o">==</span> <span class="n">pd</span><span class="p">[</span><span class="s">'正取值'</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</code></pre></div></div>
+<p>输出</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{"否": {"PClass": 0.5263157894736842, "PFeature": {"色泽": {"浅白": 0.4166666666666667, "青绿": 0.3333333333333333, "乌 黑": 0.25}, "根蒂": {"稍蜷": 0.4166666666666667, "蜷缩": 0.3333333333333333, "硬挺": 0.25}, "敲声": {"浊响": 0.4166666666666667, "沉闷": 0.3333333333333333, "清脆": 0.25}, "纹理": {"稍糊": 0.4166666666666667, "模糊": 0.3333333333333333, "清晰": 0.25}, "脐部": {"平坦": 0.4166666666666667, "稍凹": 0.3333333333333333, "凹陷": 0.25}, "触感": {"硬滑": 0.6363636363636364, "软粘": 0.36363636363636365}}}, "是": {"PClass": 0.47368421052631576, "PFeature": {"色泽": {"乌黑": 0.45454545454545453, "青绿": 0.36363636363636365, "浅白": 0.18181818181818182}, "根蒂": {"蜷缩": 0.5454545454545454, "稍蜷": 0.36363636363636365, "硬挺": 0.09090909090909091}, "敲声": {"浊响": 0.6363636363636364, "沉闷": 0.2727272727272727, "清脆": 0.09090909090909091}, "纹理": {"清晰": 0.7272727272727273, "稍糊": 0.18181818181818182, "模糊": 0.09090909090909091}, "脐 部": {"凹陷": 0.5454545454545454, "稍凹": 0.36363636363636365, "平坦": 0.09090909090909091}, "触感": {"硬滑": 0.7, "软粘": 0.3}}}}
+   预测值 正取值
+0    是   是
+1    是   是
+2    是   是
+3    是   是
+4    是   是
+5    是   是
+6    否   是
+7    是   是
+8    否   否
+9    否   否
+10   否   否
+11   否   否
+12   是   否
+13   否   否
+14   是   否
+15   否   否
+16   否   否
+正确率:82.352941%
+</code></pre></div></div>
+
+<h2 id="总结">总结：</h2>
+<ul>
+  <li>贝叶斯分类器是一种生成式模型，不是直接拟合分类结果，而是拟合出后验概率公式计算对应分类的概率。</li>
+  <li>本文只介绍了二分类，也可以用来处理多分类问题。</li>
+  <li>对于小规模数据集，表现良好。</li>
+  <li>建立在特征相互独立的假设上。</li>
+  <li>这是我的github主页https://github.com/fanchy，有些有意思的分享。</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            <div class="sidebar-inner" style="height:630px;">
+                <script type="text/javascript">
+                    (function() {
+                        var s = "_" + Math.random().toString(36).slice(2);
+                        document.write('<div style="" id="' + s + '"></div>');
+                        (window.slotbydup = window.slotbydup || []).push({
+                            id: "u3524587",
+                            container:  s
+                        });
+                    })();
+                </script>
+                <!-- 多条广告如下脚本只需引入一次 -->
+                <script type="text/javascript" src="//cpro.baidustatic.com/cpro/ui/c.js" async="async" defer="defer" ></script>
+
+            </div>
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"/></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="/contact.html" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"/></svg>
+                    </a>
+                </span>
+                
+                <span class="my-span-icon">
+                    <a href="/contact.html" aria-label="Contact" title="Contact fanchy">
+                    沪ICP备17021230号-1
+                    </a>
+                </span>
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?47c8f11f62f58a552ffd46558ea88df3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

@@ -57,12 +57,12 @@
   <meta name="twitter:image:src" content="/thumbnail-jumbo.png" />
   <meta name="twitter:image" content="/thumbnail-jumbo.png" />
 
-<meta name="twitter:url" content="/" />
+<meta name="twitter:url" content="/example.html" />
 
 <!-- Open Graph data -->
 <meta property="og:title" content="h2cloud" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="/" />
+<meta property="og:url" content="/example.html" />
 
 
   <meta property="og:image" content="/thumbnail-jumbo.png" />
@@ -87,7 +87,7 @@
 
     
     
-    <link rel="canonical" href="/">
+    <link rel="canonical" href="/example.html">
     
     
     
@@ -109,6 +109,8 @@
     
     
 
+    
+      <a class="site-title" href="/">h2cloud</a>
     
 
     
@@ -188,8 +190,7 @@
         
         <section class="page-header">
             <h1 class="project-name">h2cloud</h1>
-            <h2 class="project-tagline">这里分享我的一些技术相关的总结 游戏相关开发技术 人工智能等
-</h2>
+            <h2 class="project-tagline"></h2>
             
             <!-- Post tagline -->
             
@@ -198,51 +199,169 @@
         
         <section class="main-content">
             
-            <div>
+            <p>Text can be <strong>bold</strong>, <em>italic</em>, or <del>strikethrough</del>.</p>
 
-  <p>吾尝终日而思矣，不如须臾之所学也；吾尝跂而望矣，不如登高之博见也。登高而招，臂非加长也，而见者远；顺风而呼，声非加疾也，而闻者彰。假舆马者，非利足也，而致千里；假舟楫者，非能水也，而绝江河。君子生非异也，善假于物也。</p>
+<p><a href="./another-page.html">Link to another page</a>.</p>
 
-<p>故不积跬步，无以至千里；不积小流，无以成江海。骐骥一跃，不能十步；驽马十驾，功在不舍。锲而舍之，朽木不折；锲而不舍，金石可镂。</p>
+<p>There should be whitespace between paragraphs.</p>
 
-<p><code class="highlighter-rouge">——先秦·荀子《劝学》</code></p>
+<p>There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.</p>
 
-<h1 id="h2engine">h2engine</h1>
+<h1 id="header-1">Header 1</h1>
 
-<p>游戏服务器框架，你能从中了解游戏服务器由复杂到精简的演变过程，最流行技术如嵌入脚本、事件解耦、进程间rpc、异步io等应用，
-十年研发经验的结晶，成熟与创新结合的傲娇之作。<a href="./h2engine.html">了解更多 </a></p>
+<p>This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.</p>
 
-<h1 id="fflib">FFlib</h1>
+<h2 id="header-2">Header 2</h2>
 
-<p>fflib是轻量级的C++类库，所谓轻量是指代码结构清晰，阅读性强，绝对的精巧极致，当从底层到细节都遵循了极简原则时候，
-类库的性能自然而然达到了很高的水平。从事网络游戏开发工作过程中，在设计开发分布式并发的C++服务器程序时，
-总结了很多经验 和模式，一方面希望自己的心得更有条理的整理出来，另一方面感觉到有些东西设计的还是 很有价值的，
-故而得成fflib。<a href="./fflib.html">了解更多 </a></p>
+<blockquote>
+  <p>This is a blockquote following a header.</p>
 
-<h1 id="fflua">FFlua</h1>
+  <p>When something is important enough, you do it even if the odds are not in your favor.</p>
+</blockquote>
 
-<p>也许你已经了解了FFLUA的设计原则，即：当在编写C++代码时，希望使用LUA就像使用C++本地的代码一样，而在lua中操作C++的数据和接口的时候，
-又希望C++用起来完全跟table一个样。这样可以大大减轻程序开发的工作，从而把精力更多放大设计和逻辑上。那么做到如何lua才算像C++，
-C++做到如何才算像lua呢？我们知道二者毕竟相差甚远，C++ 调用lua函数，FFLUA已经封装调用lua函数就像调用本地C++函数一样方便 ，
-C++注册接口和对象到lua中，lua中操作对象就像操作table一样直接。 C++中除了自定义对象，STL是用的最多的了，
-C++希望lua中能够接收STL的参数，或者能够返回STL数据结构 Lua中只有table数据结构，Lua希望C++的参数的数据结构支持table，
-并且lua可以直接把table作为返回值。 C++的指针需要传递到lua中，同时也希望某些操作，lua可以把C++对象指针作为返回值<a href="./fflua.html">了解更多 </a></p>
+<h3 id="header-3">Header 3</h3>
 
-<h1 id="ffpython">FFpython</h1>
-<p>在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，
-与C++结合非常的适合。通常情况下使用C++封装机制，而用python脚本实现策略或者是控制。使用python和C++结合的技术拥有很多优势，
-ffpython是C++语言开发的方便嵌入、扩展python的类库。<a href="./ffpython.html">了解更多 </a></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Javascript code with syntax highlighting.</span>
+<span class="kd">var</span> <span class="nx">fun</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">lang</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">dateformat</span><span class="p">.</span><span class="nx">i18n</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./lang/'</span> <span class="o">+</span> <span class="nx">l</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
-<h1 id="gamedev">Gamedev</h1>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Ruby code with syntax highlighting</span>
+<span class="no">GitHubPages</span><span class="o">::</span><span class="no">Dependencies</span><span class="p">.</span><span class="nf">gems</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">gem</span><span class="p">,</span> <span class="n">version</span><span class="o">|</span>
+  <span class="n">s</span><span class="p">.</span><span class="nf">add_dependency</span><span class="p">(</span><span class="n">gem</span><span class="p">,</span> <span class="s2">"= </span><span class="si">#{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
 
-<p>这里汇总游戏开发相关的技术总结。<a href="./gamedev.html">了解更多 </a></p>
+<h4 id="header-4">Header 4</h4>
 
-<h1 id="ai">AI</h1>
+<ul>
+  <li>This is an unordered list following a header.</li>
+  <li>This is an unordered list following a header.</li>
+  <li>This is an unordered list following a header.</li>
+</ul>
 
-<p>人工智能初窥门径，水平有限，分享一些自己的学习心得，主要是AI相关的原理数学推导。<a href="./ai.html">了解更多 </a></p>
+<h5 id="header-5">Header 5</h5>
 
+<ol>
+  <li>This is an ordered list following a header.</li>
+  <li>This is an ordered list following a header.</li>
+  <li>This is an ordered list following a header.</li>
+</ol>
 
+<h6 id="header-6">Header 6</h6>
 
-</div>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">head1</th>
+      <th style="text-align: left">head two</th>
+      <th style="text-align: left">three</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good swedish fish</td>
+      <td style="text-align: left">nice</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">out of stock</td>
+      <td style="text-align: left">good and plenty</td>
+      <td style="text-align: left">nice</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good <code class="highlighter-rouge">oreos</code></td>
+      <td style="text-align: left">hmm</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">ok</td>
+      <td style="text-align: left">good <code class="highlighter-rouge">zoute</code> drop</td>
+      <td style="text-align: left">yumm</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="theres-a-horizontal-rule-below-this">There’s a horizontal rule below this.</h3>
+
+<hr />
+
+<h3 id="here-is-an-unordered-list">Here is an unordered list:</h3>
+
+<ul>
+  <li>Item foo</li>
+  <li>Item bar</li>
+  <li>Item baz</li>
+  <li>Item zip</li>
+</ul>
+
+<h3 id="and-an-ordered-list">And an ordered list:</h3>
+
+<ol>
+  <li>Item one</li>
+  <li>Item two</li>
+  <li>Item three</li>
+  <li>Item four</li>
+</ol>
+
+<h3 id="and-a-nested-list">And a nested list:</h3>
+
+<ul>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item
+        <ul>
+          <li>level 3 item</li>
+          <li>level 3 item</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+    </ul>
+  </li>
+  <li>level 1 item
+    <ul>
+      <li>level 2 item</li>
+      <li>level 2 item</li>
+    </ul>
+  </li>
+  <li>level 1 item</li>
+</ul>
+
+<h3 id="small-image">Small image</h3>
+
+<p><img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="Octocat" /></p>
+
+<h3 id="large-image">Large image</h3>
+
+<p><img src="https://guides.github.com/activities/hello-world/branching.png" alt="Branching" /></p>
+
+<h3 id="definition-lists-can-be-used-with-html-syntax">Definition lists can be used with HTML syntax.</h3>
+
+<dl>
+<dt>Name</dt>
+<dd>Godzilla</dd>
+<dt>Born</dt>
+<dd>1952</dd>
+<dt>Birthplace</dt>
+<dd>Japan</dd>
+<dt>Color</dt>
+<dd>Green</dd>
+</dl>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The final element.
+</code></pre></div></div>
 
             <div class="sidebar-inner" style="height:630px;">
                 <script type="text/javascript">

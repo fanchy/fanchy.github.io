@@ -14,7 +14,7 @@
     
     
     
-    <title>h2cloud</title>
+    <title>AI</title>
     
     
     
@@ -32,8 +32,7 @@
 
 <!-- Place this data between the <head> tags of your website -->
 
-<meta name="description" content="这里分享我的一些技术相关的总结 游戏相关开发技术 人工智能等
-" />
+<meta name="description" content="游戏开发相关的技术总结。" />
 
 
 
@@ -44,9 +43,8 @@
 
 
 
-<meta name="twitter:title" content="h2cloud" />
-<meta name="twitter:description" content="这里分享我的一些技术相关的总结 游戏相关开发技术 人工智能等
-" />
+<meta name="twitter:title" content="AI" />
+<meta name="twitter:description" content="游戏开发相关的技术总结。" />
 
 
   <meta name="twitter:creator" content="@evanown" />
@@ -57,18 +55,17 @@
   <meta name="twitter:image:src" content="/thumbnail-jumbo.png" />
   <meta name="twitter:image" content="/thumbnail-jumbo.png" />
 
-<meta name="twitter:url" content="/" />
+<meta name="twitter:url" content="/ai.html" />
 
 <!-- Open Graph data -->
-<meta property="og:title" content="h2cloud" />
+<meta property="og:title" content="AI" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="/" />
+<meta property="og:url" content="/ai.html" />
 
 
   <meta property="og:image" content="/thumbnail-jumbo.png" />
 
-<meta property="og:description" content="这里分享我的一些技术相关的总结 游戏相关开发技术 人工智能等
-" />
+<meta property="og:description" content="游戏开发相关的技术总结。" />
 <meta property="og:site_name" content="h2cloud" />
 
 
@@ -87,7 +84,7 @@
 
     
     
-    <link rel="canonical" href="/">
+    <link rel="canonical" href="/ai.html">
     
     
     
@@ -109,6 +106,8 @@
     
     
 
+    
+      <a class="site-title" href="/">h2cloud</a>
     
 
     
@@ -187,9 +186,8 @@
         
         
         <section class="page-header">
-            <h1 class="project-name">h2cloud</h1>
-            <h2 class="project-tagline">这里分享我的一些技术相关的总结 游戏相关开发技术 人工智能等
-</h2>
+            <h1 class="project-name">AI</h1>
+            <h2 class="project-tagline">游戏开发相关的技术总结。</h2>
             
             <!-- Post tagline -->
             
@@ -198,51 +196,89 @@
         
         <section class="main-content">
             
-            <div>
+            <article>
 
-  <p>吾尝终日而思矣，不如须臾之所学也；吾尝跂而望矣，不如登高之博见也。登高而招，臂非加长也，而见者远；顺风而呼，声非加疾也，而闻者彰。假舆马者，非利足也，而致千里；假舟楫者，非能水也，而绝江河。君子生非异也，善假于物也。</p>
+  <div>
+    <p>这里汇总游戏开发相关的技术总结。</p>
 
-<p>故不积跬步，无以至千里；不积小流，无以成江海。骐骥一跃，不能十步；驽马十驾，功在不舍。锲而舍之，朽木不折；锲而不舍，金石可镂。</p>
+<h2 id="ai">ai</h2>
 
-<p><code class="highlighter-rouge">——先秦·荀子《劝学》</code></p>
+<ul>
+  <li><a href="./another-page.html">设计</a>.</li>
+  <li><a href="./another-page.html">实现</a>.</li>
+  <li><a href="./another-page.html">文档</a>.</li>
+</ul>
 
-<h1 id="h2engine">h2engine</h1>
+<h2>汇总</h2>
 
-<p>游戏服务器框架，你能从中了解游戏服务器由复杂到精简的演变过程，最流行技术如嵌入脚本、事件解耦、进程间rpc、异步io等应用，
-十年研发经验的结晶，成熟与创新结合的傲娇之作。<a href="./h2engine.html">了解更多 </a></p>
+<div>&nbsp;</div>
+<ul class="post-list">
+    
+      <li>
 
-<h1 id="fflib">FFlib</h1>
+        
+        
 
-<p>fflib是轻量级的C++类库，所谓轻量是指代码结构清晰，阅读性强，绝对的精巧极致，当从底层到细节都遵循了极简原则时候，
-类库的性能自然而然达到了很高的水平。从事网络游戏开发工作过程中，在设计开发分布式并发的C++服务器程序时，
-总结了很多经验 和模式，一方面希望自己的心得更有条理的整理出来，另一方面感觉到有些东西设计的还是 很有价值的，
-故而得成fflib。<a href="./fflib.html">了解更多 </a></p>
+        <h2>
+          <a class="post-link" href="/ai/2019/08/23/%E5%86%B3%E7%AD%96%E6%A0%91ID3%E5%8E%9F%E7%90%86%E5%8F%8AR%E8%AF%AD%E8%A8%80python%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0.html" title="决策树ID3原理及R语言python代码实现">决策树ID3原理及R语言python代码实现 <span class="post-meta">Aug 23, 2019</span></a>
+          
+        </h2>
 
-<h1 id="fflua">FFlua</h1>
-
-<p>也许你已经了解了FFLUA的设计原则，即：当在编写C++代码时，希望使用LUA就像使用C++本地的代码一样，而在lua中操作C++的数据和接口的时候，
-又希望C++用起来完全跟table一个样。这样可以大大减轻程序开发的工作，从而把精力更多放大设计和逻辑上。那么做到如何lua才算像C++，
-C++做到如何才算像lua呢？我们知道二者毕竟相差甚远，C++ 调用lua函数，FFLUA已经封装调用lua函数就像调用本地C++函数一样方便 ，
-C++注册接口和对象到lua中，lua中操作对象就像操作table一样直接。 C++中除了自定义对象，STL是用的最多的了，
-C++希望lua中能够接收STL的参数，或者能够返回STL数据结构 Lua中只有table数据结构，Lua希望C++的参数的数据结构支持table，
-并且lua可以直接把table作为返回值。 C++的指针需要传递到lua中，同时也希望某些操作，lua可以把C++对象指针作为返回值<a href="./fflua.html">了解更多 </a></p>
-
-<h1 id="ffpython">FFpython</h1>
-<p>在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，
-与C++结合非常的适合。通常情况下使用C++封装机制，而用python脚本实现策略或者是控制。使用python和C++结合的技术拥有很多优势，
-ffpython是C++语言开发的方便嵌入、扩展python的类库。<a href="./ffpython.html">了解更多 </a></p>
-
-<h1 id="gamedev">Gamedev</h1>
-
-<p>这里汇总游戏开发相关的技术总结。<a href="./gamedev.html">了解更多 </a></p>
-
-<h1 id="ai">AI</h1>
-
-<p>人工智能初窥门径，水平有限，分享一些自己的学习心得，主要是AI相关的原理数学推导。<a href="./ai.html">了解更多 </a></p>
+        <p>决策树是机器学习中一种非常常见的分类与回归方法，可以认为是if-else结构的规则。分类决策树是由节点和有向边组成的树形结构，节点表示特征或者属性， 而边表示的是属性值，边指向的叶节点为对应的分类。在对样本的分类过程中，由顶向下，根据特征或属性值选择分支，递归遍历直到叶节点，将实例分到叶节点对应的类别中。 决策树的学习过程就是构造出一个能正取分类（或者误差最小）训练数据集的且有较好泛化能力的树，核心是如何选择特征或属性作为节点， 通常的算法是利用启发式的算法如ID3，C4.5，CART等递归的选择最优特征。选择一个最优特征，然后按照此特征将数据集分割成多个子集，子集再选择最优特征， 直到所有训练数据都被正取分类，这就构造出了决策树</p>
 
 
+      </li>
+    
+      <li>
 
-</div>
+        
+        
+
+        <h2>
+          <a class="post-link" href="/ai/2019/08/19/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AFpython%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0.html" title="朴素贝叶斯python代码实现">朴素贝叶斯python代码实现 <span class="post-meta">Aug 19, 2019</span></a>
+          
+        </h2>
+
+        <p>朴素贝叶斯也是机器学习中一种非常常见的分类方法，对于二分类问题，并且数据集特征为离散型属性的时候， 使用起来非常的方便。原理简单，训练效率高，拟合效果好。</p>
+
+
+      </li>
+    
+      <li>
+
+        
+        
+
+        <h2>
+          <a class="post-link" href="/ai/2018/09/25/logistic%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC%E5%8F%8AR%E8%AF%AD%E8%A8%80%E5%AE%9E%E7%8E%B0.html" title="logistic逻辑回归公式推导及R语言实现">logistic逻辑回归公式推导及R语言实现 <span class="post-meta">Sep 25, 2018</span></a>
+          
+        </h2>
+
+        <p>线性回归模型简单，对于一些线性可分的场景还是简单易用的。Logistic逻辑回归也可以看成线性回归的变种， 虽然名字带回归二字但实际上他主要用来二分类，区别于线性回归直接拟合目标值， Logistic逻辑回归拟合的是正类和负类的对数几率。</p>
+
+
+      </li>
+    
+      <li>
+
+        
+        
+
+        <h2>
+          <a class="post-link" href="/ai/2012/12/01/%E9%9A%90%E9%A9%AC%E5%B0%94%E7%A7%91%E5%A4%AB~%E7%BB%B4%E7%89%B9%E6%AF%94%E7%AE%97%E6%B3%95.html" title="隐马尔科夫~维特比算法">隐马尔科夫~维特比算法 <span class="post-meta">Dec 1, 2012</span></a>
+          
+        </h2>
+
+        <p>继上篇贝叶斯后，一直想完成隐马尔科夫这篇，一是一直没有时间完成python的示例实现代码， 二是想找一个区别于天气的隐马尔科夫例子。区别于贝叶斯，隐马尔科夫模型是基于时序的概率模型， 本文只关注于一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。 该模型可以用三元组表示：λ = (A, B,π )。</p>
+
+
+      </li>
+    
+  </ul>
+
+  </div>
+
+</article>
 
             <div class="sidebar-inner" style="height:630px;">
                 <script type="text/javascript">
