@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>隐马尔科夫~维特比算法</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="继上篇贝叶斯后，一直想完成隐马尔科夫这篇，一是一直没有时间完成python的示例实现代码， 二是想找一个区别于天气的隐马尔科夫例子。区别于贝叶斯，隐马尔科夫模型是基于时序的概率模型， 本文只关注于一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。 该模型可以用三元组表示：λ = (A, B,π )。
+" />
+
+
+
+  <meta name="keywords" itemprop="categories" content="ai" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="隐马尔科夫~维特比算法" />
+<meta name="twitter:description" content="继上篇贝叶斯后，一直想完成隐马尔科夫这篇，一是一直没有时间完成python的示例实现代码， 二是想找一个区别于天气的隐马尔科夫例子。区别于贝叶斯，隐马尔科夫模型是基于时序的概率模型， 本文只关注于一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。 该模型可以用三元组表示：λ = (A, B,π )。
+" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="/ai/mrkf.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="隐马尔科夫~维特比算法" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/ai/mrkf.html" />
+
+
+  <meta property="og:image" content="/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="继上篇贝叶斯后，一直想完成隐马尔科夫这篇，一是一直没有时间完成python的示例实现代码， 二是想找一个区别于天气的隐马尔科夫例子。区别于贝叶斯，隐马尔科夫模型是基于时序的概率模型， 本文只关注于一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。 该模型可以用三元组表示：λ = (A, B,π )。
+" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-12-01T00:00:00+08:00" />
+
+
+
+
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="ai" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="/ai/mrkf.html">
+    
+    
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">隐马尔科夫~维特比算法</h1>
+            <h2 class="project-tagline">一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。该模型可以用三元组表示：λ = (A, B,π )。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-12-01T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Dec 1, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">隐马尔科夫~维特比算法</h1>
+    <p class="post-meta">
+      <time datetime="2012-12-01T00:00:00+08:00" itemprop="datePublished">
+        
+        Dec 1, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="概念介绍">概念介绍：</h2>
+<p>　　继上篇贝叶斯后，一直想完成隐马尔科夫这篇，一是一直没有时间完成python的示例实现代码，
+    二是想找一个区别于天气的隐马尔科夫例子。区别于贝叶斯，隐马尔科夫模型是基于时序的概率模型，
+    本文只关注于一阶隐马尔科夫模型，即某一时刻的状态值只跟上一时刻的状态值有关。
+    该模型可以用三元组表示：λ = (A, B,π ), 其中：</p>
+
+<ul>
+  <li>A：为状态转移概率矩阵</li>
+  <li>B：为观察概率矩阵，或称为概率矩阵</li>
+  <li>π：为初始概率矩阵</li>
+</ul>
+
+<p>举一个例子来说明。</p>
+
+<ul>
+  <li>假设有一只电动玩具狗，它只会干三件事：汪汪叫（W），跑来跑去（R），睡觉（S）。则观察状态集合V为{W, R, S}, 则观察状态数目M=3 .</li>
+  <li>经过了解得知，电动玩具狗是受情绪控制的，它会无聊（B），高兴（H），生气（A），故状态集合Q={B, H，A}, 状态数目N=3</li>
+  <li>分析这只玩具狗后得知其状态转移概率矩阵为：</li>
+</ul>
+
+<p><img src="/assets/img/mrkf/mrkf1.png" alt="" /></p>
+
+<p>混淆矩阵为：</p>
+
+<p><img src="/assets/img/mrkf/mrkf2.png" alt="" /></p>
+
+<p>初始概率矩阵为：π = (0.2, 0.4, 0.4)</p>
+
+<h2 id="维特比算法">维特比算法</h2>
+
+<p>　　假设一天中观察到玩具狗的行为序列为{W,R,S,R,S}, 求最可能的情绪状态序列是什么。这是典型的隐马尔科夫解码问题，下面使用维特比算法求解。</p>
+
+<p>维特比变量<img src="/assets/img/mrkf/mrkf3.png" alt="" /> : 使t时刻为状态i的最佳状态序列的概率值,递推公式：</p>
+
+<p><img src="/assets/img/mrkf/mrkf4.png" alt="" />
+　　</p>
+
+<p>辅助变量<img src="/assets/img/mrkf/mrkf5.png" alt="" />   表示t时刻为状态i时的前一时刻t-1时的最佳状态，注意， 
+ <img src="/assets/img/mrkf/mrkf6.png" alt="" />为t时刻为i的最佳的概率，而<img src="/assets/img/mrkf/mrkf6.png" alt="" />为最佳状态值，
+ 由此也可知 <img src="/assets/img/mrkf/mrkf6.png" alt="" />记录了到达此点的最佳上一个时刻的状态点路径，故分配T*N数组存储，
+ 用于最后回溯路径得到最终结果，动态规划的思想。
+　　
+<img src="/assets/img/mrkf/mrkf7.png" alt="" /></p>
+
+<h2 id="python-实现代码">Python 实现代码：</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">yieldmrkf_t</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">OSet</span><span class="p">,</span> <span class="n">QSet</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span>  <span class="o">=</span> <span class="n">A</span> <span class="c"># 转移概率矩阵</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span>  <span class="o">=</span> <span class="n">B</span> <span class="c"># 混淆概率矩阵</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Pi</span> <span class="o">=</span> <span class="n">Pi</span> <span class="c"># 初始概率矩阵</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span>  <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pi</span><span class="p">)</span> <span class="c"># 隐状态数量</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span>  <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="c"># 观察状态数量</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OsetVal</span> <span class="o">=</span> <span class="n">OSet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QSetVal</span> <span class="o">=</span> <span class="n">QSet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Oset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Oset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strA</span> <span class="o">=</span> <span class="s">"A:"</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">strA</span> <span class="o">=</span> <span class="n">strA</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+            <span class="n">strA</span> <span class="o">=</span> <span class="n">strA</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">strA</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">strB</span> <span class="o">=</span> <span class="s">"B:"</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">strB</span> <span class="o">=</span> <span class="n">strB</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+            <span class="n">strB</span> <span class="o">=</span> <span class="n">strB</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">strB</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Pi:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pi</span><span class="p">,</span> <span class="s">"N:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="s">"M:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">get_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">+</span> <span class="n">o</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">get_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_set</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">delta_set</span><span class="p">[</span><span class="n">t</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">convertOState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">OStateSet_Val</span><span class="p">):</span>
+        <span class="n">dest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">OStateSet_Val</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">OsetVal</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dest</span>
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">OStateSet_Val</span><span class="p">):</span>
+        <span class="n">OStateSet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convertOState</span><span class="p">(</span><span class="n">OStateSet_Val</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">OStateSet</span><span class="p">)</span>
+        <span class="c"># 初始化t= 1 的情况</span>
+        <span class="n">delta_set</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fai_set</span>   <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span><span class="p">:</span>
+            <span class="n">delta_1_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_b</span><span class="p">(</span><span class="n">OStateSet</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">delta_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delta_1_i</span><span class="p">)</span>
+            <span class="n">fai_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c"># 递推求的delta 和fai</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span><span class="p">:</span>
+                <span class="n">fai_t_i</span>   <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">tmp_fai_i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">tmp_delta</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span><span class="p">:</span>
+                    <span class="c">#compute fai</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">delta_set</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_a</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">tmp</span> <span class="o">&gt;</span> <span class="n">tmp_fai_i</span><span class="p">:</span>
+                        <span class="n">tmp_fai_i</span> <span class="o">=</span> <span class="n">tmp</span>
+                        <span class="n">fai_t_i</span>   <span class="o">=</span> <span class="n">j</span>
+                    <span class="c">#compute delta</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_b</span><span class="p">(</span><span class="n">OStateSet</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">tmp</span> <span class="o">&gt;</span> <span class="n">tmp_delta</span><span class="p">:</span>
+                        <span class="n">tmp_delta</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="n">fai_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fai_t_i</span><span class="p">)</span>
+                <span class="n">delta_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_delta</span><span class="p">)</span>
+        <span class="c">#select last i</span>
+        <span class="n">tmp_rate_i_T</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i_T</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">QSet</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">delta_set</span><span class="p">,</span> <span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tmp</span> <span class="o">&gt;</span> <span class="n">tmp_rate_i_T</span><span class="p">:</span>
+                <span class="n">tmp_rate_i_T</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="n">i_T</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">i_dest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i_dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_T</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tmp_t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">T</span> <span class="o">-</span> <span class="n">tmp_t</span>
+            <span class="n">i_dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fai_set</span><span class="p">[(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="n">i_dest</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">i_dest</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]])</span>
+
+        <span class="n">dest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">QSetVal</span><span class="p">[</span><span class="n">i_dest</span><span class="p">[(</span><span class="n">T</span><span class="o">-</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">dest</span>
+
+<span class="n">OSet</span> <span class="o">=</span> <span class="p">[</span><span class="s">'W'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">]</span>
+<span class="n">QSet</span> <span class="o">=</span> <span class="p">[</span><span class="s">'B'</span><span class="p">,</span><span class="s">'H'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">]</span>
+<span class="n">O</span>    <span class="o">=</span> <span class="p">[</span><span class="s">'W'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">]</span>
+<span class="n">A</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<span class="n">B</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="n">Pi</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]</span>
+<span class="n">o</span> <span class="o">=</span> <span class="n">yieldmrkf_t</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">OSet</span><span class="p">,</span> <span class="n">QSet</span><span class="p">)</span>
+<span class="n">o</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+<span class="n">dest</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"output:"</span><span class="p">,</span> <span class="n">dest</span>
+</code></pre></div></div>
+
+<h2 id="输出结果">输出结果：</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A:
+0.5 0.2 0.3
+0.3 0.5 0.2
+0.2 0.3 0.5
+B:
+0.5 0.2 0.3
+0.4 0.1 0.5
+0.7 0.1 0.2
+('Pi:', [0.2, 0.4, 0.4], 'N:', 3, 'M:', 3)
+('output:', ['A', 'H', 'H', 'H', 'H'])
+</code></pre></div></div>
+<h2 id="总结">总结</h2>
+
+<ul>
+  <li>隐马尔科夫适用于时序概率模型，“隐”的含义是既可观察的状态序列和隐藏（不可观察的）状态序列存在一定关系</li>
+  <li>本文探究了隐马尔科夫的解码问题，分析实现了维特比算法</li>
+  <li>隐马尔科夫的概率计算问题和模型参数学习问题待以后探究。</li>
+  <li>更多精彩文章 http://h2cloud.org</li>
+</ul>
+
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"/></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"/></svg>
+                    </a>
+                </span>
+                
+                <span class="my-span-icon">
+                    <a href="/contact" aria-label="Contact" title="Contact fanchy">
+                    沪ICP备17021230号-1
+                    </a>
+                </span>
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    
