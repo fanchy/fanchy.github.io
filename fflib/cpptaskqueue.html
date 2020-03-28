@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++任务队列与多线程</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="多线程是开发C++服务器程序非常重要的基础，如何根据需求具体的设计、分配线程以及线程间的通信， 也是服务器程序非常重要的部分，除了能够带来程序的性能提高外，若设计失误，则可能导致程序复杂而又混乱， 变成bug滋生的温床。所以设计、开发优秀的线程组件以供重用，无论如何都是值得的。" />
+
+  <meta name="keywords" itemprop="tags" content="boost, ASIO, socket"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++任务队列与多线程" />
+<meta name="twitter:description" content="多线程是开发C++服务器程序非常重要的基础，如何根据需求具体的设计、分配线程以及线程间的通信， 也是服务器程序非常重要的部分，除了能够带来程序的性能提高外，若设计失误，则可能导致程序复杂而又混乱， 变成bug滋生的温床。所以设计、开发优秀的线程组件以供重用，无论如何都是值得的。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/cpptaskqueue.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++任务队列与多线程" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/cpptaskqueue.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="多线程是开发C++服务器程序非常重要的基础，如何根据需求具体的设计、分配线程以及线程间的通信， 也是服务器程序非常重要的部分，除了能够带来程序的性能提高外，若设计失误，则可能导致程序复杂而又混乱， 变成bug滋生的温床。所以设计、开发优秀的线程组件以供重用，无论如何都是值得的。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-01-14T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="boost" />
+  
+    <meta property="article:tag" content="ASIO" />
+  
+    <meta property="article:tag" content="socket" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/cpptaskqueue.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++任务队列与多线程</h1>
+            <h2 class="project-tagline">任务队列是设计成用来进行线程间通信，使用任务队列进行线程间通信设计到一些模式</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-01-14T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jan 14, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++任务队列与多线程</h1>
+    <p class="post-meta">
+      <time datetime="2013-01-14T00:00:00+08:00" itemprop="datePublished">
+        
+        Jan 14, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要：</h2>
+<p>很多场合之所以使用C++，一方面是由于C++编译后的native code的高效性能，另一方面是由于C++优秀的并发能力。
+并行方式有多进程 和多线程之分，本章暂且只讨论多线程，多进程方面的知识会在其他章节具体讨论。</p>
+
+<p>多线程是开发C++服务器程序非常重要的基础，如何根据需求具体的设计、分配线程以及线程间的通信，
+也是服务器程序非常重要的部分，除了能够带来程序的性能提高外，若设计失误，则可能导致程序复杂而又混乱，
+变成bug滋生的温床。所以设计、开发优秀的线程组件以供重用，无论如何都是值得的。</p>
+
+<p>线程相关的api并不复杂，然而无论是linux还是windows系统，都是c风格的接口，我们只需简单的封装成对象，方便易用即可。
+任务队列是设计成用来进行线程间通信，使用任务队列进行线程间通信设计到一些模式，原理并不难理解，
+我们需要做到是弄清楚，在什么场景下选用什么样的模式即可。</p>
+
+<h2 id="任务队列的定义">任务队列的定义：</h2>
+<p>任务队列对线程间通信进行了抽象，限定了线程间只能通过传递任务，而相关的数据及操作则被任务保存。</p>
+
+<p>任务队列这个名词可能在其他场景定义过其他意义，这里讨论的任务队列定义为：
+能够把封装了数据和操作的任务在多线程间传递的线程安全的先入先出的队列。</p>
+
+<p>其与线程关系示意图如下：</p>
+
+<p><img src="/assets/img/cpptaskqueue/cpptaskqueue1.gif" alt=""></p>
+
+<p>注：两个虚线框分别表示线程A和线程B恩能够访问的数据边界，由此可见 任务队列是线程间通信的媒介。</p>
+
+<h2 id="任务队列的实现">任务队列的实现：</h2>
+<h4 id="任务的定义">任务的定义</h4>
+<p>生产者消费者模型在软件设计中是极其常见的模型，常常被用来实现对各个组件或系统解耦合。大到分布式的系统交互，小到网络层对象和应用层对象的通讯，都会应用到生产者消费者模型，在任务队列中，生产和消费的对象为“任务”。这里把任务定义为组合了数据和操作的对象，或者简单理解成包含了void (void<em>) 类型的函数指针和void</em> 数据指针的结构。我们把任务定义成类task_t，下面来分析一下task_t的实现。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">task_impl_i</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">task_impl_i</span><span class="p">(){}</span>
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">run</span><span class="p">()</span>          <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="n">task_impl_i</span><span class="o">*</span> <span class="n">fork</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">task_impl_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">task_impl_i</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">task_impl_t</span><span class="p">(</span><span class="n">task_func_t</span> <span class="n">func_</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">arg_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">m_func</span><span class="p">(</span><span class="n">func_</span><span class="p">),</span>
+        <span class="n">m_arg</span><span class="p">(</span><span class="n">arg_</span><span class="p">)</span>
+    <span class="p">{}</span>
+
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">run</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">m_func</span><span class="p">(</span><span class="n">m_arg</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">virtual</span> <span class="n">task_impl_i</span><span class="o">*</span> <span class="n">fork</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">task_impl_t</span><span class="p">(</span><span class="n">m_func</span><span class="p">,</span> <span class="n">m_arg</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="nl">protected:</span>
+    <span class="n">task_func_t</span> <span class="n">m_func</span><span class="p">;</span>
+    <span class="kt">void</span><span class="o">*</span>       <span class="n">m_arg</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">task_t</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="kt">void</span> <span class="n">dumy</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">){}</span>
+    <span class="n">task_t</span><span class="p">(</span><span class="n">task_func_t</span> <span class="n">f_</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">d_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">task_impl</span><span class="p">(</span><span class="k">new</span> <span class="n">task_impl_t</span><span class="p">(</span><span class="n">f_</span><span class="p">,</span> <span class="n">d_</span><span class="p">))</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+    <span class="n">task_t</span><span class="p">(</span><span class="n">task_impl_i</span><span class="o">*</span> <span class="n">task_imp_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">task_impl</span><span class="p">(</span><span class="n">task_imp_</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+    <span class="n">task_t</span><span class="p">(</span><span class="k">const</span> <span class="n">task_t</span><span class="o">&amp;</span> <span class="n">src_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">task_impl</span><span class="p">(</span><span class="n">src_</span><span class="p">.</span><span class="n">task_impl</span><span class="o">-&gt;</span><span class="n">fork</span><span class="p">())</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+    <span class="n">task_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">task_impl</span> <span class="o">=</span> <span class="k">new</span> <span class="n">task_impl_t</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task_t</span><span class="o">::</span><span class="n">dumy</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">task_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">delete</span> <span class="n">task_impl</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">task_t</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">task_t</span><span class="o">&amp;</span> <span class="n">src_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">delete</span> <span class="n">task_impl</span><span class="p">;</span>
+        <span class="n">task_impl</span> <span class="o">=</span> <span class="n">src_</span><span class="p">.</span><span class="n">task_impl</span><span class="o">-&gt;</span><span class="n">fork</span><span class="p">();</span>
+        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kt">void</span> <span class="n">run</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">task_impl</span><span class="o">-&gt;</span><span class="n">run</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">task_impl_i</span><span class="o">*</span>    <span class="n">task_impl</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Task最重要的接口是run，简单的执行保存的操作，具体的操作保存在task_impl_i的基类中，由于对象本身就是数据加操作的集合，
+所以构造task_impl_i的子类对象时，为其赋予不同的数据和操作即可。这里使用了组合的方式实现了接口和实现的分离。</p>
+
+<p>这么做的优点是应用层只需知道task的概念即可，对应task_impl_i不需要了解。
+由于不同的操作和数据可能需要构造不同task_impl_i子类，我们需要提供一些泛型函数，</p>
+
+<p>能够将用户的所有操作和数据都能轻易的转换成task对象。task_binder_t 提供一系列的gen函数，
+能够转换用户的普通函数和数据为task_t对象。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">task_binder_t</span>
+<span class="p">{</span>
+    <span class="c1">//! C function</span>
+    
+    <span class="k">static</span> <span class="n">task_t</span> <span class="n">gen</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">func_</span><span class="p">)(</span><span class="kt">void</span><span class="o">*</span><span class="p">),</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">task_t</span><span class="p">(</span><span class="n">func_</span><span class="p">,</span> <span class="n">p_</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">RET</span><span class="o">&gt;</span>
+    <span class="k">static</span> <span class="n">task_t</span> <span class="n">gen</span><span class="p">(</span><span class="n">RET</span> <span class="p">(</span><span class="o">*</span><span class="n">func_</span><span class="p">)(</span><span class="kt">void</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">lambda_t</span>
+        <span class="p">{</span>
+            <span class="k">static</span> <span class="kt">void</span> <span class="n">task_func</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">p_</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">RET</span><span class="p">(</span><span class="o">*</span><span class="p">)(</span><span class="kt">void</span><span class="p">))</span><span class="n">p_</span><span class="p">)();</span>
+            <span class="p">};</span>
+        <span class="p">};</span>
+        <span class="k">return</span> <span class="n">task_t</span><span class="p">(</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">task_func</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">func_</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">FUNCT</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG1</span><span class="o">&gt;</span>
+    <span class="k">static</span> <span class="n">task_t</span> <span class="n">gen</span><span class="p">(</span><span class="n">FUNCT</span> <span class="n">func_</span><span class="p">,</span> <span class="n">ARG1</span> <span class="n">arg1_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">lambda_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">task_impl_i</span>
+        <span class="p">{</span>
+            <span class="n">FUNCT</span> <span class="n">dest_func</span><span class="p">;</span>
+            <span class="n">ARG1</span>  <span class="n">arg1</span><span class="p">;</span>
+            <span class="n">lambda_t</span><span class="p">(</span><span class="n">FUNCT</span> <span class="n">func_</span><span class="p">,</span> <span class="k">const</span> <span class="n">ARG1</span><span class="o">&amp;</span> <span class="n">arg1_</span><span class="p">)</span><span class="o">:</span>
+                <span class="n">dest_func</span><span class="p">(</span><span class="n">func_</span><span class="p">),</span>
+                <span class="n">arg1</span><span class="p">(</span><span class="n">arg1_</span><span class="p">)</span>
+            <span class="p">{}</span>
+            <span class="k">virtual</span> <span class="kt">void</span> <span class="n">run</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="p">(</span><span class="o">*</span><span class="n">dest_func</span><span class="p">)(</span><span class="n">arg1</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">virtual</span> <span class="n">task_impl_i</span><span class="o">*</span> <span class="n">fork</span><span class="p">()</span>
+            <span class="p">{</span>
+                <span class="k">return</span> <span class="k">new</span> <span class="n">lambda_t</span><span class="p">(</span><span class="n">dest_func</span><span class="p">,</span> <span class="n">arg1</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+        <span class="k">return</span> <span class="n">task_t</span><span class="p">(</span><span class="k">new</span> <span class="n">lambda_t</span><span class="p">(</span><span class="n">func_</span><span class="p">,</span> <span class="n">arg1_</span><span class="p">));</span>
+</code></pre></div></div>
+<h3 id="生产任务">生产任务</h3>
+<p>函数封装了用户的操作逻辑，需要在某线程执行特定操作时，需要将操作对应的函数转换成task_t，投递到目的线程对应的任务队列。
+任务队列使用起来虽然像是在互相投递消息，但是根本上仍然是共享数据式的数据交换方式。主要步骤如下：</p>
+
+<ul>
+  <li>用户函数转换成task_t对象</li>
+  <li>锁定目的线程的任务队列，将task_t 放到任务队列尾，当队列为空时，目的线程会wait在条件变量上，此时需要signal唤醒目的线程</li>
+</ul>
+
+<h4 id="实现的关键代码如下">实现的关键代码如下：</h4>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">produce</span><span class="p">(</span><span class="k">const</span> <span class="n">task_t</span><span class="o">&amp;</span> <span class="n">task_</span><span class="p">)</span>
+    <span class="p">{</span>        
+        <span class="n">lock_guard_t</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="kt">bool</span> <span class="n">need_sig</span> <span class="o">=</span> <span class="n">m_tasklist</span><span class="p">.</span><span class="n">empty</span><span class="p">();</span>
+
+        <span class="n">m_tasklist</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">task_</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">need_sig</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">m_cond</span><span class="p">.</span><span class="n">signal</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<h4 id="消费任务">消费任务</h4>
+<p>消费任务的线程会变成完全的任务驱动，该线程只有一个职责，执行任务队列的所有任务，若当前任务队列为空时，线程会阻塞在条件变量上，重新有新任务到来时，线程会被再次唤醒。实现代码如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span>   <span class="nf">consume</span><span class="p">(</span><span class="n">task_t</span><span class="o">&amp;</span> <span class="n">task_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">lock_guard_t</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">m_tasklist</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_flag</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">m_cond</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="n">task_</span> <span class="o">=</span> <span class="n">m_tasklist</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+        <span class="n">m_tasklist</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span> 
+<span class="kt">int</span> <span class="nf">run</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">task_t</span> <span class="n">t</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">consume</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">t</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<h2 id="任务队列的模式">任务队列的模式</h2>
+<h4 id="单线程单任务队列方式">单线程单任务队列方式</h4>
+<p>任务队列已经提供了run接口，绑定任务队列的线程只需执行此函数即可，此函数除非用户显示的调用任务队列的close接口，否则run函数永不返回。
+任务队列的close接口是专门用来停止任务队列的工作的，代码如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">close</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">lock_guard_t</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="n">m_flag</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+        <span class="n">m_cond</span><span class="p">.</span><span class="n">broadcast</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>首先设置了关闭标记，然后在条件变量上执行broadcast， 任务队列的run函数也会由此退出。在回头看一下run接口的代码你会发现，</p>
+
+<p>检查任务队列是否关闭（m_flag 变量）的代码是在任务队列为空的时候才检测的，这样能够保证任务队列被全部执行后，run函数才返回。</p>
+
+<h4 id="下面是一个使用任务队列的helloworld的示例">下面是一个使用任务队列的helloworld的示例：</h4>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">foo_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">print</span><span class="p">(</span><span class="kt">int</span> <span class="n">data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, data:"</span> <span class="o">&lt;&lt;</span><span class="n">data</span> <span class="o">&lt;&lt;</span> <span class="s">" thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">print_callback</span><span class="p">(</span><span class="kt">int</span> <span class="n">data</span><span class="p">,</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">callback_</span><span class="p">)(</span><span class="kt">int</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">callback_</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">static</span> <span class="kt">void</span> <span class="n">check</span><span class="p">(</span><span class="kt">int</span> <span class="n">data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, data:"</span> <span class="o">&lt;&lt;</span><span class="n">data</span> <span class="o">&lt;&lt;</span> <span class="s">" thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">//  单线程单任务队列</span>
+<span class="kt">void</span> <span class="nf">test_1</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">thread_t</span> <span class="kr">thread</span><span class="p">;</span>
+    <span class="n">task_queue_t</span> <span class="n">tq</span><span class="p">;</span>
+
+    <span class="kr">thread</span><span class="p">.</span><span class="n">create_thread</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task_queue_t</span><span class="o">::</span><span class="n">run</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tq</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">foo_t</span> <span class="n">foo</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+        <span class="n">tq</span><span class="p">.</span><span class="n">produce</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">thread</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">test_1</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>本例使用单线程单任务队列的方式，由于只有一个线程绑定在任务队列上，所以任务的执行会严格按照先入先出的方式执行。
+优点是能够保证逻辑操作的有序性，所以最为常用。</p>
+
+<h2 id="多线程多任务队列方式">多线程多任务队列方式</h2>
+<p>如果想利用更多线程，那么创建更多线程的同时，仍然保证每个任务队列绑定在单线程上。让不同的任务队列并行执行就可以了。</p>
+
+<h4 id="下面几种情况适用此模式">下面几种情况适用此模式：</h4>
+
+<ul>
+  <li>比如网游中数据库一般会创建连接池，用户的操作数据库都是有数据库线程池完成，在将结果投递给逻辑层。
+  对每个用户的数据增删改查操作都必须是有序的，所以每个用户绑定一个固定的任务队列。而不同的用户的数据修改互不干扰，
+  不同的用户分配不同的任务队列即可。</li>
+  <li>比如网络层中的多个socket的读写是互不干扰的，可以创建两个或更多线程，每个对应一个任务队列，不同的socket的操作可以随机的分配一个任务队列（注意分配是随机的，一旦分配了，单个socket的所有操作都会由这个任务队列完成，保证逻辑有序性）。</li>
+</ul>
+
+<p>示例代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 多线程多任务队列</span>
+<span class="kt">void</span> <span class="nf">test_2</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">thread_t</span> <span class="kr">thread</span><span class="p">;</span>
+    <span class="n">task_queue_t</span> <span class="n">tq</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">tq</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="n">task_queue_t</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kr">thread</span><span class="p">.</span><span class="n">create_thread</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task_queue_t</span><span class="o">::</span><span class="n">run</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">tq</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">foo_t</span> <span class="n">foo</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">tq</span><span class="p">[</span><span class="n">j</span> <span class="o">%</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">tq</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="n">task_queue_t</span><span class="p">))].</span><span class="n">produce</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">j</span><span class="p">));</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">thread</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="多线程单任务队列方式">多线程单任务队列方式</h4>
+<p>有时候可能并不需要逻辑操作的完全有序，而是要求操作尽可能快的执行，只要有空闲线程，任务就投递到空闲线程立刻执行。如果时序不影响结果，这种模式会更有效率，下面几种情况可能用到这种模式：</p>
+
+<ul>
+  <li>比如social game中的好友是从platform的api获取的，需要http协议通讯，若采用curl等http库同步通讯时，会阻塞线程，这是可以使用多线程单队列方式，请求投递到任务队列后，只要有空闲线程立马执行，用户A虽然比用户B先到达任务队列，但是并不能保证A比B一定先获取到好友列表，如果A有2k好友，而B只有两个呢，当然有可能B请求更快。</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 多线程单任务队列</span>
+<span class="kt">void</span> <span class="nf">test_3</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">thread_t</span> <span class="kr">thread</span><span class="p">;</span>
+    <span class="n">task_queue_t</span> <span class="n">tq</span><span class="p">;</span>
+
+    <span class="kr">thread</span><span class="p">.</span><span class="n">create_thread</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task_queue_t</span><span class="o">::</span><span class="n">run</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tq</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">foo_t</span> <span class="n">foo</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">tq</span><span class="p">.</span><span class="n">produce</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">j</span><span class="p">));</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">thread</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="任务队列的高阶用法">任务队列的高阶用法</h2>
+<h4 id="异步回调">异步回调</h4>
+<p>任务队列的模式中列举的例子都是线程间单项通讯，线程A将请求投递给了B，但B执行完毕后A并没有检测结果。实际中往往都是需要将执行结果进行额外处理或者投递到另外任务队列。异步回调可以很好的解决这个问题，原理就是投递任务时，同时包含检查任务执行结果的函数。示例代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 异步回调</span>
+<span class="kt">void</span> <span class="nf">test_4</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">thread_t</span> <span class="kr">thread</span><span class="p">;</span>
+    <span class="n">task_queue_t</span> <span class="n">tq</span><span class="p">;</span>
+
+    <span class="kr">thread</span><span class="p">.</span><span class="n">create_thread</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task_queue_t</span><span class="o">::</span><span class="n">run</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tq</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">foo_t</span> <span class="n">foo</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"helloworld, thread id:"</span><span class="o">&lt;&lt;</span> <span class="o">::</span><span class="n">pthread_self</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">tq</span><span class="p">.</span><span class="n">produce</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print_callback</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">check</span><span class="p">));</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">thread</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="异步是性能优化非常重要的手段下面如下场合可以使用异步">异步是性能优化非常重要的手段，下面如下场合可以使用异步：</h5>
+
+<ul>
+  <li>服务器程序要求很高的实时性，几乎逻辑层不执行io操作，io操作通过任务队列被io线程执行成功后再通过回调的方式传回逻辑层。</li>
+  <li>网游中用户登录，需呀从数据库载入用户数据，数据库层不需要知晓逻辑层如何处理用户数据，当接口被调用时必须传入回调函数，数据库层载入数据后直接调用回调函数，而数据作为参数。</li>
+</ul>
+
+<h2 id="隐式任务队列">隐式任务队列</h2>
+<p>使用任务队列可以解耦多线程的设计。更加优秀的使用是将其封装在接口之后。前边的例子中都是显示的操作了任务队列对象。但这就限制了用户必须知道某个接口需要绑定哪个任务队列上，尤其是多线程多任务队列的例子，如果当用户操作socket接口时还要知道socket对应哪个任务队列就显得不够优雅了。Socket自己本身可以保存对应任务队列的引用，这样使用者只需调用socket的接口，而接口内部再将请求投递到争取的任务队列。示例代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">socket_impl_t</span><span class="o">::</span><span class="n">async_send</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">tq</span><span class="p">.</span><span class="n">produce</span><span class="p">(</span><span class="n">task_binder_t</span><span class="o">::</span><span class="n">gen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">socket_impl_t</span><span class="o">::</span><span class="n">send</span><span class="p">,</span> <span class="o">&amp;</span><span class="k">this</span><span class="p">,</span> <span class="n">msg_</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">socket_impl_t</span><span class="o">::</span><span class="n">send</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//do send code</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="总结">总结：</h2>
+<ul>
+  <li>设计多线程程序时，往往设计使用任务队列是关键，好用、高效、灵活的任务队列组件十分必需，本节介绍的实现支持多种多线程模式，易用易理解。</li>
+  <li>异步回调在多线程程序中非常常见，异步往往是为了提高性能和系统吞吐量的，但是异步其不可避免的会带来复杂性，所以尽量保证异步相关的步骤简单。</li>
+  <li>任务队列封装对象接口的内部更佳，使用者直接调用接口，仿佛没有任务队列这回事，让他在看不见的地方默默运行。</li>
+  <li>本节设计的任务队列是线程安全的，并且关闭时已经投递的任务能够保证被 。</li>
+</ul>
+
+<h2 id="相关连接">相关连接</h2>
+<ul>
+  <li>文档 http://h2cloud.org</li>
+  <li>源码 https://github.com/fanchy/h2engine</li>
+  <li>介绍 http://www.cnblogs.com/zhiranok/p/ffengine.html</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>linux epoll 开发指南-【ffrpc源码解析】</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="Epoll主要在服务器编程中使用，本文主要探讨服务器程序中epoll的使用技巧。Epoll一般和异步io结合使用，故本文讨论基于以下应用场合" />
+
+  <meta name="keywords" itemprop="tags" content="epoll, socket, c++, fflib"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="linux epoll 开发指南-【ffrpc源码解析】" />
+<meta name="twitter:description" content="Epoll主要在服务器编程中使用，本文主要探讨服务器程序中epoll的使用技巧。Epoll一般和异步io结合使用，故本文讨论基于以下应用场合" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/linuxepoll.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="linux epoll 开发指南-【ffrpc源码解析】" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/linuxepoll.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="Epoll主要在服务器编程中使用，本文主要探讨服务器程序中epoll的使用技巧。Epoll一般和异步io结合使用，故本文讨论基于以下应用场合" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-12-17T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="epoll" />
+  
+    <meta property="article:tag" content="socket" />
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/linuxepoll.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">linux epoll 开发指南-【ffrpc源码解析】</h1>
+            <h2 class="project-tagline">Epoll主要在服务器编程中使用，本文主要探讨服务器程序中epoll的使用技巧</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-12-17T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Dec 17, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">linux epoll 开发指南-【ffrpc源码解析】</h1>
+    <p class="post-meta">
+      <time datetime="2013-12-17T00:00:00+08:00" itemprop="datePublished">
+        
+        Dec 17, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要</h2>
+<p>关于epoll的问题很早就像写文章讲讲自己的看法，但是由于ffrpc一直没有完工，所以也就拖下来了。
+Epoll主要在服务器编程中使用，本文主要探讨服务器程序中epoll的使用技巧。Epoll一般和异步io结合使用，故本文讨论基于以下应用场合：</p>
+
+<ul>
+  <li>主要讨论服务器程序中epoll的使用，主要涉及tcp socket的相关api。</li>
+  <li>Tcp socket 为异步模式，包括socket的异步读写，以及监听的异步操作。</li>
+  <li>本文不会过多讨论API的细节，而是专注流程与设计。
+    <h3 id="epoll-的io模型">Epoll 的io模型</h3>
+    <p>Epoll是为异步io操作而设计的，epoll中IO事件被分为read事件和write事件，如果大家对于linux的驱动模块或者linux io 模型有接触的话，就会理解起来更容易。Linux中IO操作被抽象为read、write、close、ctrl几个操作，所以epoll只提供read、write、error事件，是和linux的io模型是统一的。</p>
+  </li>
+  <li>当epoll通知read事件时，可以调用io系统调用read读取数据</li>
+  <li>当epoll通知write事件时，可以调用io系统调用write发送数据</li>
+  <li>当error事件时，可以close回收资源</li>
+  <li>Ctrl相关的接口则用来设置socket的非阻塞选项等。
+为什么要了解epoll的io模型呢，本文认为，某些情况下epoll操作的代码的复杂性是由于代码中的模型（或者类设计）与epoll io模型不匹配造成的。
+换句话说，如果我们的编码模型和epoll io模型匹配，那么非阻塞socket的编码就会很简单、清晰。</li>
+</ul>
+
+<h4 id="按照epoll模型构建的类关系为">按照epoll模型构建的类关系为：</h4>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 文件描述符相关接口</span>
+<span class="k">typedef</span> <span class="kt">int</span> <span class="n">socket_fd_t</span><span class="p">;</span>
+<span class="k">class</span> <span class="nc">fd_i</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">fd_i</span><span class="p">(){}</span>
+
+    <span class="k">virtual</span> <span class="n">socket_fd_t</span> <span class="n">socket</span><span class="p">()</span>          <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">handle_epoll_read</span><span class="p">()</span>  <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">handle_epoll_write</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">virtual</span> <span class="kt">int</span> <span class="n">handle_epoll_del</span><span class="p">()</span>          <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">close</span><span class="p">()</span>                          <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="kt">int</span> <span class="n">epoll_impl_t</span><span class="o">::</span><span class="n">event_loop</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nfds</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">epoll_event</span> <span class="n">ev_set</span><span class="p">[</span><span class="n">EPOLL_EVENTS_SIZE</span><span class="p">];</span>
+
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="n">nfds</span>  <span class="o">=</span> <span class="o">::</span><span class="n">epoll_wait</span><span class="p">(</span><span class="n">m_efd</span><span class="p">,</span> <span class="n">ev_set</span><span class="p">,</span> <span class="n">EPOLL_EVENTS_SIZE</span><span class="p">,</span> <span class="n">EPOLL_WAIT_TIME</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">nfds</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">EINTR</span> <span class="o">==</span> <span class="n">errno</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">nfds</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nfds</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">epoll_event</span><span class="o">&amp;</span> <span class="n">cur_ev</span> <span class="o">=</span> <span class="n">ev_set</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="n">fd_i</span><span class="o">*</span> <span class="n">fd_ptr</span>            <span class="o">=</span> <span class="p">(</span><span class="n">fd_i</span><span class="o">*</span><span class="p">)</span><span class="n">cur_ev</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">ptr</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">cur_ev</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">ptr</span> <span class="o">==</span> <span class="k">this</span><span class="p">)</span><span class="c1">//! iterupte event</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_running</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="c1">//! 删除那些已经出现error的socket 对象</span>
+                <span class="n">fd_del_callback</span><span class="p">();</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span> <span class="p">(</span><span class="n">cur_ev</span><span class="p">.</span><span class="n">events</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">EPOLLIN</span> <span class="o">|</span> <span class="n">EPOLLPRI</span><span class="p">))</span>
+            <span class="p">{</span>
+                <span class="n">fd_ptr</span><span class="o">-&gt;</span><span class="n">handle_epoll_read</span><span class="p">();</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">cur_ev</span><span class="p">.</span><span class="n">events</span> <span class="o">&amp;</span> <span class="n">EPOLLOUT</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">fd_ptr</span><span class="o">-&gt;</span><span class="n">handle_epoll_write</span><span class="p">();</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">cur_ev</span><span class="p">.</span><span class="n">events</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">EPOLLERR</span> <span class="o">|</span> <span class="n">EPOLLHUP</span><span class="p">))</span>
+            <span class="p">{</span>
+                <span class="n">fd_ptr</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        
+    <span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="n">nfds</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="epoll的lt模式和et模式的比较">Epoll的LT模式和ET模式的比较</h3>
+<p>先简单比较一下level trigger 和 edge trigger 模式的不同。</p>
+
+<h4 id="lt模式的特点是">LT模式的特点是：</h4>
+<ul>
+  <li>若数据可读，epoll返回可读事件</li>
+  <li>若开发者没有把数据完全读完，epoll会不断通知数据可读，直到数据全部被读取。</li>
+  <li>若socket可写，epoll返回可写事件，而且是只要socket发送缓冲区未满，就一直通知可写事件。</li>
+  <li>优点是对于read操作比较简单，只要有read事件就读，读多读少都可以。</li>
+  <li>缺点是write相关操作较复杂，由于socket在空闲状态发送缓冲区一定是不满的，故若socket一直在epoll wait列表中，则epoll会一直通知write事件，所以必须保证没有数据要发送的时候，要把socket的write事件从epoll wait列表中删除。而在需要的时候在加入回去，这就是LT模式的最复杂部分。
+    <h4 id="et模式的特点是">ET模式的特点是：</h4>
+  </li>
+  <li>若socket可读，返回可读事件</li>
+  <li>若开发者没有把所有数据读取完毕，epoll不会再次通知epoll read事件，也就是说存在一种隐患，如果开发者在读到可读事件时，如果没有全部读取所有数据，那么可能导致epoll在也不会通知该socket的read事件。（其实这个问题并没有听上去难，参见下文）。</li>
+  <li>若发送缓冲区未满，epoll通知write事件，直到开发者填满发送缓冲区，epoll才会在下次发送缓冲区由满变成未满时通知write事件。</li>
+  <li>ET模式下，只有socket的状态发生变化时才会通知，也就是读取缓冲区由无数据到有数据时通知read事件，发送缓冲区由满变成未满通知write事件。</li>
+  <li>缺点是epoll read事件触发时，必须保证socket的读取缓冲区数据全部读完（事实上这个要求很容易达到）</li>
+  <li>优点：对于write事件，发送缓冲区由满到未满时才会通知，若无数据可写，忽略该事件，若有数据可写，直接写。Socket的write事件可以一直发在epoll的wait列表。Man epoll中我们知道，当向socket写数据，返回的值小于传入的buffer大小或者write系统调用返回EWouldBlock时，表示发送缓冲区已满。</li>
+</ul>
+
+<p>让我们换一个角度来理解ET模式，事实上，epoll的ET模式其实就是socket io完全状态机。</p>
+
+<h3 id="先来看epoll中read-的状态图">先来看epoll中read 的状态图:</h3>
+<p><img src="/assets/img/linuxepoll/linuxepoll1.jpg" alt=""></p>
+
+<p>当socket由不可读变成可读时，epoll的ET模式返回read 事件。对于read 事件，开发者需要保证把读取缓冲区数据全部读出，man epoll可知：</p>
+<ul>
+  <li>Read系统调用返回EwouldBlock，表示读取缓冲区数据全部读出</li>
+  <li>Read系统调用返回的数值小于传入的buffer参数，表示读取缓冲区全部读出。</li>
+</ul>
+
+<h4 id="示例代码">示例代码</h4>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">socket_impl_t</span><span class="o">::</span> <span class="n">handle_epoll_read</span> <span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">is_open</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">nread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">char</span> <span class="n">recv_buffer</span><span class="p">[</span><span class="n">RECV_BUFFER_SIZE</span><span class="p">];</span>
+        <span class="k">do</span>
+        <span class="p">{</span>
+            <span class="n">nread</span> <span class="o">=</span> <span class="o">::</span><span class="n">read</span><span class="p">(</span><span class="n">m_fd</span><span class="p">,</span> <span class="n">recv_buffer</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nread</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">recv_buffer</span><span class="p">[</span><span class="n">nread</span><span class="p">]</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+                <span class="n">m_sc</span><span class="o">-&gt;</span><span class="n">handle_read</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">recv_buffer</span><span class="p">,</span> <span class="kt">size_t</span><span class="p">(</span><span class="n">nread</span><span class="p">));</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">nread</span> <span class="o">&lt;</span> <span class="kt">int</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="p">{</span>
+                        <span class="k">break</span><span class="p">;</span><span class="c1">//! equal EWOULDBLOCK</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">nread</span><span class="p">)</span> <span class="c1">//! eof</span>
+            <span class="p">{</span>
+                <span class="k">this</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EINTR</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EWOULDBLOCK</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">else</span>
+                <span class="p">{</span>
+                    <span class="k">this</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+                    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>再来看write 的状态机：</p>
+
+<p><img src="/assets/img/linuxepoll/linuxepoll2.jpg" alt=""></p>
+
+<p>需要读者注意的是，socket模式是可写的，因为发送缓冲区初始时空的。故应用层有数据要发送时，直接调用write系统调用发送数据，若write系统调用返回EWouldBlock则表示socket变为不可写，或者write系统调用返回的数值小于传入的buffer参数的大小，这时需要把未发送的数据暂存在应用层待发送列表中，等待epoll返回write事件，再继续发送应用层待发送列表中的数据，同样若应用层待发送列表中的数据没有一次性发完，那么继续等待epoll返回write事件，如此循环往复。所以可以反推得到如下结论，若应用层待发送列表有数据，则该socket一定是不可写状态，那么这时候要发送新数据直接追加到待发送列表中。若待发送列表为空，则表示socket为可写状态，则可以直接调用write系统调用发送数据。总结如下：</p>
+
+<ul>
+  <li>当发送数据时，若应用层待发送列表有数据，则将要发送的数据追加到待发送列表中。否则直接调用write系统调用。</li>
+  <li>Write系统调用发送数据时，检测write返回值，若返回数值&gt;0且小于传入的buffer参数大小，或返回EWouldBlock错误码，表示，发送缓冲区已满，将未发送的数据追加到待发送列表</li>
+  <li>Epoll返回write事件后，检测待发送列表是否有数据，若有数据，依次尝试发送指导数据全部发送完毕或者发送缓冲区被填满。
+    <h4 id="示例代码-1">示例代码：</h4>
+  </li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">socket_impl_t</span><span class="o">::</span><span class="n">send_impl</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">string</span> <span class="n">buff_</span> <span class="o">=</span> <span class="n">src_buff_</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">is_open</span><span class="p">()</span> <span class="o">||</span> <span class="n">m_sc</span><span class="o">-&gt;</span><span class="n">check_pre_send</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">buff_</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">//! socket buff is full, cache the data</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">buff_</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">string</span> <span class="n">left_buff</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">do_send</span><span class="p">(</span><span class="n">buff_</span><span class="p">,</span> <span class="n">left_buff</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">this</span> <span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">left_buff</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="c1">//! send ok</span>
+        <span class="n">m_sc</span><span class="o">-&gt;</span><span class="n">handle_write_completed</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="n">socket_impl_t</span><span class="o">::</span> <span class="n">handle_epoll_write</span> <span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">string</span> <span class="n">left_buff</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">is_open</span><span class="p">()</span> <span class="o">||</span> <span class="nb">true</span> <span class="o">==</span> <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">do_send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">left_buff</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">this</span> <span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+            <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="n">left_buff</span><span class="p">);</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_send_buffer</span><span class="p">.</span><span class="n">empty</span><span class="p">());</span>
+
+    <span class="n">m_sc</span><span class="o">-&gt;</span><span class="n">handle_write_completed</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="总结">总结</h2>
+<ul>
+  <li>LT模式主要是读操作比较简单，但是对于ET模式并没有优势，因为将读取缓冲区数据全部读出并不是难事。而write操作，ET模式则流程非常的清晰，按照完全状态机来理解和实现就变得非常容易。而LT模式的write操作则复杂多了，要频繁的维护epoll的wail列表。</li>
+  <li>在代码编写时，把epoll ET当成状态机，当socket被创建完成（accept和connect系统调用返回的socket）时加入到epoll列表，之后就不用在从中删除了。为什么呢？man epoll中的FAQ告诉我们，当socket被close掉后，其自动从epoll中删除。对于监听socket简单说几点注意事项：</li>
+  <li>监听socket的write事件忽略</li>
+  <li>监听socket的read事件表示有新连接，调用accept接受连接，直到返回EWouldBlock。</li>
+  <li>对于Error事件，有些错误是可以接受的错误，比如文件描述符用光的错误
+示例代码:</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">acceptor_impl_t</span><span class="o">::</span><span class="n">handle_epoll_read</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">sockaddr_storage</span> <span class="n">addr</span><span class="p">;</span>
+    <span class="n">socklen_t</span> <span class="n">addrlen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">new_fd</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">new_fd</span> <span class="o">=</span> <span class="o">::</span><span class="n">accept</span><span class="p">(</span><span class="n">m_listen_fd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addrlen</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EWOULDBLOCK</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EINTR</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">EMFILE</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">ECONNABORTED</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">ENFILE</span> <span class="o">||</span>
+                        <span class="n">errno</span> <span class="o">==</span> <span class="n">EPERM</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">ENOBUFS</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">ENOMEM</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">perror</span><span class="p">(</span><span class="s">"accept"</span><span class="p">);</span><span class="c1">//! if too many open files occur, need to restart epoll event</span>
+                <span class="n">m_epoll</span><span class="o">-&gt;</span><span class="n">mod_fd</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">perror</span><span class="p">(</span><span class="s">"accept"</span><span class="p">);</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">socket_i</span><span class="o">*</span> <span class="n">socket</span> <span class="o">=</span> <span class="n">create_socket</span><span class="p">(</span><span class="n">new_fd</span><span class="p">);</span>
+        <span class="n">socket</span><span class="o">-&gt;</span><span class="n">open</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>GitHub ：https://github.com/fanchy/FFRPC</li>
+  <li>ffrpc 介绍: http://www.cnblogs.com/zhiranok/p/ffrpc_summary.html</li>
+  <li>故，综上所述，服务器程序中推荐使用epoll 的ET 模式！！！！</li>
+  <li>更多精彩文章 http://h2cloud.org</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

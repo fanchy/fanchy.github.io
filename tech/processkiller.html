@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>进程上下文切换 – 残酷的性能杀手</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="对于服务器的优化，很多人都有自己的经验和见解，但就我观察，有两点常常会被人忽视 – 上下文切换 和 Cache Line同步 问题，人们往往都会习惯性地把视线集中在尽力减少内存拷贝，减少IO次数这样的问题上，不可否认它们一样重要，但一个高性能服务器需要更细致地去考察这些问题，这个问题我将分成两篇文章来写：" />
+
+  <meta name="keywords" itemprop="tags" content="linux, 性能分析, 进程上下文切换"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="进程上下文切换 – 残酷的性能杀手" />
+<meta name="twitter:description" content="对于服务器的优化，很多人都有自己的经验和见解，但就我观察，有两点常常会被人忽视 – 上下文切换 和 Cache Line同步 问题，人们往往都会习惯性地把视线集中在尽力减少内存拷贝，减少IO次数这样的问题上，不可否认它们一样重要，但一个高性能服务器需要更细致地去考察这些问题，这个问题我将分成两篇文章来写：" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/processkiller.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="进程上下文切换 – 残酷的性能杀手" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/processkiller.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="对于服务器的优化，很多人都有自己的经验和见解，但就我观察，有两点常常会被人忽视 – 上下文切换 和 Cache Line同步 问题，人们往往都会习惯性地把视线集中在尽力减少内存拷贝，减少IO次数这样的问题上，不可否认它们一样重要，但一个高性能服务器需要更细致地去考察这些问题，这个问题我将分成两篇文章来写：" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-08-13T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="linux" />
+  
+    <meta property="article:tag" content="性能分析" />
+  
+    <meta property="article:tag" content="进程上下文切换" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/processkiller.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">进程上下文切换 – 残酷的性能杀手</h1>
+            <h2 class="project-tagline">进程上下文切换 – 残酷的性能杀手</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-08-13T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Aug 13, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">进程上下文切换 – 残酷的性能杀手</h1>
+    <p class="post-meta">
+      <time datetime="2012-08-13T00:00:00+08:00" itemprop="datePublished">
+        
+        Aug 13, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <p>进程上下文切换 – 残酷的性能杀手（上）(转载cppthinker.com)
+对于服务器的优化，很多人都有自己的经验和见解，但就我观察，有两点常常会被人忽视 – 上下文切换 和 Cache Line同步 问题，人们往往都会习惯性地把视线集中在尽力减少内存拷贝，减少IO次数这样的问题上，不可否认它们一样重要，但一个高性能服务器需要更细致地去考察这些问题，这个问题我将分成两篇文章来写：</p>
+
+<ul>
+  <li>从一些我们常用的用户空间函数，到linux内核代码的跟踪，来看一个上下文切换是如何产生的</li>
+  <li>从实际数据来看它对我们程序的影响</li>
+</ul>
+
+<p>另外，关于Cache Line 的测试大家可移步 http://www.cppthinker.com/cpp/9/cpu_cache/</p>
+
+<h2 id="context-switch简介--">Context Switch简介 -</h2>
+
+<p>上下文切换（以下简称CS）的定义，http://www.linfo.org/context_switch.html 此文中已做了详细的说明，这里我又偷懒不详细解释了：）  只提炼以下几个关键要点：</p>
+
+<ul>
+  <li>context（这里我觉得叫process context更合适）是指CPU寄存器和程序计数器在任何时间点的内容</li>
+  <li>CS可以描述为kernel执行下面的操作
+    <ul>
+      <li>挂起一个进程，并储存该进程当时在内存中所反映出的状态</li>
+      <li>从内存中恢复下一个要执行的进程，恢复该进程原来的状态到寄存器，返回到其上次暂停的执行代码然后继续执行</li>
+    </ul>
+  </li>
+  <li>CS只能发生在内核态(kernel mode)</li>
+  <li>system call会陷入内核态，是user mode =&gt; kernel mode的过程，我们称之为mode switch，但不表明会发生CS（其实mode switch同样也会做很多和CS一样的流程，例如通过寄存器传递user mode 和 kernel mode之间的一些参数）</li>
+  <li>一个硬件中断的产生，也可能导致kernel收到signal后进行CS</li>
+</ul>
+
+<h4 id="什么样的操作可能会引起cs--">什么样的操作可能会引起CS -</h4>
+
+<p>首先我们一定是希望减少CS，那什么样的操作会发生CS呢？也许看了上面的介绍你还云里雾里？</p>
+
+<p>首先，linux中一个进程的时间片到期，或是有更高优先级的进程抢占时，是会发生CS的，但这些都是我们应用开发者不可控的。那么我们不妨更多地从应用开发者（user space）的角度来看这个问题，我们的进程可以主动地向内核申请进行CS，而用户空间通常有两种手段能达到这一“目的”：</p>
+
+<ul>
+  <li>休眠当前进程/线程</li>
+  <li>唤醒其他进程/线程</li>
+</ul>
+
+<p>pthread库中的pthread_cond_wait 和 pthread_cond_signal就是很好的例子（虽然是针对线程，但linux内核并不区分进程和线程，线程只是共享了address space和其他资源罢了），pthread_cond_wait负责将当前线程挂起并进入休眠，直到条件成立的那一刻，而pthread_cond_signal则是唤醒守候条件的线程。我们直接来看它们的代码吧</p>
+
+<p>pthread_cond_wait.c</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span>
+<span class="n">__pthread_cond_wait</span> <span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">mutex</span><span class="p">)</span>
+     <span class="n">pthread_cond_t</span> <span class="o">*</span><span class="n">cond</span><span class="p">;</span>
+     <span class="n">pthread_mutex_t</span> <span class="o">*</span><span class="n">mutex</span><span class="p">;</span>
+<span class="p">{</span>
+  <span class="k">struct</span> <span class="n">_pthread_cleanup_buffer</span> <span class="n">buffer</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">_condvar_cleanup_buffer</span> <span class="n">cbuffer</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">err</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">pshared</span> <span class="o">=</span> <span class="p">(</span><span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__mutex</span> <span class="o">==</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="o">~</span><span class="mi">0l</span><span class="p">)</span>
+        <span class="o">?</span> <span class="n">LLL_SHARED</span> <span class="o">:</span> <span class="n">LLL_PRIVATE</span><span class="p">;</span>
+
+  <span class="cm">/* yunjie: 这里省略了部分代码 */</span>
+
+  <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="cm">/* yunjie: 这里省略了部分代码 */</span>
+
+      <span class="cm">/* Wait until woken by signal or broadcast.  */</span>
+      <span class="n">lll_futex_wait</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__futex</span><span class="p">,</span> <span class="n">futex_val</span><span class="p">,</span> <span class="n">pshared</span><span class="p">);</span>
+
+        <span class="cm">/* yunjie: 这里省略了部分代码 */</span>
+      
+      <span class="cm">/* If a broadcast happened, we are done.  */</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">cbuffer</span><span class="p">.</span><span class="n">bc_seq</span> <span class="o">!=</span> <span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__broadcast_seq</span><span class="p">)</span>
+    <span class="k">goto</span> <span class="n">bc_out</span><span class="p">;</span>
+
+      <span class="cm">/* Check whether we are eligible for wakeup.  */</span>
+      <span class="n">val</span> <span class="o">=</span> <span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__wakeup_seq</span><span class="p">;</span>
+    <span class="p">}</span>   
+  <span class="k">while</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="n">seq</span> <span class="o">||</span> <span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__woken_seq</span> <span class="o">==</span> <span class="n">val</span><span class="p">);</span>
+
+  <span class="cm">/* Another thread woken up.  */</span>  
+  <span class="o">++</span><span class="n">cond</span><span class="o">-&gt;</span><span class="n">__data</span><span class="p">.</span><span class="n">__woken_seq</span><span class="p">;</span>
+
+ <span class="nl">bc_out:</span>
+    <span class="cm">/* yunjie: 这里省略了部分代码 */</span>
+  <span class="k">return</span> <span class="n">__pthread_mutex_cond_lock</span> <span class="p">(</span><span class="n">mutex</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>代码已经经过精简，但我们仍然直接把目光放到19行，lll_futex_wait，这是一个pthread内部宏，用处是调用系统调用sys_futex（futex是一种user mode和kernel mode混合mutex，这里不展开讲了），这个操作会将当前线程挂起休眠（马上我们将会到内核中一探究竟）</p>
+
+<p>lll_futex_wait宏展开的全貌</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define lll_futex_wake(futex, nr, private) \
+  do {                                        \
+    int __ignore;                                 \
+    register __typeof (nr) _nr __asm ("edx") = (nr);                  \
+    __asm __volatile ("syscall"                           \
+              : "=a" (__ignore)                       \
+              : "0" (SYS_futex), "D" (futex),                 \
+            "S" (__lll_private_flag (FUTEX_WAKE, private)),       \
+            "d" (_nr)                         \
+              : "memory", "cc", "r10", "r11", "cx");              \
+  } while (0)
+</span></code></pre></div></div>
+<p>可以看到，该宏的行为很简单，就是通过内嵌汇编的方式，快速调用syscall:SYS_futex，所以我们也不用再多费口舌，直接看kernel的实现吧</p>
+
+<p>linux/kernel/futex.c</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SYSCALL_DEFINE6</span><span class="p">(</span><span class="n">futex</span><span class="p">,</span> <span class="n">u32</span> <span class="n">__user</span> <span class="o">*</span><span class="p">,</span> <span class="n">uaddr</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">u32</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> 
+        <span class="k">struct</span> <span class="n">timespec</span> <span class="n">__user</span> <span class="o">*</span><span class="p">,</span> <span class="n">utime</span><span class="p">,</span> <span class="n">u32</span> <span class="n">__user</span> <span class="o">*</span><span class="p">,</span> <span class="n">uaddr2</span><span class="p">,</span>
+        <span class="n">u32</span><span class="p">,</span> <span class="n">val3</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">timespec</span> <span class="n">ts</span><span class="p">;</span>
+    <span class="n">ktime_t</span> <span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">tp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">u32</span> <span class="n">val2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> 
+    <span class="kt">int</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">op</span> <span class="o">&amp;</span> <span class="n">FUTEX_CMD_MASK</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">utime</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_WAIT</span> <span class="o">||</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_LOCK_PI</span> <span class="o">||</span>
+              <span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_WAIT_BITSET</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">copy_from_user</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ts</span><span class="p">,</span> <span class="n">utime</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EFAULT</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">timespec_valid</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ts</span><span class="p">))</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">timespec_to_ktime</span><span class="p">(</span><span class="n">ts</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_WAIT</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">ktime_add_safe</span><span class="p">(</span><span class="n">ktime_get</span><span class="p">(),</span> <span class="n">t</span><span class="p">);</span>
+        <span class="n">tp</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">;</span>
+    <span class="p">}</span>    
+    <span class="cm">/*   
+     * requeue parameter in &amp;#39;utime&amp;#39; if cmd == FUTEX_REQUEUE.
+     * number of waiters to wake in &amp;#39;utime&amp;#39; if cmd == FUTEX_WAKE_OP.
+     */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_REQUEUE</span> <span class="o">||</span> <span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_CMP_REQUEUE</span> <span class="o">||</span>
+        <span class="n">cmd</span> <span class="o">==</span> <span class="n">FUTEX_WAKE_OP</span><span class="p">)</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="p">(</span><span class="n">u32</span><span class="p">)</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="n">utime</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">do_futex</span><span class="p">(</span><span class="n">uaddr</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">uaddr2</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val3</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>linux 2.5内核以后都使用这种SYSCALL_DEFINE的方式来实现内核对应的syscall（我这里阅读的是inux-2.6.27.62内核）， 略过一些条件检测和参数拷贝的代码，我们可以看到在函数最后调用了do_futex，由于这里内核会进行多个函数地跳转，我这里就不一一贴代码污染大家了</p>
+
+<p>大致流程： pthread_cond_wait =&gt; sys_futex =&gt; do_futex =&gt; futex_wait （蓝色部分为内核调用流程）</p>
+
+<p>futex_wait中的部分代码</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* add_wait_queue is the barrier after __set_current_state. */</span>                                
+    <span class="n">__set_current_state</span><span class="p">(</span><span class="n">TASK_INTERRUPTIBLE</span><span class="p">);</span>                                                      
+    <span class="n">add_wait_queue</span><span class="p">(</span><span class="o">&amp;</span><span class="n">q</span><span class="p">.</span><span class="n">waiters</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">wait</span><span class="p">);</span>                                                            
+    <span class="cm">/*                                                                                            
+     * !plist_node_empty() is safe here without any lock.                                         
+     * q.lock_ptr != 0 is not safe, because of ordering against wakeup.                           
+     */</span>                                                                                           
+    <span class="k">if</span> <span class="p">(</span><span class="n">likely</span><span class="p">(</span><span class="o">!</span><span class="n">plist_node_empty</span><span class="p">(</span><span class="o">&amp;</span><span class="n">q</span><span class="p">.</span><span class="n">list</span><span class="p">)))</span> <span class="p">{</span>                                                     
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">abs_time</span><span class="p">)</span>                                                                            
+            <span class="n">schedule</span><span class="p">();</span>                                                                           
+        <span class="k">else</span> <span class="p">{</span>                                                                                    
+            <span class="n">hrtimer_init_on_stack</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">,</span> <span class="n">CLOCK_MONOTONIC</span><span class="p">,</span>                                      
+                        <span class="n">HRTIMER_MODE_ABS</span><span class="p">);</span>                                                        
+            <span class="n">hrtimer_init_sleeper</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">,</span> <span class="n">current</span><span class="p">);</span>                                                    
+            <span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">.</span><span class="n">expires</span> <span class="o">=</span> <span class="o">*</span><span class="n">abs_time</span><span class="p">;</span>                                                          
+                                                                                                  
+            <span class="n">hrtimer_start</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">.</span><span class="n">expires</span><span class="p">,</span>                                              
+                        <span class="n">HRTIMER_MODE_ABS</span><span class="p">);</span>                                                        
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">hrtimer_active</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">))</span>                                                        
+                <span class="n">t</span><span class="p">.</span><span class="n">task</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>                                                                    
+                                                                                                                                                                                                     
+            <span class="cm">/*                                                                                    
+             * the timer could have already expired, in which                                     
+             * case current would be flagged for rescheduling.                                    
+             * Don&amp;#39;t bother calling schedule.                                                     
+             */</span>                                                                                   
+            <span class="k">if</span> <span class="p">(</span><span class="n">likely</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">task</span><span class="p">))</span>                                                                   
+                <span class="n">schedule</span><span class="p">();</span>                                                                       
+                                                                                                  
+            <span class="n">hrtimer_cancel</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">);</span>                                                             
+                                                                                                  
+            <span class="cm">/* Flag if a timeout occured */</span>                                                       
+            <span class="n">rem</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">task</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>                                                               
+                                                                                                  
+            <span class="n">destroy_hrtimer_on_stack</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">.</span><span class="n">timer</span><span class="p">);</span>                                                   
+        <span class="p">}</span>                                                                                         
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>以上是futex_wait的一部分代码，主要逻辑是将当前进程/线程的状态设为TASK_INTERRUPTIBLE（可被信号打断），然后将当前进程/线程加入到内核的wait队列（等待某种条件发生而暂时不会进行抢占的进程序列），之后会调用schedule，这是内核用于调度进程的函数，在其内部还会调用context_switch，在这里就不展开，但有一点可以肯定就是当前进程/线程会休眠，然后内核会调度器他还有时间片的进程/线程来抢占CPU，这样pthread_cond_wait就完成了一次CS
+pthread_cond_signal的流程基本和pthread_cond_wait一致，这里都不再贴代码耽误时间</p>
+
+<p>大致流程：pthread_cond_signal =&gt; SYS_futex =&gt; do_futex =&gt; futex_wake =&gt; wake_futex =&gt; __wake_up =&gt; __wake_up_common =&gt; try_to_wake_up （蓝色部分为内核调用流程）
+try_to_wake_up()会设置一个need_resched标志，该标志标明内核是否需要重新执行一次调度，当syscall返回到user space或是中断返回时，内核会检查它，如果已被设置，内核会在继续执行之前调用调度程序，之后我们万能的schedule函数就会在wait_queue（还记得吗，我们调用pthread_cond_wait的线程还在里面呢）中去拿出进程并挑选一个让其抢占CPU，所以，根据我们跟踪的内核代码，pthread_cond_signal也会发生一次CS</p>
+
+<h2 id="本篇结束--">本篇结束 -</h2>
+
+<p>会造成CS的函数远远不止这些，例如我们平时遇到mutex竞争，或是我们调用sleep时，都会发生，
+我们总是忽略了它的存在，但它却默默地扼杀着我们的程序性能（相信我，它比你想象中要更严重），
+在下一篇中我将以chaos库（我编写的一个开源网络库）中的一个多线程组件为例，给大家演示CS所带来的性能下降
+希望对大家有帮助 ：）</p>
+
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

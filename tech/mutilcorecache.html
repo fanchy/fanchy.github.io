@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>多核环境下编写程序需注意cache【转载】</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="前阵子接触到一道关于数组内部链表(多用于内存池技术)的数据结构的题, 这种数据结构能够比普通链表在cache中更容易命中, 理由很简单, 就是因为其在地址上是连续的(=.=!), 借这个机会, 就对cpu cache进行了一个研究, 今天做一个简单的分享, 首先先来普及一下cpu cache的知识, 这里的cache是指cpu的高速缓存. 在我们程序员看来, 缓存是一个透明部件. 因此, 程序员通常无法直接干预对缓存的操作. 但是, 确实可以根据缓存的特点对程序代码实施特定优化, 从而更好地利用高速缓存. 高速缓存的置换策略会尽可能地将访问频繁的数据放入cache中, 这是一个动态的过程..." />
+
+  <meta name="keywords" itemprop="tags" content="多核, 多线程, cache"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="多核环境下编写程序需注意cache【转载】" />
+<meta name="twitter:description" content="前阵子接触到一道关于数组内部链表(多用于内存池技术)的数据结构的题, 这种数据结构能够比普通链表在cache中更容易命中, 理由很简单, 就是因为其在地址上是连续的(=.=!), 借这个机会, 就对cpu cache进行了一个研究, 今天做一个简单的分享, 首先先来普及一下cpu cache的知识, 这里的cache是指cpu的高速缓存. 在我们程序员看来, 缓存是一个透明部件. 因此, 程序员通常无法直接干预对缓存的操作. 但是, 确实可以根据缓存的特点对程序代码实施特定优化, 从而更好地利用高速缓存. 高速缓存的置换策略会尽可能地将访问频繁的数据放入cache中, 这是一个动态的过程..." />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/mutilcorecache.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="多核环境下编写程序需注意cache【转载】" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/mutilcorecache.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="前阵子接触到一道关于数组内部链表(多用于内存池技术)的数据结构的题, 这种数据结构能够比普通链表在cache中更容易命中, 理由很简单, 就是因为其在地址上是连续的(=.=!), 借这个机会, 就对cpu cache进行了一个研究, 今天做一个简单的分享, 首先先来普及一下cpu cache的知识, 这里的cache是指cpu的高速缓存. 在我们程序员看来, 缓存是一个透明部件. 因此, 程序员通常无法直接干预对缓存的操作. 但是, 确实可以根据缓存的特点对程序代码实施特定优化, 从而更好地利用高速缓存. 高速缓存的置换策略会尽可能地将访问频繁的数据放入cache中, 这是一个动态的过程..." />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-01-13T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="多核" />
+  
+    <meta property="article:tag" content="多线程" />
+  
+    <meta property="article:tag" content="cache" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/mutilcorecache.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">多核环境下编写程序需注意cache【转载】</h1>
+            <h2 class="project-tagline">多核环境下编写程序需注意cache【转载】</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-01-13T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jan 13, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">多核环境下编写程序需注意cache【转载】</h1>
+    <p class="post-meta">
+      <time datetime="2012-01-13T00:00:00+08:00" itemprop="datePublished">
+        
+        Jan 13, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h3 id="介绍">介绍</h3>
+<p>前阵子接触到一道关于数组内部链表(多用于内存池技术)的数据结构的题, 这种数据结构能够比普通链表在cache中更容易命中, 理由很简单, 就是因为其在地址上是连续的(=.=!), 借这个机会, 就对cpu cache进行了一个研究, 今天做一个简单的分享, 首先先来普及一下cpu cache的知识, 这里的cache是指cpu的高速缓存. 在我们程序员看来, 缓存是一个透明部件. 因此, 程序员通常无法直接干预对缓存的操作. 但是, 确实可以根据缓存的特点对程序代码实施特定优化, 从而更好地利用高速缓存. 
+高速缓存的置换策略会尽可能地将访问频繁的数据放入cache中, 这是一个动态的过程, 所以cache中的数据不会一直不变. 目前一般的机器的cpu cache可分为一级缓存和二级缓存. 一级缓存更靠近cpu, 速度比二级缓存更快. 二级缓存比一级缓存速度更慢, 容量更大, 主要就是做一级缓存和内存之间数据临时交换的地方用.
+这两者和RAM在空间和效率上的关系如下:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">L1 Cache---&gt; L2 Cache ---&gt; RAM
+</span><span class="gd">------------&gt; 容量递增 ------------&gt;
+------------&gt; 速度递减 ------------&gt;
+-----&gt; CPU访问优先级递减 -----&gt;
+</span></code></pre></div></div>
+
+<p>在linux系统中, 我们可以使用cat /proc/cpuinfo 来获知机器的cpu和核数.
+而cpu cache的信息, 我们通过dmesg | grep cache来获知.
+例如:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU: L1 I Cache: 64K (64 bytes/line), D cache 64K (64 bytes/line)
+CPU: L1 I Cache: 64K (64 bytes/line), D cache 64K (64 bytes/line)
+</code></pre></div></div>
+<p>说明我这台机器有两个处理器, 并只有一级缓存, 大小为 64K, 缓存行/快 大小为64 bytes.</p>
+
+<p>由于不同的处理器之间都具有自己的高速缓存, 所以当两个cpu的cache中都存有数据a, 那么就有可能需要进行同步数据, 而cache之间同步数据的最小单元为cache行大小, 可以把一个cache想象成一张表, 表的每一行都是64bytes(假设), 当cpu被告知cache第一行的第一个byte为脏数据时, cpu会将第一行都进行同步.
+例如以下场景:</p>
+<ul>
+  <li>CPU1读取了数据a(假设a小于cache行大小),并存入CPU1的高速缓存.</li>
+  <li>CPU2也读取了数据a,并存入CPU2的高速缓存.</li>
+  <li>CPU1修改了数据a, a被放回CPU1的高速缓存行. 但是该信息并没有被写入RAM.</li>
+  <li>CPU2访问a, 但由于CPU1并未将数据写入RAM, 导致了数据不同步.</li>
+</ul>
+
+<p>为了解决这个问题, 芯片设计者制定了一个规则. 当一个CPU修改高速缓存行中的字节时, 计算机中的其它CPU会被通知, 它们的高速缓存将视为无效. 于是, 在上面的情况下, CPU2发现自己的高速缓存中数据已无效, CPU1将立即把自己的数据写回RAM, 然后CPU2重新读取该数据. 这样就完成了一次两个cpu之间cache的同步.
+为了测试上述场景, 我编写了如下程序进行测试:</p>
+
+<pre><code class="language-cppp">#include&lt;sys/types.h&gt; 
+#include&lt;sys/sysinfo.h&gt; 
+#include &lt;sys/time.h&gt;
+#include&lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+
+#include &lt;iostream&gt;
+using namespace std;
+
+#define ENABLE_WHCIH_CPU
+#define ENABLE_SET_CPU
+
+#define EXEC_COUNT (100 * 1000 * 1000)
+
+struct  bits_t
+{
+inta;
+    char            placeholder[64];
+int b;
+};
+
+struct bits_t bits;
+
+int which_cpu(const char* prefix_)
+{
+    #ifdef ENABLE_WHCIH_CPU
+cpu_set_t cur_cpu;
+CPU_ZERO(&amp;cur_cpu);
+if (sched_getaffinity(0, sizeof(cur_cpu), &amp;cur_cpu) == -1) 
+{ 
+printf("warning: cound not get cpu affinity, continuing...\n"); 
+return -1;
+} 
+int num = sysconf(_SC_NPROCESSORS_CONF);
+for (int i = 0; i &lt; num; i++) 
+{ 
+if (CPU_ISSET(i, &amp;cur_cpu)) 
+{ 
+printf("[%s] this process %d is running processor : %d\n", prefix_, getpid(), i); 
+} 
+} 
+    #endif
+
+return 0;
+}
+
+int set_cpu(int cpu_id_)
+{
+    #ifdef ENABLE_SET_CPU
+cpu_set_t mask;
+CPU_ZERO(&amp;mask); 
+CPU_SET(cpu_id_, &amp;mask); 
+if (sched_setaffinity(0, sizeof(mask), &amp;mask) == -1) 
+{ 
+printf("warning: could not set CPU affinity, continuing...\n"); 
+return -1;
+    } 
+    #endif
+
+return 0;
+}
+
+void* thd_func1(void* arg_)
+{
+set_cpu(0);
+which_cpu("thread 1 start");
+    timeval begin_tv;
+    gettimeofday(&amp;begin_tv, NULL);
+
+    for (int i = 0; i &lt; EXEC_COUNT; i++)
+    {
+        bits.a += 1;
+        int a = bits.a;
+    }
+
+    timeval end_tv;
+    gettimeofday(&amp;end_tv, NULL);
+    printf("thd1 perf:[%lu]us\n", (end_tv.tv_sec * 1000 * 1000 + end_tv.tv_usec) - (begin_tv.tv_sec * 1000 * 1000 + begin_tv.tv_usec));
+which_cpu("thread 1 end");
+
+    return NULL;
+}
+
+void* thd_func2(void* arg_)
+{
+set_cpu(1);
+which_cpu("thread 2 start");
+    timeval begin_tv;
+    gettimeofday(&amp;begin_tv, NULL);
+
+    for (int i = 0; i &lt; EXEC_COUNT; i++)
+    {
+        bits.b += 2;
+        int b = bits.b;
+    }
+
+    timeval end_tv;
+    gettimeofday(&amp;end_tv, NULL);
+    printf("thd2 perf:[%lu]us\n", (end_tv.tv_sec * 1000 * 1000 + end_tv.tv_usec) - (begin_tv.tv_sec * 1000 * 1000 + begin_tv.tv_usec));
+which_cpu("thread 2 end");
+
+    return NULL;
+}
+
+
+int main(int argc_, char* argv_[])
+{
+int num = sysconf(_SC_NPROCESSORS_CONF);
+printf("system has %d processor(s).\n", num);
+cpu_set_t cpu_mask;
+cpu_set_t cur_cpu_info;
+
+memset((void*)&amp;bits, 0, sizeof(bits_t));
+set_cpu(0);
+which_cpu("main thread");
+
+    pthread_t pid1;
+    pthread_create(&amp;pid1, NULL, thd_func1, NULL);
+
+    pthread_t pid2;
+    pthread_create(&amp;pid2, NULL, thd_func2, NULL);
+
+    pthread_join(pid1, NULL);
+    pthread_join(pid2, NULL);
+
+    return 0;
+}
+</code></pre>
+
+<p>该程序中会创建两个线程, 分别对全局变量bits的a和b成员进行1亿次加法操作.
+在这里我分别针对四种情况进行了测试 -</p>
+<ul>
+  <li>两个线程分别跑在不同的cpu上, bits_t结构体没有placeholder这64个填充字节.</li>
+  <li>两个线程分别跑在不同的cpu上, bits_t结构体有placeholder这64个填充字节.</li>
+  <li>两个线程分别跑在相同的cpu上, bits_t结构体没有placeholder这64个填充字节.</li>
+  <li>两个线程分别跑在相同的cpu上, bits_t结构体有placeholder这64个填充字节.</li>
+</ul>
+
+<p>程序可以通过set_cpu函数来将线程绑定到指定的cpu上去.
+为了大家阅读的方便, 我已将测试结果报告整理成以下四个表格.</p>
+
+<h4 id="情况一测试结果">情况一测试结果:</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 线程id	 CPU绑定	 有无placeholder	 平均耗时(微妙)
+ 1	 cpu0	 无	 2186931
+ 2	 cpu1	 无	 2033496   
+</code></pre></div></div>
+<h4 id="情况二测试结果">情况二测试结果:</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>线程id	 CPU绑定	 有无placeholder	 平均耗时(微妙)
+ 1	 cpu0	 有	 402144
+ 2	 cpu1	 有	 392745 
+</code></pre></div></div>
+<p>我们先来看情况一和情况二的结果对比, 显然, 后者要比前者效率高得多的多, 可以验证在有 placeholder填充字节之后, bit_t的a和b域被划分到了cache的不同两行, 所以当在cpu0执行的线程1修改a后, cpu1在读b时, 不需要去同步cache. 而情况一因为a和b在cache中的同一行, 导致两个cpu要互相进行大量的cache行同步.</p>
+
+<h4 id="情况三测试结果">情况三测试结果:</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>线程id	 CPU绑定	 有无placeholder	 平均耗时(微妙)
+ 1	 cpu0	 无	 716056
+ 2	 cpu0	 无	 686804   
+</code></pre></div></div>
+<h4 id="情况四测试结果">情况四测试结果:</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>线程id	 CPU绑定	 有无placeholder	 平均耗时(微妙)
+ 1	 cpu0	 有	 761421
+ 2	 cpu0	 有	 884969
+</code></pre></div></div>
+
+<p>可以看出, 情况三和四, 因为两个线程运行在同一个cpu上, 有和没有placeholder填充字节在性能上几乎没有什么区别, 因为不存在cache之间行同步的问题, 但是由于是一个cpu在调度切换两个线程, 所以要比情况一慢一点.
+从上面测试结果看来, 某些特定情况下, 对于cache的优化还是很重要的, 但是也不能一味地为了追求性能都将所有共享数据加入填充字节, 毕竟cache就那么大, 如果不是某些特定的读写非常频繁的场景下, 没有必要这么做.
+PS: 由于不同的硬件架构体系之间会有差别, 例如某些硬件架构同一个cpu下的两个物理核之间共享cache, 所以测试时要试具体环境而定.</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

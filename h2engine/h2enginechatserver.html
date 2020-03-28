@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>游戏服务器设计之聊天室示例</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="h2engine引擎建群以后，有热心网友向我反馈，想尝试h2engine但是没有服务器开发经验觉得无从入手，希望我能提供一个简单明了的示例。 由于前一段时间工作实在忙碌，一直没有抽出时间好好写一下，后来抽空写了出来， 自己从小白开发者的角度重新审视了一遍h2engine,自己也收获匪浅，也优化了部分h2engine的架构，使其更易使用。 以前的例子都是c++加脚本的例子，这次写一个纯c++的例子。" />
+
+  <meta name="keywords" itemprop="tags" content="游戏服务器, 聊天室, socket"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="h2engine" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="游戏服务器设计之聊天室示例" />
+<meta name="twitter:description" content="h2engine引擎建群以后，有热心网友向我反馈，想尝试h2engine但是没有服务器开发经验觉得无从入手，希望我能提供一个简单明了的示例。 由于前一段时间工作实在忙碌，一直没有抽出时间好好写一下，后来抽空写了出来， 自己从小白开发者的角度重新审视了一遍h2engine,自己也收获匪浅，也优化了部分h2engine的架构，使其更易使用。 以前的例子都是c++加脚本的例子，这次写一个纯c++的例子。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//h2engine/h2enginechatserver.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="游戏服务器设计之聊天室示例" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//h2engine/h2enginechatserver.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="h2engine引擎建群以后，有热心网友向我反馈，想尝试h2engine但是没有服务器开发经验觉得无从入手，希望我能提供一个简单明了的示例。 由于前一段时间工作实在忙碌，一直没有抽出时间好好写一下，后来抽空写了出来， 自己从小白开发者的角度重新审视了一遍h2engine,自己也收获匪浅，也优化了部分h2engine的架构，使其更易使用。 以前的例子都是c++加脚本的例子，这次写一个纯c++的例子。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2018-06-13T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="游戏服务器" />
+  
+    <meta property="article:tag" content="聊天室" />
+  
+    <meta property="article:tag" content="socket" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="h2engine" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/h2engine/h2enginechatserver.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">游戏服务器设计之聊天室示例</h1>
+            <h2 class="project-tagline">针对前面使用boost asio 中遇到的问题，对asio进行封装</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2018-06-13T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jun 13, 2018
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">游戏服务器设计之聊天室示例</h1>
+    <p class="post-meta">
+      <time datetime="2018-06-13T00:00:00+08:00" itemprop="datePublished">
+        
+        Jun 13, 2018
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h1 id="游戏服务器设计之聊天室示例">游戏服务器设计之聊天室示例</h1>
+<h2 id="简介">简介</h2>
+<p>h2engine引擎建群以后，有热心网友向我反馈，想尝试h2engine但是没有服务器开发经验觉得无从入手，希望我能提供一个简单明了的示例。</p>
+
+<p>由于前一段时间工作实在忙碌，一直没有抽出时间好好写一下，后来抽空写了出来，自己从小白开发者的角度重新审视了一遍h2engine,自己也收获匪浅，
+也优化了部分h2engine的架构，使其更易使用。以前的例子都是c++加脚本的例子，这次写一个纯c++的例子。</p>
+
+<h4 id="开发服务器程序一般有如下几个基本操作">开发服务器程序一般有如下几个基本操作：</h4>
+<ol>
+  <li>启动程序，监听网络端口，初始化相应的模块</li>
+  <li>注册消息处理函数,根据不同的协议号，不同的逻辑处理，并把相应的结果返回给客户端。</li>
+  <li>数据的增删改查，设计到数据库的连接池、异步查询等技术。</li>
+  <li>定时器，除了用户触发的接口，就剩定时器触发接口了
+写一个基本的服务器架子，无非就上面几个东西，h2engine就是要简化我们搭建服务器的成本，拿来即用,下面以聊天室为例，分别阐述之。</li>
+</ol>
+
+<h2 id="启动程序以及初始化服务">启动程序以及初始化服务</h2>
+<p>h2engine是一个服务器引擎，封装了启动操作，简单说就是main已经提前写好了，也不推荐你改，比如日志初始化，后台服务处理啊balabala这些玩意都帮忙处理好了，你无非是想自己定义的模块程序启动的时候能够加载进去，是吧？h2engine的src目录是放用户自定义模块的地方，比如自己创建很多目录比如item处理道具模块，chat处理聊天模块，等等。src的目录下有一个setup.cpp这个就相当于main.cpp,用户初始化的代码放到这里就可以了，下面截取一个setup.cpp的示例。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include "server/ffworker.h"
+#include "server/entity.h"
+#include "player/player.h"
+#include "map/map.h"
+#include "task/task.h"
+#include "chat/chat.h"
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">ff</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">bool</span> <span class="nf">initEnvir</span><span class="p">(){</span>
+    <span class="n">PlayerModule</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+    <span class="n">MapModule</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+    <span class="n">TaskModule</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+    <span class="n">ChatModule</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">WORKER_AT_SETUP</span><span class="p">(</span><span class="n">initEnvir</span><span class="p">);</span>
+<span class="k">static</span> <span class="kt">bool</span> <span class="nf">cleanupEnvir</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">WORKER_AT_EXIT</span><span class="p">(</span><span class="n">cleanupEnvir</span><span class="p">);</span>
+</code></pre></div></div>
+<p>其实，setup.cpp这个文件名是没有任何要求的，随便你取什么名字，setup.cpp比较见名知意。如上所示，启动的时候我们启动了PlayerModule MapModule TaskModule ChatModule。根据你的需求增加初始化代码，cleanupEnvir是处理服务器关闭的事件回调，你可以在这里添加相应的处理代码。
+问题来了，网络监听在哪里设置，网络监听没啥搞头，已经做了标准化，配置一下gate_listen参数就可以改变监听的端口号，默认监听44000。</p>
+
+<h2 id="消息处理">消息处理</h2>
+<p>一般都是使用整数协议号 + 数据的方式处理消息，协议号用枚举定义，数据格式可以json，protobuff，thrift都可以。本示例只是简单演示，直接使用的字符串。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">enum</span> <span class="n">ChatCmdDef</span><span class="p">{</span>
+    <span class="n">CHAT_C_LOGIN</span>       <span class="o">=</span> <span class="mi">101</span><span class="p">,</span> <span class="c1">//!演示用，随意定义</span>
+    <span class="n">CHAT_C_BROADCAST</span>   <span class="o">=</span> <span class="mi">102</span><span class="p">,</span>
+    <span class="n">CHAT_S_BROADCAST</span>   <span class="o">=</span> <span class="mi">102</span>
+<span class="p">};</span>
+<span class="kt">bool</span> <span class="n">ChatModule</span><span class="o">::</span><span class="n">init</span><span class="p">(){</span>
+    <span class="n">CMD_MGR</span><span class="p">.</span><span class="n">setCmdHookFunc</span><span class="p">(</span><span class="n">cmdValidCheckFunctor</span><span class="p">);</span>
+    <span class="n">CMD_MGR</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">CHAT_C_LOGIN</span><span class="p">,</span>            <span class="o">&amp;</span><span class="n">handleLogin</span><span class="p">);</span>
+    <span class="n">CMD_MGR</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">LOGOUT_CMD</span><span class="p">,</span>              <span class="o">&amp;</span><span class="n">handleLogout</span><span class="p">);</span>
+    <span class="n">CMD_MGR</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">CHAT_C_BROADCAST</span><span class="p">,</span>        <span class="o">&amp;</span><span class="n">handleChat</span><span class="p">);</span>
+    <span class="c1">//!一般而言，初始化的时候需要创建表，读取配置等</span>
+    <span class="n">string</span> <span class="n">sql</span> <span class="o">=</span> <span class="s">"create table IF NOT EXISTS chattest (UID integer, CHAT_TIMES interger);"</span><span class="p">;</span>
+    <span class="n">DB_MGR</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>如上示例了一个典型模块的初始化，这里很好的演示了怎么模块化而不是把所有消息都注册到一个大文件里。以聊天室的需求为例，这里处理三个请求，登陆请求，登出请求，和聊天请求。</p>
+<ol>
+  <li>登陆请求，一般流程是查询数据库，验证账号密码，载入用户数据, 将用户数据发给客户端，也同步给其他在线的用户。</li>
+</ol>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">ChatLoginDbFunctor</span><span class="p">{</span>
+    <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">QueryDBResult</span><span class="o">&amp;</span> <span class="n">result</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">getSession</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+            <span class="c1">//!异步载入数据的过程中，user可能下线</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">256</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">dataResult</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span><span class="c1">//! 数据库里没有数据，创建一条数据</span>
+            <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"insert into chattest (UID, CHAT_TIMES) values ('%lu', '0')"</span><span class="p">,</span> <span class="n">uid</span><span class="p">);</span>
+            <span class="n">DB_MGR</span><span class="p">.</span><span class="n">asyncQueryModId</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">buff</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span><span class="p">{</span>
+            <span class="n">entity</span><span class="o">-&gt;</span><span class="n">get</span><span class="o">&lt;</span><span class="n">ChatCtrl</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">nChatTimes</span> <span class="o">=</span> <span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">dataResult</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="n">c_str</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="n">EntityPtr</span> <span class="n">old</span> <span class="o">=</span> <span class="n">ENTITY_MGR</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">ENTITY_PLAYER</span><span class="p">,</span> <span class="n">uid</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">old</span><span class="p">){</span><span class="c1">//!重登录，踢掉原来的</span>
+            <span class="n">old</span><span class="o">-&gt;</span><span class="n">sessionClose</span><span class="p">();</span>
+            <span class="n">ENTITY_MGR</span><span class="p">.</span><span class="n">del</span><span class="p">(</span><span class="n">ENTITY_PLAYER</span><span class="p">,</span> <span class="n">uid</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">entity</span><span class="o">-&gt;</span><span class="n">setUid</span><span class="p">(</span><span class="n">uid</span><span class="p">);</span>
+        <span class="n">entity</span><span class="o">-&gt;</span><span class="n">setType</span><span class="p">(</span><span class="n">ENTITY_PLAYER</span><span class="p">);</span>
+        <span class="n">ENTITY_MGR</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">entity</span><span class="p">);</span>
+
+
+        <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"user[%lu]进入了聊天室！"</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">());</span>
+        <span class="n">FFWORKER</span><span class="p">.</span><span class="n">gateBroadcastMsg</span><span class="p">(</span><span class="n">CHAT_S_BROADCAST</span><span class="p">,</span> <span class="n">buff</span><span class="p">);</span><span class="c1">//!这个是gate广播也就是全服广播</span>
+    <span class="p">}</span>
+    <span class="n">userid_t</span>    <span class="n">uid</span><span class="p">;</span>
+    <span class="n">EntityPtr</span>   <span class="n">entity</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">handleLogin</span><span class="p">(</span><span class="n">EntityPtr</span> <span class="n">entity</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span><span class="c1">//!处理登录，简单示例，用字符串协议</span>
+    <span class="n">userid_t</span> <span class="n">uid</span> <span class="o">=</span> <span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">uid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">entity</span><span class="o">-&gt;</span><span class="n">sendMsg</span><span class="p">(</span><span class="n">CHAT_S_BROADCAST</span><span class="p">,</span> <span class="s">"非法操作，请先使用101协议登录，参数为uid(非0)！"</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">char</span> <span class="n">sql</span><span class="p">[</span><span class="mi">256</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">sql</span><span class="p">),</span> <span class="s">"select CHAT_TIMES from chattest where UID = '%lu'"</span><span class="p">,</span> <span class="n">uid</span><span class="p">);</span>
+    <span class="n">ChatLoginDbFunctor</span> <span class="n">dbFunc</span><span class="p">;</span>
+    <span class="n">dbFunc</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">uid</span><span class="p">;</span>
+    <span class="n">dbFunc</span><span class="p">.</span><span class="n">entity</span> <span class="o">=</span> <span class="n">entity</span><span class="p">;</span>
+    <span class="n">DB_MGR</span><span class="p">.</span><span class="n">asyncQueryModId</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">dbFunc</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<p>如上所示，这个登陆函数虽小，但是还算写的蛮规矩的，如果已经登陆过了，忽略，重登陆了踢掉老的。而且数据载入是异步，非常具有生产环境的参考价值。</p>
+<ol>
+  <li>登出请求，一般是关闭客户端，保存用户数据，删除一些连接状态，同步给其他在线的客户端。</li>
+</ol>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">void</span> <span class="nf">handleLogout</span><span class="p">(</span><span class="n">EntityPtr</span> <span class="n">entity</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+    <span class="c1">//!清除缓存</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">256</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"update chattest set CHAT_TIMES = '%d' where UID = '%lu'"</span><span class="p">,</span>
+                                 <span class="n">entity</span><span class="o">-&gt;</span><span class="n">get</span><span class="o">&lt;</span><span class="n">ChatCtrl</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">nChatTimes</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">());</span>
+    <span class="n">DB_MGR</span><span class="p">.</span><span class="n">asyncQueryModId</span><span class="p">(</span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">(),</span> <span class="n">buff</span><span class="p">);</span>
+
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"user[%lu]离开了聊天室！"</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">());</span>
+    <span class="n">FFWORKER</span><span class="p">.</span><span class="n">gateBroadcastMsg</span><span class="p">(</span><span class="n">CHAT_S_BROADCAST</span><span class="p">,</span> <span class="n">buff</span><span class="p">);</span><span class="c1">//!这个是gate广播也就是全服广播</span>
+    <span class="n">ENTITY_MGR</span><span class="p">.</span><span class="n">del</span><span class="p">(</span><span class="n">ENTITY_PLAYER</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>如上代码所示，下线清缓存，保存数据，广播其他玩家。</p>
+<ol>
+  <li>聊天请求，本示例简单起见，广播给所有人。</li>
+</ol>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">ChatFunctor</span><span class="p">{</span>
+    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">EntityPtr</span> <span class="n">e</span><span class="p">){</span>
+        <span class="n">e</span><span class="o">-&gt;</span><span class="n">sendMsg</span><span class="p">(</span><span class="n">CHAT_S_BROADCAST</span><span class="p">,</span> <span class="n">destData</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">string</span> <span class="n">destData</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">handleChat</span><span class="p">(</span><span class="n">EntityPtr</span> <span class="n">entity</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+    <span class="c1">//!简单示例，广播给所有人</span>
+    <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">256</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">entity</span><span class="o">-&gt;</span><span class="n">get</span><span class="o">&lt;</span><span class="n">ChatCtrl</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">nChatTimes</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"user[%lu]说:%s 发言总次数[%d]"</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">(),</span> <span class="n">msg</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">get</span><span class="o">&lt;</span><span class="n">ChatCtrl</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">nChatTimes</span><span class="p">);</span>
+    <span class="n">ChatFunctor</span> <span class="n">func</span><span class="p">;</span>
+    <span class="n">func</span><span class="p">.</span><span class="n">destData</span> <span class="o">=</span> <span class="n">buff</span><span class="p">;</span>
+    <span class="n">ENTITY_MGR</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">ENTITY_PLAYER</span><span class="p">,</span> <span class="n">func</span><span class="p">);</span><span class="c1">//!这里遍历每一个entity，也就是本worker上的所有用户,这个是示例，不如gateBroadcastMsg效率高</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>上面代码示例了如何做广播操作，发给客户端无非就是单播和广播，这里都有示例，entity是一个非常重要的概念，可以让你非常方便迅速的开始你的业务而不用建立各种乱七八糟的缓存。</p>
+
+<h2 id="数据的增删改查">数据的增删改查</h2>
+<p>DB_MGR封装了关系型数据库的操作，支持sqlite和mysql，本示例使用了sqlite，保证你编译完项目就可以立即体验而不用过分操心怎么搭建mysqlserver。二者切换只是配置的不同而已。代码不用任何修改。DB_MGR分同步接口和异步接口，异步接口在服务器编程中用的非常常见，一般用一个仿函数作为回调函数。DB_MGR.asyncQueryModId使用了连接池，不同的uid会分配在不同的连接上，确保数据库操作更加高效，又保证单个用户的数据库操作是有序的。</p>
+<h2 id="定时器">定时器</h2>
+<p>定时器比较简单，这个聊天示例貌似也用不到，暂时没有加上需要的可以自己查看一下FFWORKER.regTimer(mstimeout_, callback);</p>
+<h2 id="总结">总结</h2>
+<ol>
+  <li>模块初始化，非侵入式设计，非常容易的集成自己的模块</li>
+  <li>注册网络消息的处理函数，CMD_MGR注册一下</li>
+  <li>异步数据库查询，包括查询后的回调，使用DB_MGR进行相关操作。</li>
+  <li>定时器，异步定时器，回调的时候也保证是在主线程。</li>
+  <li>模拟客户端 <a href="http://h2cloud.org/client.html" target="_blank" rel="noopener noreferrer nofollow">http://h2cloud.org/client.html</a>
+</li>
+  <li>GitHub地址:  <a href="https://github.com/fanchy/h2engine" target="_blank" rel="noopener noreferrer nofollow">https://github.com/fanchy/h2engine</a>
+</li>
+  <li>关于游戏服务器引擎h2engine：<a href="http://www.cnblogs.com/zhiranok/p/ffengine.html" target="_blank" rel="noopener noreferrer nofollow">http://www.cnblogs.com/zhiranok/p/ffengine.html</a>
+</li>
+</ol>
+
+<p>更多精彩文章 <a href="http://h2cloud.org/" target="_blank" rel="noopener noreferrer nofollow">http://h2cloud.org/</a></p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

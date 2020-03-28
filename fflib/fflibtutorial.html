@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++ 多进程并发框架FFLIB之Tutorial</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="封装了epoll和socket" />
+
+  <meta name="keywords" itemprop="tags" content="fflib, c++, socket"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++ 多进程并发框架FFLIB之Tutorial" />
+<meta name="twitter:description" content="封装了epoll和socket" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/fflibtutorial.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++ 多进程并发框架FFLIB之Tutorial" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/fflibtutorial.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="封装了epoll和socket" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-08-08T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="socket" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/fflibtutorial.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++ 多进程并发框架FFLIB之Tutorial</h1>
+            <h2 class="project-tagline">C++ 多进程并发框架FFLIB之Tutorial</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-08-08T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Aug 8, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++ 多进程并发框架FFLIB之Tutorial</h1>
+    <p class="post-meta">
+      <time datetime="2012-08-08T00:00:00+08:00" itemprop="datePublished">
+        
+        Aug 8, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <p>FFLIB框架是为简化分布式/多进程并发而生的。它起始于本人尝试解决工作中经常遇到的问题如消息定义、异步、多线程、单元测试、性能优化等。基本介绍可以看这里：
+http://www.cnblogs.com/zhiranok/archive/2012/07/30/fflib_framework.html</p>
+
+<p>其中之所以特意采用了Broker模式，是吸收了MPI和Erlang的思想。</p>
+
+<p>关于MPI：http://www.mcs.anl.gov/research/projects/mpi/
+关于Erlang：http://www.erlang.org/
+FFLIB 目前处于alpha阶段，一些有用的功能还需继续添加。但是FFLIB一开始就是为了解决实际问题而生。Broker 即可以以独立进程运行，也可以集成到某个特定的进程中启动。除了这些，FFLIB中使用epoll实现的网络层也极具参考价值。网上有一些关于epoll ET 和 LT的讨论，关于哪种方式更简单，本人的答案是ET。ET模式下epoll 就是一个完全状态机。开发者只需实现FD的read、write、error 三种状态即可。
+我进一步挖掘FFLIB的功能。写一篇FFLIB的Tutorial。创建更多的FFLIB使用示例，以此来深入探讨FFLIB的意义。在游戏开发中，或者一些分布式的环境中，有许多大家熟悉的模式。，本文挑选了如下作为FFLIB示例：</p>
+
+<h3 id="requestreply">Request/Reply</h3>
+<ul>
+  <li>点对点通讯</li>
+  <li>阻塞通讯</li>
+  <li>多播通讯</li>
+  <li>Map/Reduce</li>
+  <li>Request/Reply</li>
+  <li>异步的Request/Reply</li>
+</ul>
+
+<p>在FFLIB中所有的消息都是Request和Reply一一对应的，默认情况下工作在异步模式。假设如下场景，Flash连入GatewayServer并发送Login消息包，GatewaServer 解析用户名密码，调用LoginServer 验证。</p>
+
+<h3 id="首先定义msg">首先定义msg:</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">user_login_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"user_login_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">uid</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uid</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">long</span>   <span class="n">uid</span><span class="p">;</span>
+        <span class="n">string</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"user_login_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">bool</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+<span class="err">```</span><span class="n">cpp</span>
+<span class="cp">### LoginServer中如此定义接口：
+</span>
+<span class="err">```</span><span class="n">cpp</span>
+<span class="k">class</span> <span class="nc">login_server_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">verify</span><span class="p">(</span><span class="n">user_login_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">user_login_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">user_login_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">login_server_t</span> <span class="n">login_server</span><span class="p">;</span>
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"login_server"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">login_server</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">login_server_t</span><span class="o">::</span><span class="n">verify</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="在gatewayserver中调用上面接口">在GatewayServer中调用上面接口：</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">lambda_t</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="kt">void</span> <span class="n">callback</span><span class="p">(</span><span class="n">user_login_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">,</span> <span class="n">socket_ptr_t</span> <span class="n">socket_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">true</span> <span class="o">==</span> <span class="n">msg_</span><span class="p">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">//! socket_-&gt;send_msg("login ok");</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="c1">//! socket_-&gt;send_msg("login failed");</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="n">user_login_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+    <span class="n">in</span><span class="p">.</span><span class="n">uid</span>  <span class="o">=</span> <span class="mi">520</span><span class="p">;</span>
+    <span class="n">in</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">"ILoveYou"</span><span class="p">;</span>
+    <span class="n">socket_ptr_t</span> <span class="n">flash_socket</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span><span class="c1">//! TODO</span>
+
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+         <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"login_server_t"</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+       <span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">binder_t</span><span class="o">::</span><span class="n">callback</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">callback</span><span class="p">,</span> <span class="n">flash_socket</span><span class="p">));</span>
+</code></pre></div></div>
+<p>如上所示， async_call 可以通过binder_t模板函数为回调函绑定参数。</p>
+
+<h3 id="同步的requestreply">同步的Request/Reply</h3>
+<p>　　大部分时候我们期望Reply被异步处理，但有时Reply 必须被首先处理后才能触发后续操作，一般这种情况发生在程序初始化之时。假设如下场景，SceneServer启动时必须从SuperServer中获取配置，然后才能执行加载场景数据等后续初始化操作。</p>
+
+<p>　　首先定义通信的msg：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">config_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"config_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">server_type</span> <span class="o">&lt;&lt;</span> <span class="n">server_id</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">server_type</span> <span class="o">&gt;&gt;</span> <span class="n">server_id</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">int</span> <span class="n">server_type</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">server_id</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"config_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="如上所示-msg-序列化自动支持map">如上所示， msg 序列化自动支持map。</h3>
+<p>SuperServer 中定义返回配置的接口：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">super_server_t</span> <span class="n">super_server</span><span class="p">;</span>
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"super_server"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">super_server</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">super_server_t</span><span class="o">::</span><span class="n">get_config</span><span class="p">);</span>
+</code></pre></div></div>
+<p>SceneServer 可以如此实现同步Request/Reply:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rpc_future_t</span><span class="o">&lt;</span><span class="n">config_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;</span> <span class="n">rpc_future</span><span class="p">;</span>
+
+<span class="n">config_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">server_type</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">server_id</span>   <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="k">const</span> <span class="n">config_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">out</span> <span class="o">=</span> <span class="n">rpc_future</span><span class="p">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"super_server"</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">in</span><span class="p">);</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;&lt;</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="c1">//std::foreach(out.value.begin(), out.value.end(), fuctor_xx);</span>
+</code></pre></div></div>
+<h3 id="点对点通讯">点对点通讯</h3>
+<p>异步Request/Reply 已经能够解决大部分问题了，但是有时处理Push模式时稍显吃了。我们知道消息推算有Push 和Poll两种方式。了解二者：
+http://blog.sina.com.cn/s/blog_6617106b0100hrm1.html
+上面提到的Request/Reply 非常适合poll模式，以上一个获取配置为例，SuperServer由于定义接口的时候只需知道callback，并不知道SceneServer的具体连接。，所以SuperServer不能向SceneServer Push消息。在FFLIB中并没有限定某个节点必须是Client或只能是Service，实际上可以兼有二者的角色。SceneServer 也可以提供接口供SuperServer调用，这就符合了Push的语义。假设如下场景，GatewayServer需要在用户登入时调用通知SessionServer，而某一时刻SessionServer也可能呢通知GatewayServer 强制某用户下线。二者互为client和service。大家必须知道，在FFLIB中实现两个节点的通信只需知道对方的服务名称即可，Broker 在此时实现解耦的作用非常明显，若要增加对其他节点的通信，只需通过服务名称async_call即可。</p>
+
+<h4 id="定义通信的msg">定义通信的msg：</h4>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">user_online_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"user_online_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">uid</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uid</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">long</span> <span class="n">uid</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"user_online_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">bool</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">force_user_offline_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"force_user_offline_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">uid</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uid</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kt">long</span> <span class="n">uid</span><span class="p">;</span>
+    <span class="p">};</span>
+
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"force_user_offline_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kt">bool</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>GatewayServer 通知SessionServer 用户上线，并提供强制用户下线的接口：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">gateway_server_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">force_user_offline</span><span class="p">(</span><span class="n">force_user_offline_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">force_user_offline_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//! close user socket</span>
+        <span class="n">force_user_offline_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">gateway_server_t</span> <span class="n">gateway_server</span><span class="p">;</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"gateway_server"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gateway_server</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gateway_server_t</span><span class="o">::</span><span class="n">force_user_offline</span><span class="p">);</span>
+
+<span class="n">user_online_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="mi">520</span><span class="p">;</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"session_server"</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">callback_TODO</span><span class="p">);</span>
+</code></pre></div></div>
+<p>SessionServer 提供用户上线接口，可能会调用GatewayServer 的接口强制用户下线。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">session_server_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">user_login</span><span class="p">(</span><span class="n">user_online_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">user_online_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//! close user socket</span>
+        <span class="n">user_online_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">session_server_t</span> <span class="n">session_server</span><span class="p">;</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"session_server"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">session_server</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">session_server_t</span><span class="o">::</span><span class="n">user_login</span><span class="p">);</span>
+
+<span class="n">force_user_offline_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="mi">520</span><span class="p">;</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"gateway_server"</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">callback_TODO</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="多播通信">多播通信</h3>
+<ul>
+  <li>和点对点通信一样，要实现多播，只需要知道目标的服务名称。特别提一点的是，FFLIB中有服务组的概念。比如启动了多个场景服务器SceneServer，除了数据不同，二者接口完全相同，有可能只是相同进程的不同实例。在FFLIB框架中把这些服务归为一个服务组，然后再为每个实例分配索引id。</li>
+  <li>假设如下场景，SuperServer 中要实现一个GM接口，通知所有SceneServer 重新加载配置。</li>
+  <li>定义通信的msg：</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">reload_config_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"reload_config_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"reload_config_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+
+        <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kt">bool</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>SceneServer 提供重新载入配置接口：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">scene_server_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">reload_config</span><span class="p">(</span><span class="n">reload_config_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">reload_config_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//! close user socket</span>
+        <span class="n">reload_config_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">scene_server_t</span> <span class="n">scene_server</span><span class="p">;</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"scene_server"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">scene_server</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">scene_server_t</span><span class="o">::</span><span class="n">reload_config</span><span class="p">);</span> 
+</code></pre></div></div>
+<p>在SuperServer 中如此实现多播（跟准确是广播，大同小异）：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">lambda_t</span>
+<span class="p">{</span>
+<span class="err">　　</span><span class="k">static</span> <span class="kt">void</span> <span class="n">reload_config</span><span class="p">(</span><span class="n">rpc_service_t</span><span class="o">*</span> <span class="n">rs_</span><span class="p">)</span>
+<span class="err">　　</span><span class="p">{</span>
+          <span class="n">reload_config_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+          <span class="n">rs_</span><span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">callback_TODO</span><span class="p">);</span>
+<span class="err">　　</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"scene_server"</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="n">foreach</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">reload_config</span><span class="p">);</span>
+</code></pre></div></div>
+<h2 id="mapreduce">Map/Reduce</h2>
+<p>在游戏中使用Map/reduce 的情形并不多见，本人找到网上最常见的Map/reduce 实例 WordCount。情形如下：有一些文本字符串，统计每个字符出现的次数。</p>
+
+<ul>
+  <li>Map操作，将文本分为多个子文本，分发给多个Worker 进程进行统计</li>
+  <li>Reduce 操作，将多组worker 进程计算的结果汇总</li>
+  <li>Worker：为文本统计各个字符出现的次数
+    <h3 id="定义通信消息">定义通信消息：</h3>
+    <div class="language-cpp highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">word_count_t</span>
+<span class="p">{</span>
+ <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+ <span class="p">{</span>
+     <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+         <span class="n">msg_i</span><span class="p">(</span><span class="s">"word_count_t::in_t"</span><span class="p">)</span>
+     <span class="p">{}</span>
+     <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">str</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+     <span class="p">}</span>
+     <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">str</span><span class="p">;</span>
+     <span class="p">}</span>
+     <span class="n">string</span> <span class="n">str</span><span class="p">;</span>
+ <span class="p">};</span>
+
+ <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+ <span class="p">{</span>
+     <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+         <span class="n">msg_i</span><span class="p">(</span><span class="s">"word_count_t::out_t"</span><span class="p">)</span>
+     <span class="p">{}</span>
+
+     <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+     <span class="p">}</span>
+
+     <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="n">map</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">value</span><span class="p">;</span>
+ <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div>    </div>
+    <h3 id="定义woker的接口">定义woker的接口：</h3>
+  </li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">worker_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">word_count</span><span class="p">(</span><span class="n">word_count_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">word_count_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//! close user socket</span>
+        <span class="n">word_count_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">str</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">in_msg_</span><span class="p">.</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">it</span> <span class="o">!=</span> <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">end</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">[</span><span class="n">in_msg_</span><span class="p">.</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">worker_t</span> <span class="n">worker</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+         <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"worker"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">worker</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">worker_t</span><span class="o">::</span><span class="n">word_count</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<h3 id="模拟mapreduce-操作">模拟Map/reduce 操作：</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">struct</span> <span class="n">lambda_t</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="kt">void</span> <span class="n">reduce</span><span class="p">(</span><span class="n">word_count_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">,</span> <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;*</span> <span class="n">result_</span><span class="p">,</span> <span class="kt">size_t</span><span class="o">*</span> <span class="n">size_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">msg_</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">msg_</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it2</span> <span class="o">=</span> <span class="n">result_</span><span class="o">-&gt;</span><span class="n">find</span><span class="p">(</span><span class="n">it</span><span class="o">-&gt;</span><span class="n">first</span><span class="p">);</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">it2</span> <span class="o">!=</span> <span class="n">result_</span><span class="o">-&gt;</span><span class="n">end</span><span class="p">())</span>
+                <span class="p">{</span>
+                    <span class="n">it2</span><span class="o">-&gt;</span><span class="n">second</span> <span class="o">+=</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">else</span>
+                <span class="p">{</span>
+                    <span class="p">(</span><span class="o">*</span><span class="n">result_</span><span class="p">)[</span><span class="n">it</span><span class="o">-&gt;</span><span class="n">first</span><span class="p">]</span> <span class="o">=</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="o">--</span> <span class="n">size_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">//reduce end!!!!!!!!!!!!!!!!</span>
+                <span class="k">delete</span> <span class="n">result_</span><span class="p">;</span>
+                <span class="k">delete</span> <span class="n">size_</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">static</span> <span class="kt">void</span> <span class="n">do_map</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">**</span> <span class="n">p</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;*</span> <span class="n">result</span>  <span class="o">=</span> <span class="k">new</span> <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span>
+            <span class="kt">size_t</span><span class="o">*</span>    <span class="n">dest_size</span>   <span class="o">=</span> <span class="k">new</span> <span class="kt">size_t</span><span class="p">();</span>
+            <span class="o">*</span><span class="n">dest_size</span> <span class="o">=</span> <span class="n">size_</span><span class="p">;</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size_</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">word_count_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+                <span class="n">in</span><span class="p">.</span><span class="n">str</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+
+                <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+                    <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"worker"</span><span class="p">)</span>
+                    <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span> <span class="o">%</span> <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"worker"</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">())</span>
+                    <span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">binder_t</span><span class="o">::</span><span class="n">callback</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">reduce</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">dest_size</span><span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str_vec</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="s">"oh nice"</span><span class="p">,</span> <span class="s">"oh fuck"</span><span class="p">,</span> <span class="s">"oh no"</span><span class="p">,</span> <span class="s">"oh dear"</span><span class="p">,</span> <span class="s">"oh wonderful"</span><span class="p">,</span> <span class="s">"oh bingo"</span><span class="p">};</span>
+    <span class="n">lambda_t</span><span class="o">::</span><span class="n">do_map</span><span class="p">(</span><span class="n">str_vec</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="总结">总结：</h2>
+
+<ul>
+  <li>FFLIB 使进程间通信更容易</li>
+  <li>source code:  https://ffown.googlecode.com/svn/trunk</li>
+  <li>示例代码目录：example/tutorial</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

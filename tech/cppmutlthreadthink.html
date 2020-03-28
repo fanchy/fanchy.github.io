@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++ 多线程编程总结</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="在开发C++程序时，一般在吞吐量、并发、实时性上有较高的要求。设计C++程序时，总结起来可以从如下几点提高效率" />
+
+  <meta name="keywords" itemprop="tags" content="tcpdump, linux, tcp抓包"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++ 多线程编程总结" />
+<meta name="twitter:description" content="在开发C++程序时，一般在吞吐量、并发、实时性上有较高的要求。设计C++程序时，总结起来可以从如下几点提高效率" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/cppmutlthreadthink.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++ 多线程编程总结" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/cppmutlthreadthink.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="在开发C++程序时，一般在吞吐量、并发、实时性上有较高的要求。设计C++程序时，总结起来可以从如下几点提高效率" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-05-13T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="tcpdump" />
+  
+    <meta property="article:tag" content="linux" />
+  
+    <meta property="article:tag" content="tcp抓包" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/cppmutlthreadthink.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++ 多线程编程总结</h1>
+            <h2 class="project-tagline">在开发C++程序时，一般在吞吐量、并发、实时性上有较高的要求。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-05-13T00:00:00+08:00" itemprop="datePublished">
+                    
+                    May 13, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++ 多线程编程总结</h1>
+    <p class="post-meta">
+      <time datetime="2012-05-13T00:00:00+08:00" itemprop="datePublished">
+        
+        May 13, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要</h2>
+<p>在开发C++程序时，一般在吞吐量、并发、实时性上有较高的要求。设计C++程序时，总结起来可以从如下几点提高效率：</p>
+
+<ul>
+  <li>并发</li>
+  <li>异步</li>
+  <li>缓存</li>
+</ul>
+
+<p>下面将我平常工作中遇到一些问题例举一二，其设计思想无非以上三点。</p>
+
+<h2 id="任务队列">任务队列</h2>
+<h3 id="以生产者-消费者模型设计任务队列">以生产者-消费者模型设计任务队列</h3>
+<p>生产者-消费者模型是人们非常熟悉的模型，比如在某个服务器程序中，当User数据被逻辑模块修改后，就产生一个更新数据库的任务（produce），投递给IO模块任务队列，IO模块从任务队列中取出任务执行sql操作（consume）。
+设计通用的任务队列，示例代码如下：
+详细实现可参见：
+http://ffown.googlecode.com/svn/trunk/fflib/include/detail/task_queue_impl.h</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">task_queue_t</span><span class="o">::</span><span class="n">produce</span><span class="p">(</span><span class="k">const</span> <span class="n">task_t</span><span class="o">&amp;</span> <span class="n">task_</span><span class="p">)</span> <span class="p">{</span>       
+        <span class="n">lock_guard_t</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">m_tasklist</span><span class="o">-&gt;</span><span class="n">empty</span><span class="p">()){</span><span class="c1">//! 条件满足唤醒等待线程</span>
+            <span class="n">m_cond</span><span class="p">.</span><span class="n">signal</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">m_tasklist</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">task_</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="kt">int</span>   <span class="n">task_queue_t</span><span class="o">::</span><span class="n">comsume</span><span class="p">(</span><span class="n">task_t</span><span class="o">&amp;</span> <span class="n">task_</span><span class="p">){</span>
+        <span class="n">lock_guard_t</span> <span class="n">lock</span><span class="p">(</span><span class="n">m_mutex</span><span class="p">);</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">m_tasklist</span><span class="o">-&gt;</span><span class="n">empty</span><span class="p">())</span><span class="c1">//! 当没有作业时，就等待直到条件满足被唤醒{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_flag</span><span class="p">){</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">m_cond</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">task_</span> <span class="o">=</span> <span class="n">m_tasklist</span><span class="o">-&gt;</span><span class="n">front</span><span class="p">();</span>
+        <span class="n">m_tasklist</span><span class="o">-&gt;</span><span class="n">pop_front</span><span class="p">();</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="err">}</span>
+</code></pre></div></div>
+<h3 id="任务队列使用技巧">任务队列使用技巧</h3>
+<h4 id="io-与-逻辑分离">IO 与 逻辑分离</h4>
+<p>比如网络游戏服务器程序中，网络模块收到消息包，投递给逻辑层后立即返回，继续接受下一个消息包。逻辑线程在一个没有io操作的环境下运行，以保障实时性。示例：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">handle_xx_msg</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid</span><span class="p">,</span> <span class="k">const</span> <span class="n">xx_msg_t</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+    <span class="n">logic_task_queue</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">servie_t</span><span class="o">::</span><span class="n">proces</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">msg</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>注意，此模式下为单任务队列，每个任务队列单线程。</p>
+
+<h4 id="并行流水线">并行流水线</h4>
+<p>上面的只是完成了io 和 cpu运算的并行，而cpu中逻辑操作是串行的。在某些场合，cpu逻辑运算部分也可实现并行，如游戏中用户A种菜和B种菜两种操作是完全可以并行的，因为两个操作没有共享数据。最简单的方式是A、B相关的操作被分配到不同的任务队列中。示例如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">handle_xx_msg</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid</span><span class="p">,</span> <span class="k">const</span> <span class="n">xx_msg_t</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">)</span> <span class="p">{</span>
+<span class="err">　　</span><span class="n">logic_task_queue_array</span><span class="p">[</span><span class="n">uid</span> <span class="o">%</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">logic_task_queue_array</span><span class="p">)]</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span>
+<span class="err">　　　　</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">servie_t</span><span class="o">::</span><span class="n">proces</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">msg</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>注意，此模式下为多任务队列，每个任务队列单线程。</p>
+
+<h4 id="连接池与异步回调">连接池与异步回调</h4>
+<p>比如逻辑Service模块需要数据库模块异步载入用户数据，并做后续处理计算。而数据库模块拥有一个固定连接数的连接池，当执行SQL的任务到来时，选择一个空闲的连接，执行SQL，并把SQL 通过回调函数传递给逻辑层。其步骤如下：</p>
+
+<ul>
+  <li>预先分配好线程池，每个线程创建一个连接到数据库的连接</li>
+  <li>为数据库模块创建一个任务队列，所有线程都是这个任务队列的消费者</li>
+  <li>逻辑层想数据库模块投递sql执行任务，同时传递一个回调函数来接受sql执行结果</li>
+</ul>
+
+<p>示例如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">db_t</span><span class="o">:</span><span class="n">load</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid_</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">user_data_t</span><span class="o">&amp;</span><span class="p">)</span> <span class="n">func_</span><span class="p">){</span>
+    <span class="c1">//! sql execute, construct user_data_t user</span>
+    <span class="n">func_</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="nf">process_user_data_loaded</span><span class="p">(</span><span class="n">user_data_t</span><span class="o">&amp;</span><span class="p">){</span>
+    <span class="c1">//! todo something</span>
+<span class="p">}</span>
+<span class="n">db_task_queue</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">db_t</span><span class="o">:</span><span class="n">load</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">func</span><span class="p">));</span>
+</code></pre></div></div>
+<p>注意，此模式下为单任务队列，每个任务队列多线程。</p>
+
+<h3 id="日志">日志</h3>
+<p>本文主要讲C++多线程编程，日志系统不是为了提高程序效率，但是在程序调试、运行期排错上，日志是无可替代的工具，相信开发后台程序的朋友都会使用日志。常见的日志使用方式有如下几种：</p>
+
+<ul>
+  <li>流式，如logstream « “start servie time[%d]” « time(0) « ” app name[%s]” « app_string.c_str() « endl;</li>
+  <li>Printf 格式如：logtrace(LOG_MODULE, “start servie time[%d] app name[%s]”, time(0), app_string.c_str());
+　　二者各有优缺点，流式是线程安全的，printf格式格式化字符串会更直接，但缺点是线程不安全，如果把app_string.c_str() 换成app_string （std::string），编译被通过，但是运行期会crash（如果运气好每次都crash，运气不好偶尔会crash）。我个人钟爱printf风格，可以做如下改进：</li>
+  <li>增加线程安全，利用C++模板的traits机制，可以实现线程安全。示例：
+    <div class="language-cpp highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">ARG1</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="nf">logtrace</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">module</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">ARG1</span> <span class="n">arg1</span><span class="p">){</span>
+ <span class="n">boost</span><span class="o">::</span><span class="n">format</span> <span class="n">s</span><span class="p">(</span><span class="n">fmt</span><span class="p">);</span>
+ <span class="n">f</span> <span class="o">%</span> <span class="n">arg1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+    <p>这样，除了标准类型+std::string 传入其他类型将编译不能通过。这里只列举了一个参数的例子，可以重载该版本支持更多参数，如果你愿意，可以支持9个参数或更多。</p>
+  </li>
+  <li>
+    <p>为日志增加颜色，在printf中加入控制字符，可以再屏幕终端上显示颜色，Linux下示例：printf(“\033[32;49;1m [DONE] \033[39;49;0m”) 
+更多颜色方案参见：
+http://hi.baidu.com/jiemnij/blog/item/d95df8c28ac2815cb219a80e.html</p>
+  </li>
+  <li>每个线程启动时，都应该用日志打印该线程负责什么功能。这样，程序跑起来的时候通过top –H – p pid 可以得知那个功能使用cpu的多少。实际上，我的每行日志都会打印线程id，此线程id非pthread_id，而其实是线程对应的系统分配的进程id号。</li>
+  <li>性能监控
+尽管已经有很多工具可以分析c++程序运行性能，但是其大部分还是运行在程序debug阶段。我们需要一种手段在debug和release阶段都能监控程序，一方面得知程序瓶颈之所在，一方面尽早发现哪些组件在运行期出现了异常。
+通常都是使用gettimeofday 来计算某个函数开销，可以精确到微妙。可以利用C++的确定性析构，非常方便的实现获取函数开销的小工具,示例如下</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">profiler</span><span class="p">{</span>
+    <span class="n">profiler</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">func_name</span><span class="p">){</span>
+        <span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tv</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">m_func_name</span><span class="o">=</span><span class="n">func_name</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">profiler</span><span class="p">(){</span>
+        <span class="k">struct</span> <span class="n">timeval</span> <span class="n">tv2</span><span class="p">;</span>
+        <span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tv2</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="kt">long</span> <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">tv</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">-</span> <span class="n">tv</span><span class="p">.</span><span class="n">tv_sec</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000000</span> <span class="o">+</span> <span class="p">(</span><span class="n">tv</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">-</span> <span class="n">tv</span><span class="p">.</span><span class="n">tv_usec</span><span class="p">);</span>
+        <span class="c1">//! post to some manager</span>
+    <span class="p">}</span>
+    <span class="k">struct</span> <span class="n">timeval</span> <span class="n">tv</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">m_func_name</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="cp">#define PROFILER() profiler ____profiler_instance##__LINE__(__FUNCTION__)
+</span></code></pre></div></div>
+<p>Cost 应该被投递到性能统计管理器中，该管理器定时讲性能统计数据输出到文件中。</p>
+
+<h3 id="lambda-编程">Lambda 编程</h3>
+<p>使用foreach 代替迭代器
+很多编程语言已经内建了foreach，但是c++还没有。所以建议自己在需要遍历容器的地方编写foreach函数。习惯函数式编程的人应该会非常钟情使用foreach，使用foreach的好处多多少少有些，如：</p>
+
+<p>http://www.cnblogs.com/chsword/archive/2007/09/28/910011.html
+但主要是编程哲学上层面的。</p>
+
+<h4 id="示例">示例：</h4>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">user_mgr_t</span><span class="o">::</span><span class="n">foreach</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">user_t</span><span class="o">&amp;</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">func_</span><span class="p">){</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">m_users</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">m_users</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">++</span><span class="n">it</span><span class="p">){</span>
+        <span class="n">func_</span><span class="p">(</span><span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>比如要实现dump 接口，不需要重写关于迭代器的代码</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">user_mgr_t</span><span class="o">:</span><span class="n">dump</span><span class="p">(){</span>
+    <span class="k">struct</span> <span class="n">lambda</span> <span class="p">{</span>
+        <span class="k">static</span> <span class="kt">void</span> <span class="n">print</span><span class="p">(</span><span class="n">user_t</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">){</span>
+            <span class="c1">//! print(tostring(user);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">this</span><span class="o">-&gt;</span><span class="n">foreach</span><span class="p">(</span><span class="n">lambda</span><span class="o">::</span><span class="n">print</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>实际上，上面的代码变通的生成了匿名函数，如果是c++ 11 标准的编译器，本可以写的更简洁一些：</p>
+
+<p>this-&gt;foreach(<a href="user_t&amp;%20user"></a> {} );</p>
+
+<p>但是我大部分时间编写的程序都要运行在centos 上，你知道吗它的gcc版本是gcc 4.1.2， 所以大部分时间我都是用变通的方式使用lambda函数。</p>
+
+<p>Lambda 函数结合任务队列实现异步
+常见的使用任务队列实现异步的代码如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">service_t</span><span class="o">:</span><span class="n">async_update_user</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid</span><span class="p">){</span>
+    <span class="n">task_queue</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">service_t</span><span class="o">:</span><span class="n">sync_update_user_impl</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">uid</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">service_t</span><span class="o">:</span><span class="n">sync_update_user_impl</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid</span><span class="p">){</span>
+    <span class="n">user_t</span><span class="o">&amp;</span> <span class="n">user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">uid</span><span class="p">);</span>
+    <span class="n">user</span><span class="p">.</span><span class="n">update</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>这样做的缺点是，一个接口要响应的写两遍函数，如果一个函数的参数变了，那么另一个参数也要跟着改动。并且代码也不是很美观。使用lambda可以让异步看起来更直观，仿佛就是在接口函数中立刻完成一样。示例代码：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">service_t</span><span class="o">:</span><span class="n">async_update_user</span><span class="p">(</span><span class="kt">long</span> <span class="n">uid</span><span class="p">){</span>
+    <span class="k">struct</span> <span class="n">lambda</span> <span class="p">{</span>
+        <span class="k">static</span> <span class="kt">void</span> <span class="n">update_user_impl</span><span class="p">(</span><span class="n">service_t</span><span class="o">*</span> <span class="n">servie</span><span class="p">,</span> <span class="kt">long</span> <span class="n">uid</span><span class="p">){</span>
+            <span class="n">user_t</span><span class="o">&amp;</span> <span class="n">user</span> <span class="o">=</span> <span class="n">servie</span><span class="o">-&gt;</span><span class="n">get_user</span><span class="p">(</span><span class="n">uid</span><span class="p">);</span>
+            <span class="n">user</span><span class="p">.</span><span class="n">update</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="n">task_queue</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lambda</span><span class="o">:</span><span class="n">update_user_impl</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">uid</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>这样当要改动该接口时，直接在该接口内修改代码，非常直观。</p>
+
+<h3 id="奇技淫巧">奇技淫巧</h3>
+<p>利用shared_ptr 实现map/reduce
+Map/reduce的语义是先将任务划分为多个任务，投递到多个worker中并发执行，其产生的结果经reduce汇总后生成最终的结果。Shared_ptr的语义是什么呢？当最后一个shared_ptr析构时，将会调用托管对象的析构函数。语义和map/reduce过程非常相近。我们只需自己实现讲请求划分多个任务即可。示例过程如下：</p>
+
+<h4 id="定义请求托管对象加入我们需要在10个文件中搜索oh-nice字符串出现的次数定义托管结构体如下">定义请求托管对象，加入我们需要在10个文件中搜索“oh nice”字符串出现的次数，定义托管结构体如下：</h4>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">reducer</span><span class="p">{</span>
+    <span class="kt">void</span> <span class="n">set_result</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">long</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">m_result</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">reducer</span><span class="p">(){</span>
+        <span class="kt">long</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">m_result</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">m_result</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="c1">//! post total to somewhere</span>
+    <span class="p">}</span>
+    <span class="kt">long</span> <span class="n">m_result</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<h4 id="定义执行任务的-worker">定义执行任务的 worker</h4>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">worker_t</span><span class="o">:</span><span class="n">exe</span><span class="p">(</span><span class="kt">int</span> <span class="n">index_</span><span class="p">,</span> <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">reducer</span><span class="o">&gt;</span> <span class="n">ret</span><span class="p">)</span> <span class="p">{</span>
+<span class="err">　　</span><span class="n">ret</span><span class="o">-&gt;</span><span class="n">set_result</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="将任务分割后投递给不同的worker">将任务分割后，投递给不同的worker</h4>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">reducer</span><span class="o">&gt;</span> <span class="n">ret</span><span class="p">(</span><span class="k">new</span> <span class="nf">reducer</span><span class="p">());</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">task_queue</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">post</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">worker_t</span><span class="o">:</span><span class="n">exe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">ret</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="相关连接">相关连接</h2>
+<ul>
+  <li>文档 http://h2cloud.org</li>
+  <li>源码 https://github.com/fanchy/h2engine</li>
+  <li>介绍 http://www.cnblogs.com/zhiranok/p/ffengine.html</li>
+  <li>更多精彩文章 http://h2cloud.org</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

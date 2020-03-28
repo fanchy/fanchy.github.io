@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++ FFLIB之FFXML： 极简化TinyXml 读取</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="封C++中解析XML已经有一些非常成熟的类库可以使用，TinyXml是最受欢迎的解析类库之一。尽管TinyXml已经已经封装了解析细节， 但是解析、遍历Xml仍然是稍显繁琐。FFXML针对如下需求对TinyXml做了轻量封装" />
+
+  <meta name="keywords" itemprop="tags" content="fflib, c++, tinyxml, c++读取xml"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++ FFLIB之FFXML： 极简化TinyXml 读取" />
+<meta name="twitter:description" content="封C++中解析XML已经有一些非常成熟的类库可以使用，TinyXml是最受欢迎的解析类库之一。尽管TinyXml已经已经封装了解析细节， 但是解析、遍历Xml仍然是稍显繁琐。FFXML针对如下需求对TinyXml做了轻量封装" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/fflibtimyxml.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++ FFLIB之FFXML： 极简化TinyXml 读取" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/fflibtimyxml.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="封C++中解析XML已经有一些非常成熟的类库可以使用，TinyXml是最受欢迎的解析类库之一。尽管TinyXml已经已经封装了解析细节， 但是解析、遍历Xml仍然是稍显繁琐。FFXML针对如下需求对TinyXml做了轻量封装" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-02-03T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="tinyxml" />
+  
+    <meta property="article:tag" content="c++读取xml" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/fflibtimyxml.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++ FFLIB之FFXML： 极简化TinyXml 读取</h1>
+            <h2 class="project-tagline">封C++中解析XML已经有一些非常成熟的类库可以使用，TinyXml是最受欢迎的解析类库之一</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-02-03T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Feb 3, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++ FFLIB之FFXML： 极简化TinyXml 读取</h1>
+    <p class="post-meta">
+      <time datetime="2013-02-03T00:00:00+08:00" itemprop="datePublished">
+        
+        Feb 3, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要：</h2>
+
+<p>XML是结构化的标记语言，经常被用来做配置文件。由于XML的具有非常强的自描述属性，使用XML的配置文件往往直观易懂。</p>
+
+<p>C++中解析XML已经有一些非常成熟的类库可以使用，TinyXml是最受欢迎的解析类库之一。尽管TinyXml已经已经封装了解析细节，
+但是解析、遍历Xml仍然是稍显繁琐。FFXML针对如下需求对TinyXml做了轻量封装：</p>
+
+<p>只把XML当成配置文件，也就是说，只有对XML的读取操作，在我日工作中，都是用XML当做纯配置文件，把XML当成序列化文件或数据文件的情况少之又少。
+XML配置文件不会太大，我们假设限制在几千行以内，通常XML配置文件不需要那么大，在这种需求下，的XML的读取效率不是问题，
+易用性会被放到首位，必须非常容易获取xml中的内容。</p>
+
+<p>我们知道XML是结构化的，有层级的概念，这对于C++中的内存模型多多少少会有区别，所以往往获取XML内容的代码会有各种循环、判断、嵌套。
+FFXML提供了一种“标记语法”使得获取XML内容可以和XML的结构息息对应，即保障了直观，又很容易修改，比如调整了XML的层级关系，
+FFXML能够保障大多数情况只需改几个字母，而不是修改嵌套的循环代码.</p>
+
+<h2 id="标记语言">标记语言：</h2>
+
+<h3 id="实现先给出示例的xml内容">实现先给出示例的XML内容</h3>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;game</span> <span class="na">type =</span> <span class="s">"good"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;scene&gt;</span>happly<span class="nt">&lt;/scene&gt;</span>
+    <span class="nt">&lt;role</span> <span class="na">ID=</span><span class="s">"123456"</span>  <span class="na">pos =</span> <span class="s">"any"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;name</span> <span class="na">nick =</span> <span class="s">"xx"</span> <span class="nt">&gt;</span>OhNice<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;num&gt;</span>99<span class="nt">&lt;/num&gt;</span>
+    <span class="nt">&lt;/role&gt;</span>
+<span class="nt">&lt;/game&gt;</span>
+</code></pre></div></div>
+<p>我们知道，如果使用tinyXml读取XML，每一层都需要使用特定的接口获取，从而必须要写一写循环和判断甚至嵌套。
+FFXML提供了一种“标记语法”来表示XML中各个层级的关系：</p>
+
+<ul>
+  <li>game.scene ffxml通过 “.”  来分割各个层级，game.scene 代表获取root标记下层的scene标记  在FFXML中获取scen标记的值简单到一行代码const char* scene_val = ffxml.get(“game.scene”);</li>
+  <li>game.{type}  FFXML通过 “{}”表示属性标记，root.{type}表示获取root标记内的type属性的值, 使用FFXML获取type属性的值的代码仍然只有一行:const char* type_val = ffxml.get(“game.{type}”);</li>
+  <li>game.@0  获取game标签下的索引0的标签内容,也就是scene的内容,即const char* scene_val = ffxml.get(“game.@0”);</li>
+  <li>game.&amp;0  获取game标记下索引0的字标记的name，也就是ffxml.get(“game.&amp;0”) == “scene”;</li>
+  <li>game.{@0} 获取game标记下索引0的属性值</li>
+  <li>game.{&amp;0}  获取game标记下索引0的属性的name</li>
+</ul>
+
+<p>FFXML 提供size接口获取字标记的数量如ffxml.size(“game.role”)   表示role标记下字子标记的数量=2
+size 接口也可以获取属性的数量，如ffxml.size(“game.role.{}”) 表示role标记属性的个个数</p>
+
+<h3 id="示例代码">示例代码:</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include "xml/ffxml.h"
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">ff</span><span class="p">;</span>
+
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">ffxml_t</span> <span class="n">ffxml</span><span class="p">;</span>
+    
+    <span class="c1">//! 载入test.xml</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ffxml</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"test.xml"</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"test.xml 载入失败</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取字段     game.scene:        %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.scene"</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取字段     game.role.name:    %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.role.name"</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取字段     game.role.num:     %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.role.num"</span><span class="p">));</span>
+    
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取属性     game.{type}:       %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.{type}"</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取属性     game.role.{ID}:    %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.role.{ID}"</span><span class="p">));</span>
+    
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取标记数量 game:              %u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game"</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取标记数量 game.role:         %u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game.role"</span><span class="p">));</span>
+    
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取属性数量 game:              %u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game.{}"</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"获取属性数量 game.role:         %u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game.role.{}"</span><span class="p">));</span>
+    
+    <span class="c1">//! 遍历子节点</span>
+    <span class="kt">char</span> <span class="n">arg_key</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+    <span class="kt">char</span> <span class="n">arg_val</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game.role"</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sprintf</span><span class="p">(</span><span class="n">arg_key</span><span class="p">,</span> <span class="s">"game.role.&amp;%u"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="n">sprintf</span><span class="p">(</span><span class="n">arg_val</span><span class="p">,</span> <span class="s">"game.role.@%u"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"遍历子节点   game.role:         %s-&gt;%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg_key</span><span class="p">),</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg_val</span><span class="p">));</span>
+    <span class="p">}</span>
+    
+    <span class="c1">//! 遍历属性节点</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="s">"game.role"</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sprintf</span><span class="p">(</span><span class="n">arg_key</span><span class="p">,</span> <span class="s">"game.role.{&amp;%u}"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="n">sprintf</span><span class="p">(</span><span class="n">arg_val</span><span class="p">,</span> <span class="s">"game.role.{@%u}"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"遍历属性     game.role:         %s-&gt;%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg_key</span><span class="p">),</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg_val</span><span class="p">));</span>
+    <span class="p">}</span>
+    
+    
+    <span class="n">printf</span><span class="p">(</span><span class="s">"组合         game.role.@1.{@nick} %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffxml</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"game.role.@0.{@nick}"</span><span class="p">));</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="总结">总结：</h2>
+<p>详细源代码：<a href="https://github.com/fanchy" target="_blank" rel="noopener noreferrer nofollow">https://github.com/fanchy</a></p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>Boost ASIO proactor 浅析</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="Boost asio 的socket的异步非阻塞模式才有的是proactor模式，当IO操作介绍后回调相应的处理函数。 ASIO在Linux平台下的实现基于epoll，但是epoll只支持reactor模式，ASIO通过封装在epoll上实现了proactor。 提到ASIO proactor，ASIO中的所有异步操作都是基于io_service实现的，io_service是ASIO中的任务队列， 并且他负责调用epoll_wait等待IO事件到来。" />
+
+  <meta name="keywords" itemprop="tags" content="boost, ASIO, io_service"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="Boost ASIO proactor 浅析" />
+<meta name="twitter:description" content="Boost asio 的socket的异步非阻塞模式才有的是proactor模式，当IO操作介绍后回调相应的处理函数。 ASIO在Linux平台下的实现基于epoll，但是epoll只支持reactor模式，ASIO通过封装在epoll上实现了proactor。 提到ASIO proactor，ASIO中的所有异步操作都是基于io_service实现的，io_service是ASIO中的任务队列， 并且他负责调用epoll_wait等待IO事件到来。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/boostasioproactor.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="Boost ASIO proactor 浅析" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/boostasioproactor.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="Boost asio 的socket的异步非阻塞模式才有的是proactor模式，当IO操作介绍后回调相应的处理函数。 ASIO在Linux平台下的实现基于epoll，但是epoll只支持reactor模式，ASIO通过封装在epoll上实现了proactor。 提到ASIO proactor，ASIO中的所有异步操作都是基于io_service实现的，io_service是ASIO中的任务队列， 并且他负责调用epoll_wait等待IO事件到来。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2011-10-07T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="boost" />
+  
+    <meta property="article:tag" content="ASIO" />
+  
+    <meta property="article:tag" content="io_service" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/boostasioproactor.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">Boost ASIO proactor 浅析</h1>
+            <h2 class="project-tagline">ASIO在Linux平台下的实现基于epoll，但是epoll只支持reactor模式，ASIO通过封装在epoll上实现了proactor。。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2011-10-07T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Oct 7, 2011
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Boost ASIO proactor 浅析</h1>
+    <p class="post-meta">
+      <time datetime="2011-10-07T00:00:00+08:00" itemprop="datePublished">
+        
+        Oct 7, 2011
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h3 id="前情提要">前情提要：</h3>
+<p>Boost asio 的socket的异步非阻塞模式才有的是proactor模式，当IO操作介绍后回调相应的处理函数。
+ASIO在Linux平台下的实现基于epoll，但是epoll只支持reactor模式，ASIO通过封装在epoll上实现了proactor。
+提到ASIO proactor，ASIO中的所有异步操作都是基于io_service实现的，io_service是ASIO中的任务队列，
+并且他负责调用epoll_wait等待IO事件到来，对io_service的实现参加前边的blog：<a href="./boostioservice.html">Boost::asio io_service 实现分析</a>.</p>
+
+<h3 id="proactor-和-rector">Proactor 和 Rector：</h3>
+<p>两种设计模式网上已经有很多种解释，这两种模式都是针对IO操作的，我的理解是Rector只是告诉调用者什么时候事件到来，
+但是需要进行什么操作，需要调用者自己处理。Preactor不是当事件到来时通知，而是针对此事件对应的操作完成时，
+通知调用者，一般通知方式都是异步回调。举例，Reactor中注册读事件，那么文件描述符可读时，
+需要调用者自己调用read系统调用读取数据，若工作在Preactor模式，注册读事件，同时提供一个buffer用于存储读取的数据，
+那么Preactor通过回调函数通知用户时，用户无需在调用系统调用读取数据，因为数据已经存储在buffer中了。显然epoll是Reactor的。</p>
+
+<h3 id="asio-的实现">ASIO 的实现：</h3>
+<h4 id="epoll的封装">Epoll的封装：</h4>
+<ul>
+  <li>boost/asio/detail/epoll_reactor.hpp 是epoll_reatcor的封装，class epoll_reactor有两个作用，任务队列和调用epoll_wait，支持的操作类型有read、write、connect、except。其实现文件为boost/asio/etail/impl/epoll_reactor.ipp，主要的实现逻辑有run和start_op。</li>
+  <li>Run函数的逻辑是：调用一次epoll_wait，得到相应的IO事件</li>
+  <li>遍历相应IO事件，若是专门用于中断epoll操作的文件描述符那么跳过</li>
+  <li>若是用于定时器的文件描述符，则设置标志变量check_timers为true</li>
+  <li>若是基本IO事件，依次检查其IN、OUT事件，except事件会首先检测，将次事件对应的队列上的操作全部执行完毕（先调用io_servie::post，然后被调用）。</li>
+  <li>若check_timers标志变量被设置，那么将已经超时的操作通过io_service::post调用</li>
+  <li>start_op的实现：</li>
+  <li>Start_op需要事件的类型、文件描述符、回调函数做参数，首先调用perform，也就是直接send，send若成功直接调用io_service::post调用回调函数</li>
+  <li>如果文件描述符没有注册到epoll_wait，那么EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLOUT | EPOLLPRI | EPOLLET 全部注册到epoll_wait。</li>
+  <li>每个文件描述符有自己的队列，该事件的回调函数会被添加到队列中。</li>
+</ul>
+
+<h4 id="boostasioiptcpsocket中的异步方法的实现">boost::asio::ip::tcp::socket中的异步方法的实现</h4>
+<ul>
+  <li>Socket中有async_打头的许多异步方法，这里已async_send为例</li>
+  <li>boost/asio/ip/tcp.hpp 声明了tcp::socket的原型，实际原型是
+  typedef basic_stream_socket<tcp> socket;</tcp>
+</li>
+  <li>basic_stream_socket是模板类，声明在boost/asio/basic_stream_socket.hpp文件中，async_send操作只是简单的为
+  this-&gt;service.async_send(this-&gt;implementation, buffers, 0, handler);</li>
+</ul>
+
+<h4 id="而service的原型是什么呢">而service的原型是什么呢？</h4>
+
+<p>basic_stream_socket继承于basic_socket&lt;Protocol, stream_socket_service&gt;，
+而	stream_socket_service声明文件为boost/asio/stream_socket_service.hpp，L60中</p>
+
+<p>typedef detail::reactive_socket_service<protocol> service_impl_type;</protocol></p>
+
+<p>告诉我们service的原	型是detail::reactive_socket_service<tcp>，其声明文件为
+boost/asio/detail/reactive_socket_service.hpp</tcp></p>
+<h4 id="async_send操作实现逻辑为">async_send操作实现逻辑为：</h4>
+
+<ul>
+  <li>先分配一个回调函数，调用start_op，start_op的实现在detail/reactive_socket_service_base.ipp文件中，
+只是简单的向epoll_reactor调用start_op方法注册write_op。start_op在上面的段落中已经讲到了。</li>
+</ul>
+
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>安全编程-c++野指针和内存泄漏</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="尽管C++ 野指针和内存泄漏一直被诟病，但是在实时性很强的应用场合，c++ 仍然是不二之选。游戏服务器开发仍然使用c++ 作为主语言，但是大多结合动态脚本技术，一方面规避了野指针和内存泄露，一方面获得了开发效率和扩展性的红利。但脚本技术不是本文的讨论重点，事实上关于c++ 与 lua的技术文章我也一直在整理中，将会另文别述。今天主要说说在使用c++过程中，如何避免和解决野指针和内存泄漏问题。" />
+
+  <meta name="keywords" itemprop="tags" content="c++, 野指针, 内存泄漏"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="安全编程-c++野指针和内存泄漏" />
+<meta name="twitter:description" content="尽管C++ 野指针和内存泄漏一直被诟病，但是在实时性很强的应用场合，c++ 仍然是不二之选。游戏服务器开发仍然使用c++ 作为主语言，但是大多结合动态脚本技术，一方面规避了野指针和内存泄露，一方面获得了开发效率和扩展性的红利。但脚本技术不是本文的讨论重点，事实上关于c++ 与 lua的技术文章我也一直在整理中，将会另文别述。今天主要说说在使用c++过程中，如何避免和解决野指针和内存泄漏问题。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/safememory.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="安全编程-c++野指针和内存泄漏" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/safememory.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="尽管C++ 野指针和内存泄漏一直被诟病，但是在实时性很强的应用场合，c++ 仍然是不二之选。游戏服务器开发仍然使用c++ 作为主语言，但是大多结合动态脚本技术，一方面规避了野指针和内存泄露，一方面获得了开发效率和扩展性的红利。但脚本技术不是本文的讨论重点，事实上关于c++ 与 lua的技术文章我也一直在整理中，将会另文别述。今天主要说说在使用c++过程中，如何避免和解决野指针和内存泄漏问题。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-12-22T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="野指针" />
+  
+    <meta property="article:tag" content="内存泄漏" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/safememory.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">安全编程-c++野指针和内存泄漏</h1>
+            <h2 class="project-tagline">安全编程-c++野指针和内存泄漏</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-12-22T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Dec 22, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">安全编程-c++野指针和内存泄漏</h1>
+    <p class="post-meta">
+      <time datetime="2012-12-22T00:00:00+08:00" itemprop="datePublished">
+        
+        Dec 22, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要：</h2>
+<p>尽管C++ 野指针和内存泄漏一直被诟病，但是在实时性很强的应用场合，c++ 仍然是不二之选。游戏服务器开发仍然使用c++ 作为主语言，但是大多结合动态脚本技术，一方面规避了野指针和内存泄露，一方面获得了开发效率和扩展性的红利。但脚本技术不是本文的讨论重点，事实上关于c++ 与 lua的技术文章我也一直在整理中，将会另文别述。今天主要说说在使用c++过程中，如何避免和解决野指针和内存泄漏问题。</p>
+
+<h2 id="野指针">野指针：</h2>
+<p>野指针的出现会导致程序崩溃，这是每个人都不愿意看到的。Linux会生成coredump文件，可用gdb分析。Win下可以注册unexception获取调用堆栈，将错误信息写到文件中。先分析一下通常出现野指针的场景：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">monster_t</span>
+<span class="p">{</span>
+<span class="nl">protected:</span>
+    <span class="n">player_t</span><span class="o">*</span> <span class="n">m_attack</span><span class="p">;</span>
+
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">handle_ai</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">m_attack</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">m_attack</span><span class="o">-&gt;</span><span class="n">get_x</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>问题就在于，m_attack有值，但是对应的对象已经被销毁了。这是大部分野指针出现原因。分析类之间关系可知，monster_t 和 player_t是0-1的关系，monster_t引用player_t，但是player_t甚至都不知道有一个（或N个）monster 引用了自己。所以当player被销毁时，很难做到把所有引用该player_t的地方全部重置。这种问题其实比较常见，比如player中引用connection，而connection又是被网络层管理生命周期的，也同样容易产生野指针情况。常见的解决方式是：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">monster_t</span>
+<span class="p">{</span>
+<span class="nl">protected:</span>
+    <span class="kt">long</span> <span class="n">m_attack_id</span><span class="p">;</span>
+
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">handle_ai</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">player_t</span><span class="o">*</span> <span class="n">attack</span> <span class="o">=</span> <span class="n">obj_mgr</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">m_attack_id</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attack</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">attack</span><span class="o">-&gt;</span><span class="n">get_x</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>另外一种与之相似的方式：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">monster_t</span>
+<span class="p">{</span>
+<span class="nl">protected:</span>
+    <span class="n">player_t</span><span class="o">*</span> <span class="n">m_attack</span><span class="p">;</span>
+
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">handle_ai</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obj_mgr</span><span class="p">.</span><span class="n">is_exist</span><span class="p">(</span><span class="n">m_attack</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">m_attack</span><span class="o">-&gt;</span><span class="n">get_x</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">m_attack</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>梳理野指针的产生原因后，我们其实需要的是这样的指针：
+一种指针，引用了另一个对象的地址（不然就不是指针了），当目标对象销毁时，该指针自然指向null，而不需要目标对象主动通知重置。
+幸运的是，这种指针已经有了，就是weak_ptr; 在boost库中，sharedptr,scopedptr,weakptr统称为smartptr。可以尽量使用智能指针，
+避免野指针。本人建议尽量使用shared_ptr结合weak_ptr使用。Scoped_ptr本人使用的较少，只是在创建线程对象的时候使用，
+正好符合不能复制的语义。使用shared_ptr和weak_ptr的示例代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">monster_t</span>
+<span class="p">{</span>
+<span class="nl">protected:</span>
+    <span class="n">weak_ptr</span><span class="o">&lt;</span><span class="n">player_t</span><span class="o">&gt;</span> <span class="n">m_attack</span><span class="p">;</span>
+    <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">player_t</span><span class="o">&gt;</span> <span class="n">get_attack</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">player_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">m_attack</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">handle_ai</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">player_t</span><span class="o">&gt;</span> <span class="n">attack</span> <span class="o">=</span> <span class="n">get_attack</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attack</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">attack</span><span class="o">-&gt;</span><span class="n">get_x</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>有人问monster_t为什么不直接使用shared_ptr，如果使用shared_ptr就不符合现实的模型了，monster_t显然不应该控制player_t的生命周期，</p>
+
+<p>如果使用了shared_ptr，那么可能导致player_t被延迟析构，甚至会导致内存暴涨。这也是shared_ptr的使用误区，
+所以本人建议尽量shared_ptr和weak_ptr结合用，否则野指针问题解决了，内存泄漏问题又来了。</p>
+
+<h3 id="内存泄漏">内存泄漏：</h3>
+<p>野指针问题可以通过采用良好的编程范式，尽量规避，但总计c++规避内存泄漏的方法却很为难，简单而言尽量保证对象的分配和释放（分别）是单个入口的，这样大部分问题都可以拦截在code review阶段。那么怎么检测内存泄漏呢？</p>
+
+<p>首先说明本方法区别于valgrind等工具，该工具是调试期进行的检测，本文探究的是运行期的检测，确切说是运行期定时输出所有对象的数量到日志中。</p>
+
+<p>首先定义分配、释放对象的接口：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="o">*</span> <span class="nf">new_obj</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">T</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">();</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">inc</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG1</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="o">*</span> <span class="nf">new_obj</span><span class="p">(</span><span class="n">ARG1</span> <span class="n">arg1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">T</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">(</span><span class="n">arg1</span><span class="p">);</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">inc</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG1</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG2</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="o">*</span> <span class="nf">new_obj</span><span class="p">(</span><span class="n">ARG1</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">ARG2</span> <span class="n">arg2</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">T</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">);</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">inc</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="o">*</span> <span class="nf">new_array</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">T</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">inc</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>为了节省篇幅，这里只列举了三种构造的代码，当分配对象时，对应的类型数量增加1，obj_counter 使用原子操作为每一种类型记录其数量。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">obj_counter_i</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">obj_counter_i</span><span class="p">()</span><span class="o">:</span><span class="n">m_ref_count</span><span class="p">(</span><span class="mi">0</span><span class="p">){}</span>
+    <span class="k">virtual</span> <span class="o">~</span> <span class="n">obj_counter_i</span><span class="p">(){}</span>
+    <span class="kt">void</span> <span class="n">inc</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">__sync_add_and_fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">m_ref_count</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span> <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">dec</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="n">__sync_sub_and_fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">m_ref_count</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>        <span class="p">}</span>
+    <span class="kt">long</span> <span class="n">val</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span> <span class="k">return</span> <span class="n">m_ref_count</span><span class="p">;</span>                            <span class="p">}</span>
+
+    <span class="k">virtual</span> <span class="n">string</span> <span class="n">get_name</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s">""</span><span class="p">;</span> <span class="p">}</span>
+<span class="nl">protected:</span>
+    <span class="k">volatile</span> <span class="kt">long</span> <span class="n">m_ref_count</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">obj_counter_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">obj_counter_i</span>
+<span class="p">{</span>
+    <span class="n">obj_counter_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">reg</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">virtual</span> <span class="n">string</span> <span class="n">get_name</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">TYPE_NAME</span><span class="p">(</span><span class="n">T</span><span class="p">);</span> <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>相应的当对象被释放的时候，对应的对象数量减一，示例代码如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="nf">del_obj</span><span class="p">(</span><span class="n">T</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">delete</span> <span class="n">p</span><span class="p">;</span>
+        <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">obj_counter_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">dec</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样就做到了所有的对象的数量都被记录了，可以定时的将对象数量输出到文件：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">obj_counter_summary_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">reg</span><span class="p">(</span><span class="n">obj_counter_i</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_all_counter</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">long</span><span class="o">&gt;</span> <span class="n">get_all_obj_num</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">long</span><span class="o">&gt;</span> <span class="n">ret</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">list</span><span class="o">&lt;</span><span class="n">obj_counter_i</span><span class="o">*&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">m_all_counter</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">m_all_counter</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ret</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">make_pair</span><span class="p">((</span><span class="o">*</span><span class="n">it</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">get_name</span><span class="p">(),</span> <span class="p">(</span><span class="o">*</span><span class="n">it</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">()));</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">void</span> <span class="n">dump</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">path_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ofstream</span> <span class="n">tmp_fstream</span><span class="p">;</span>
+        <span class="n">tmp_fstream</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+        <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">long</span><span class="o">&gt;</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">get_all_obj_num</span><span class="p">();</span>
+        <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">long</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">ret</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+
+        <span class="kt">time_t</span> <span class="n">timep</span>   <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="k">struct</span> <span class="n">tm</span> <span class="o">*</span><span class="n">tmp</span> <span class="o">=</span> <span class="n">localtime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">timep</span><span class="p">);</span>
+
+        <span class="kt">char</span> <span class="n">tmp_buff</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+        <span class="n">sprintf</span><span class="p">(</span><span class="n">tmp_buff</span><span class="p">,</span> <span class="s">"%04d%02d%02d-%02d:%02d:%02d"</span><span class="p">,</span>
+                <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_year</span> <span class="o">+</span> <span class="mi">1900</span><span class="p">,</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_mon</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_mday</span><span class="p">,</span>
+                <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_hour</span><span class="p">,</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_min</span><span class="p">,</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">tm_sec</span><span class="p">);</span>
+        <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">1024</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+
+        <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"obj,num,%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">tmp_buff</span><span class="p">);</span>
+        <span class="n">tmp_fstream</span> <span class="o">&lt;&lt;</span> <span class="n">buff</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(;</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">ret</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"%s,%ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">first</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">);</span>
+            <span class="n">tmp_fstream</span> <span class="o">&lt;&lt;</span> <span class="n">buff</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">tmp_fstream</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="nl">protected:</span>
+    <span class="n">list</span><span class="o">&lt;</span><span class="n">obj_counter_i</span><span class="o">*&gt;</span>    <span class="n">m_all_counter</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>输出的文件格式为csv格式，方便进一步做数据分析。可以使用我开发的小工具格式化csv数据。url:http://ffown.sinaapp.com/perf/csv.html</p>
+
+<h4 id="文件内容data">文件内容data:</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>obj,num,20120606-17:01:41
+dumy,1111
+foo,222
+obj,num,20120606-18:01:41
+dumy,11311
+foo,2422
+obj,num,20120606-19:01:41
+dumy,41111
+foo,24442
+</code></pre></div></div>
+
+<p><img src="/assets/img/safememory/safememory1.png" alt=""></p>
+
+<h2 id="总结">总结：</h2>
+
+<ul>
+  <li>野指针可以使用shared_ptr和weak_ptr结合使用来尽量规避。</li>
+  <li>使用shared_ptr要尽量小心，否则可能导致对象无法释放，导致内存泄漏。</li>
+  <li>可以定时输出当前所有对象的数量，来分析是否有内存泄漏，或者内存泄漏是有哪些对象引起的。</li>
+  <li>本文介绍了记录所有对象的方法，除了可以分析内存泄漏外，也不失为数据分析的一种方法。需要注明的是，本方法不能替代valgrind工具，二者作用不同。</li>
+  <li>TYPE_NAME 的实现参考</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

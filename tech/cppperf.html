@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++ 后台程序实时性能监控</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="做后台程序经常会被问一句话，你的程序能撑多少人。一般官方一点的回答是这个得根据实际情况而定。 实际上后台程序的性能是可以被量化的。我们开发的每一个服务器程序， 对性能都非常有底，以为我们有数据。So，能撑多少人不少随便猜的，让数据报表来说话。" />
+
+  <meta name="keywords" itemprop="tags" content="cpp, 性能监控, 服务器"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++ 后台程序实时性能监控" />
+<meta name="twitter:description" content="做后台程序经常会被问一句话，你的程序能撑多少人。一般官方一点的回答是这个得根据实际情况而定。 实际上后台程序的性能是可以被量化的。我们开发的每一个服务器程序， 对性能都非常有底，以为我们有数据。So，能撑多少人不少随便猜的，让数据报表来说话。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/cppperf.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++ 后台程序实时性能监控" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/cppperf.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="做后台程序经常会被问一句话，你的程序能撑多少人。一般官方一点的回答是这个得根据实际情况而定。 实际上后台程序的性能是可以被量化的。我们开发的每一个服务器程序， 对性能都非常有底，以为我们有数据。So，能撑多少人不少随便猜的，让数据报表来说话。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-06-06T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="cpp" />
+  
+    <meta property="article:tag" content="性能监控" />
+  
+    <meta property="article:tag" content="服务器" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/cppperf.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++ 后台程序实时性能监控</h1>
+            <h2 class="project-tagline">C++ 后台程序实时性能监控</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-06-06T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jun 6, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++ 后台程序实时性能监控</h1>
+    <p class="post-meta">
+      <time datetime="2012-06-06T00:00:00+08:00" itemprop="datePublished">
+        
+        Jun 6, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="面对的问题">面对的问题：</h2>
+<p>做后台程序经常会被问一句话，你的程序能撑多少人。一般官方一点的回答是这个得根据实际情况而定。实际上后台程序的性能是可以被量化的。我们开发的每一个服务器程序，对性能都非常有底，以为我们有数据。So，能撑多少人不少随便猜的，让数据报表来说话。
+另外一种情况经常发生在开发人员之中，甲乙丙一起讨论接口实现，经常会说这么实现效率太低，那么实现效率才高等。实际上，效率高低都是相对而言的。一个函数1ms执行完毕够快吗？看起来挺快，若某接口需要此函数100次循环，那么情况就不是很乐观了。但是若此接口又是十天半个月才会被触发一次，似乎事情又变的不是很严重。说到这里想起《unix编程艺术》上关于性能优化的总结：</p>
+
+<ul>
+  <li>最有效的优化往往是优化之外的，如清晰干净的设计</li>
+  <li>最有效的优化就是不优化，摩尔定律会为你优化</li>
+  <li>如果确定要优化，必须找到真正的瓶颈</li>
+  <li>还有一种跟性能有关的情况是，后台程序经常有很多组件组成。比如在运行期发生接口调用性能下降的情况，必须知道是那些组件性能下降引起的。如果可以实时的知道所有接口的性能数据，以上的问题都可迎刃而解。</li>
+</ul>
+
+<h3 id="总结如下原因必须开启实时性能监控">总结如下原因，必须开启实时性能监控：</h3>
+
+<ul>
+  <li>我们需要知道系统的吞吐量，以此参数做部署等。</li>
+  <li>实时了解各个系统组件的性能，某组件发生故障，可以及时发现</li>
+  <li>获得程序接口调用热点，调用多且慢的接口才需要优化</li>
+  <li>解决方案：</li>
+</ul>
+
+<h3 id="后台程序开发一个专门统计性能的组件其需要有如下功能">后台程序开发一个专门统计性能的组件，其需要有如下功能：</h3>
+
+<ul>
+  <li>可以汇总性能数据，如定时将1小时内说有接口调用开销、次数等数据汇总到文件</li>
+  <li>可以非常方便的与逻辑层接口集成，比如在现有接口增加一行代码即可</li>
+  <li>直观的报表，性能数据写入文件必须按照通用的格式，方便工具分析数据，生成报表</li>
+  <li>性能监控组件</li>
+</ul>
+
+<p>我实现了一个性能组件performance_daemon_t。接口如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 性能监控</span>
+<span class="k">class</span> <span class="nc">performance_daemon_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">struct</span> <span class="n">perf_tool_t</span>
+    <span class="p">{</span>
+        <span class="n">perf_tool_t</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">mod_</span><span class="p">)</span><span class="o">:</span>
+            <span class="n">mod</span><span class="p">(</span><span class="n">mod_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tm</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="o">~</span><span class="n">perf_tool_t</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">struct</span> <span class="n">timeval</span> <span class="n">now</span><span class="p">;</span>
+            <span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">now</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+            <span class="kt">long</span> <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">now</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">-</span> <span class="n">tm</span><span class="p">.</span><span class="n">tv_sec</span><span class="p">)</span><span class="o">*</span><span class="mi">1000000</span> <span class="o">+</span> <span class="p">(</span><span class="n">now</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">-</span> <span class="n">tm</span><span class="p">.</span><span class="n">tv_usec</span><span class="p">);</span>
+            <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">performance_daemon_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">post</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">cost</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>    <span class="n">mod</span><span class="p">;</span>
+        <span class="k">struct</span> <span class="n">timeval</span> <span class="n">tm</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="nl">public:</span>
+    <span class="n">performance_daemon_t</span><span class="p">();</span>
+    <span class="o">~</span><span class="n">performance_daemon_t</span><span class="p">();</span>
+
+    <span class="c1">//! 启动线程，创建文件</span>
+    <span class="kt">int</span> <span class="n">start</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">path_</span><span class="p">,</span> <span class="kt">int</span> <span class="n">seconds_</span><span class="p">);</span>
+    <span class="c1">//! 关闭线程</span>
+    <span class="kt">int</span> <span class="n">stop</span><span class="p">();</span>
+
+    <span class="c1">//! 增加性能监控数据</span>
+    <span class="kt">void</span> <span class="n">post</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">mod_</span><span class="p">,</span> <span class="kt">long</span> <span class="n">us</span><span class="p">);</span>
+</code></pre></div></div>
+<p>perf_tool_t 是工具类，构造和析构自动调用两次gettimeofday获取函数调用开销，例外有辅助宏定义如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define AUTO_PERF() performance_daemon_t::perf_tool_t __tmp__(__FUNCTION__)
+</span>
+<span class="cp">#define PERF(m)     performance_daemon_t::perf_tool_t __tmp__(m)
+</span></code></pre></div></div>
+<p>使用示例:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">AUTO_PERF</span><span class="p">();</span>
+    <span class="c1">//! TODO -----</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">performance_daemon_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">start</span><span class="p">(</span><span class="s">"perf.txt"</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span> 
+    <span class="n">foo</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>performance_daemon_t 每隔5秒将性能统计数据输出到perf.txt， perf.txt的内容是CVS文件格式。</p>
+
+<p>报表工具：</p>
+
+<p>perf.txt 文件内容还不够直观，示例内容如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>time,mod,max_cost[us],min_cost[us],per_cost[us],request_per_second,exe_times
+20120606-17:01:41,dumy,515,174,254,3937,390
+20120606-17:01:41,foo,5924,4,506,1976,1030
+20120606-17:01:41,test,304,8,243,4115,185
+time,mod,max_cost[us],min_cost[us],per_cost[us],request_per_second,exe_times
+20120606-17:11:41,dumy,1086,222,280,5571,312
+20120606-17:11:41,foo,5707,194,503,1988,770
+20120606-17:11:41,test,807,8,265,3773,142
+time,mod,max_cost[us],min_cost[us],per_cost[us],request_per_second,exe_times
+20120606-17:21:41,dumy,1086,222,680,2571,512
+20120606-17:21:41,foo,5707,194,403,1388,470
+20120606-17:21:41,test,807,8,265,4773,442
+</code></pre></div></div>
+
+<p>为生成足够友好、直观的报表，我实现了一个WEB报表页面，http://ffown.sinaapp.com/perf/， 将perf.txt 内容直接粘贴到web 页面，点击转换输出如下报表：</p>
+
+<h3 id="各个接口性能监控-折线图">各个接口性能监控-折线图：</h3>
+<p><img src="/assets/img/cppperf/cppperf1.jpg" alt=""></p>
+
+<p>此图显示了三个接口随时间顺序的走势，可以非常清楚foo、test、dumy三个接口那个时间性能高，哪个时间性能低，一目了然。</p>
+
+<h3 id="接口热点分布图">接口热点分布图：</h3>
+
+<p><img src="/assets/img/cppperf/cppperf2.jpg" alt=""></p>
+
+<p>显示三个接口随时间调用次数走势，可以很清楚显示哪个时间段是高峰期。大饼图显示了哪个接口是热点接口，很明显，foo 接口调用次数最多，优化当优先优化foo。</p>
+
+<h3 id="组件实现浅析">组件实现浅析：</h3>
+
+<ul>
+  <li>post 接口：程序把接口调用开销投递到性能组件任务队列中，保证了对接口性能影响最小。</li>
+  <li>timer定时回调：timer_service_t 是我用epoll 实现的定时器，主要实现如下:</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">timer_service_t</span><span class="o">::</span><span class="n">run</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">epoll_event</span> <span class="n">ev_set</span><span class="p">[</span><span class="mi">64</span><span class="p">];</span>
+    <span class="c1">//! interupt();</span>
+
+    <span class="k">struct</span> <span class="n">timeval</span> <span class="n">tv</span><span class="p">;</span>
+
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="o">::</span><span class="n">epoll_wait</span><span class="p">(</span><span class="n">m_efd</span><span class="p">,</span> <span class="n">ev_set</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">m_min_timeout</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">m_runing</span><span class="p">)</span><span class="c1">//! cancel</span>
+        <span class="p">{</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tv</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+        <span class="kt">long</span> <span class="n">cur_ms</span> <span class="o">=</span> <span class="n">tv</span><span class="p">.</span><span class="n">tv_sec</span><span class="o">*</span><span class="mi">1000</span> <span class="o">+</span> <span class="n">tv</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">;</span>
+
+        <span class="n">process_timer_callback</span><span class="p">(</span><span class="n">cur_ms</span><span class="p">);</span>
+        
+    <span class="p">}</span><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>process_timer_callback 中检测链表内所有的定时任务，若超时，触发回调函数。</p>
+
+<h3 id="备注">备注：</h3>
+
+<p>有人可能当心AUTO_PERF(); 会影响接口性能，其实其平均开销大约为1us</p>
+
+<h3 id="代码实现">代码实现：</h3>
+
+<p>https://ffown.googlecode.com/svn/trunk/example/ff_performance</p>
+
+<h3 id="web-报表生成工具">WEB 报表生成工具：</h3>
+
+<p>http://ffown.sinaapp.com/perf/</p>
+
+<h3 id="文档">文档：</h3>
+
+<p>http://ffown.sinaapp.com/perf/perf.pdf</p>
+
+<p>更多精彩文章 http://h2cloud.org</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

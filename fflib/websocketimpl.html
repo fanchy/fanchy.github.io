@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>WebSocket协议详解与c++&amp;c#实现</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="封装了epoll和socket" />
+
+  <meta name="keywords" itemprop="tags" content="fflib, Websocket协议, socket"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="WebSocket协议详解与c++&amp;c#实现" />
+<meta name="twitter:description" content="封装了epoll和socket" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/websocketimpl.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="WebSocket协议详解与c++&amp;c#实现" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/websocketimpl.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="封装了epoll和socket" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2019-04-25T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+    <meta property="article:tag" content="Websocket协议" />
+  
+    <meta property="article:tag" content="socket" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/websocketimpl.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">WebSocket协议详解与c++&amp;c#实现</h1>
+            <h2 class="project-tagline">Websocket协议是全双工的、基于数据帧的、建立在tcp之上的长连接协议。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2019-04-25T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Apr 25, 2019
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">WebSocket协议详解与c++&amp;c#实现</h1>
+    <p class="post-meta">
+      <time datetime="2019-04-25T00:00:00+08:00" itemprop="datePublished">
+        
+        Apr 25, 2019
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要：</h2>
+<p>随着手机游戏、H5游戏以及微信小游戏的普及，越来越多的客户端-服务器端的通讯采用websocket协议。
+Websocket协议是全双工的、基于数据帧的、建立在tcp之上的长连接协议。Websocket的协议是头是字符串的兼容http的，</p>
+
+<p>而握手之后的数据帧则是紧凑的二进制，所以websocket是紧凑和高效的。现在主流的PC浏览器以及手机浏览器对websocket都实现了非常成熟的支持。
+Websocket协议有着统一的标准的，所有websocket通讯无论实现的语言如何，无论使用的终端如何，最终都是一致的。
+Websocket的有点有：</p>
+
+<ol>
+  <li>Websocket有公共的标准，有很多公共的库可以使用，比如web端，各个浏览器都已原生的支持websocket，所以拿来即用，非常的方便。比如cocos2dx就继承了websocket。</li>
+  <li>比如游戏使用了websocket，那么就可以非常容易的用web调用js发websocket消息，从而模拟客户端的操作。</li>
+  <li>Websocket相对于http是长连接的，这样就可以实现实时的推送消息。</li>
+  <li>Websocket既能支持文本格式也可以支持二进制格式，这样无论是js还是c++，都可以适当的选择自己喜欢的数据格式。</li>
+</ol>
+
+<p><img src="/assets/img/websocketimpl/websocketimpl1.png" alt=""></p>
+
+<p>Websocket可以说完全治好了大家关于长连接使用什么协议的纠结。再游戏行业，服务器一般都是使用C++专门开发的网络程序，常规的一般都是使用比较传统的二进制协议，现在想用websocket的人越来越多，但是可以用于服务器端的websocket库却很少，要不就是库太重量级依赖了太多不需要的模块要不就是绑定了特定的网络接口实现，github上搜了下还websocket库很少。下面介绍一下我的通用websocket解析库，具有如下特点。</p>
+<ol>
+  <li>轻量，只封装websocket的解析，不依赖任何网络接口，拿来即用。</li>
+  <li>逻辑清晰，你可以直接看代码，直接能够理解websocket的协议。</li>
+  <li>One header file only。全部实现就在一个头文件里，集成不能再容易了。</li>
+  <li>目前提供C++和c#的实现。别的语言我就没空写了，刚兴趣的可以照猫画虎来一个。</li>
+</ol>
+
+<h2 id="websocket消息头">Websocket消息头：</h2>
+<p>模拟发送websocket非常的容易，我们写一个很简单的html+js就可以实现，当然你可以直接使用我的这个模拟客户端: https://fanchy.github.io/client.html。比如我们输入ip为127.0.0.1端口44000，将会受到这样的文本协议。</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET /chat HTTP/1.1
+Host: 127.0.0.1:44000
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36
+Upgrade: websocket
+Origin: https://fanchy.github.io
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Sec-WebSocket-Key: 8SIMf+o8pqn1RCe/ivxtPg==
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+</code></pre></div></div>
+<p>关键参数有：</p>
+<ul>
+  <li>Get /chat 这个是客户端指定的目录，我们做游戏服务器的，基本上根据目录区分服务器，只根据端口区分服务器，所以这个参数实际上可以忽略。</li>
+  <li>Upgrade: websocket 这个必须有，这个是兼容http的需要，有这个字段说明这个不是普通的http是一个websocket的连接。</li>
+  <li>Sec-WebSocket-Version版本号，可以忽略。</li>
+  <li>Sec-WebSocket-Key这个是用作握手的key，具体使用见下文。
+Websocket协议的验证
+我们游戏服务器可能使用多种协议，比如同时兼容二进制协议和websocket协议。因为有websocket一定是GET开头的，所以我们可以通过验证第一个消息是不是带GET字符串从而判断对方连接是websocket连接还是普通连接。示例代码：
+    <div class="language-cpp highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">statusWebSocketConnection</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">cacheRecvData</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">dictParams</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span> <span class="o">==</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">strRecvData</span> <span class="o">=</span> <span class="n">cacheRecvData</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"GET"</span><span class="p">)</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">statusWebSocketConnection</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"GE"</span><span class="p">)</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">statusWebSocketConnection</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"G"</span><span class="p">)</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">statusWebSocketConnection</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">statusWebSocketConnection</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"</span><span class="se">\r\n\r\n</span><span class="s">"</span><span class="p">)</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span><span class="c1">//!header data not end</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">strRecvData</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"Upgrade: websocket"</span><span class="p">)</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">statusWebSocketConnection</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">strLines</span><span class="p">;</span>
+<span class="n">strSplit</span><span class="p">(</span><span class="n">strRecvData</span><span class="p">,</span> <span class="n">strLines</span><span class="p">,</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">strLines</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">line</span> <span class="o">=</span> <span class="n">strLines</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">strParams</span><span class="p">;</span>
+    <span class="n">strSplit</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">strParams</span><span class="p">,</span> <span class="s">": "</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strParams</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">dictParams</span><span class="p">[</span><span class="n">strParams</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">strParams</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strParams</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">strParams</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">find</span><span class="p">(</span><span class="s">"GET"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">dictParams</span><span class="p">[</span><span class="s">"PATH"</span><span class="p">]</span> <span class="o">=</span> <span class="n">strParams</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="websocket的握手">Websocket的握手</h2>
+<p>Websocket因为要兼容http，所以会发一个常规的http的协议头，然后进行一次握手从而建立安全连接。Websocket握手的时候也就是建立连接后第一个消息会包含Sec-WebSocket-Key这个字段，服务器接收到这个字段后追加一个固定的guid值”258EAFA5-E914-47DA-95CA-C5AB0DC85B11”，然后做sha1加密并转base64变成可见字符返回给客户端。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">dictParams</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"Sec-WebSocket-Key"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">dictParams</span><span class="p">.</span><span class="n">end</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">Sec_WebSocket_Key</span> <span class="o">=</span> <span class="n">dictParams</span><span class="p">[</span><span class="s">"Sec-WebSocket-Key"</span><span class="p">];</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">strGUID</span> <span class="o">=</span> <span class="n">Sec_WebSocket_Key</span> <span class="o">+</span> <span class="s">"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">dataHashed</span> <span class="o">=</span> <span class="n">sha1Encode</span><span class="p">(</span><span class="n">strGUID</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">strHashBase64</span> <span class="o">=</span> <span class="n">base64Encode</span><span class="p">(</span><span class="n">dataHashed</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">dataHashed</span><span class="p">.</span><span class="n">length</span><span class="p">(),</span> <span class="nb">false</span><span class="p">);</span>
+
+    <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">512</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"HTTP/1.1 101 Switching Protocols</span><span class="se">\r\n</span><span class="s">Upgrade: websocket</span><span class="se">\r\n</span><span class="s">Connection: Upgrade</span><span class="se">\r\n</span><span class="s">Sec-WebSocket-Accept: %s</span><span class="se">\r\n\r\n</span><span class="s">"</span><span class="p">,</span> <span class="n">strHashBase64</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+
+    <span class="n">addSendPkg</span><span class="p">(</span><span class="n">buff</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>组装成websocket协议头如下：
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: mzjDI+C9Ekz6tc/f5gWv38L5Hu0=
+客户端收到服务器的这个应答消息后，握手完成，连接建立完成，开始数据传输。</p>
+
+<h2 id="数据帧">数据帧</h2>
+<p>与tcp的流式数据不同，与http相似，websocket使用帧的方式传输数据，这样解包实际上是方便的，根据长度解析消息包这个最清晰了。
+ABNF如下图所示：
+<img src="/assets/img/websocketimpl/websocketimpl2.png" alt=""></p>
+
+<ul>
+  <li>FIN：1 bit，如果不是分片，这个就是1，如果是分片，并且不是最后一个片，那么就是0</li>
+  <li>RSV1, RSV2, RSV3: 每个1 bit，简单说用不到</li>
+  <li>Opcode: 4 bits， 0，1, 2都代表数据，8代表关闭连接，0X9为ping，0XA为pong其他用不到。</li>
+  <li>Mask: 1 bit 这个客户端必须是1.</li>
+  <li>Payload length: 7 bits, 7+16 bits, 或者 7+64 bits，，如果是小于126就用一个字节表示数据长度，如果等于126，表示后续2字节表示长度，如果是127后续8字节表示长度。</li>
+  <li>Masking-key: 0 or 4 bytes 客户端发送的必须有掩码</li>
+  <li>Payload data不出意外剩下的就是数据了。</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">nFIN</span> <span class="o">=</span> <span class="p">((</span><span class="n">cacheRecvData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">==</span> <span class="mh">0x80</span><span class="p">)</span><span class="o">?</span> <span class="mi">1</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">nOpcode</span> <span class="o">=</span> <span class="n">cacheRecvData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x0F</span><span class="p">;</span>
+    <span class="c1">//int nMask = ((cacheRecvData[1] &amp; 0x80) == 0x80) ? 1 : 0; //!this must be 1</span>
+    <span class="kt">int</span> <span class="n">nPayload_length</span> <span class="o">=</span> <span class="n">cacheRecvData</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x7F</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">nPlayLoadLenByteNum</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nPayload_length</span> <span class="o">==</span> <span class="mi">126</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">nPlayLoadLenByteNum</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">nMaskingKeyByteNum</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">aMasking_key</span><span class="p">;</span>
+    <span class="n">aMasking_key</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cacheRecvData</span><span class="p">.</span><span class="n">c_str</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nPlayLoadLenByteNum</span><span class="p">,</span> <span class="n">nMaskingKeyByteNum</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">aPayload_data</span><span class="p">;</span>
+    <span class="n">aPayload_data</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cacheRecvData</span><span class="p">.</span><span class="n">c_str</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nPlayLoadLenByteNum</span> <span class="o">+</span> <span class="n">nMaskingKeyByteNum</span><span class="p">,</span> <span class="n">nPayload_length</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">nLeftSize</span> <span class="o">=</span> <span class="n">cacheRecvData</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">nPlayLoadLenByteNum</span> <span class="o">+</span> <span class="n">nMaskingKeyByteNum</span> <span class="o">+</span> <span class="n">nPayload_length</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">nLeftSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">leftBytes</span><span class="p">;</span>
+        <span class="n">leftBytes</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cacheRecvData</span><span class="p">.</span><span class="n">c_str</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nPlayLoadLenByteNum</span> <span class="o">+</span> <span class="n">nMaskingKeyByteNum</span> <span class="o">+</span> <span class="n">nPayload_length</span><span class="p">,</span> <span class="n">nLeftSize</span><span class="p">);</span>
+        <span class="n">cacheRecvData</span> <span class="o">=</span> <span class="n">leftBytes</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nPayload_length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">aPayload_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)(</span><span class="n">aPayload_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">aMasking_key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">nMaskingKeyByteNum</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="mi">8</span> <span class="o">==</span> <span class="n">nOpcode</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">addSendPkg</span><span class="p">(</span><span class="n">buildPkg</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="n">nOpcode</span><span class="p">));</span><span class="c1">// close</span>
+        <span class="n">bIsClose</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">==</span> <span class="n">nOpcode</span> <span class="o">||</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">nOpcode</span> <span class="o">||</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">nOpcode</span> <span class="o">||</span> <span class="mi">9</span> <span class="o">==</span> <span class="n">nOpcode</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">9</span> <span class="o">==</span> <span class="n">nOpcode</span><span class="p">)</span><span class="c1">//!ping</span>
+        <span class="p">{</span>
+            <span class="n">addSendPkg</span><span class="p">(</span><span class="n">buildPkg</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="mh">0xA</span><span class="p">));</span><span class="c1">// pong</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">nFIN</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dataFragmentation</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">addRecvPkg</span><span class="p">(</span><span class="n">aPayload_data</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="n">dataFragmentation</span> <span class="o">+=</span> <span class="n">aPayload_data</span><span class="p">;</span>
+                <span class="n">addRecvPkg</span><span class="p">(</span><span class="n">dataFragmentation</span><span class="p">);</span>
+                <span class="n">dataFragmentation</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">dataFragmentation</span> <span class="o">+=</span> <span class="n">aPayload_data</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="pingpongclose">Ping/pong/close</h2>
+
+<p>收到ping就发pong，有可能ping的时候也带着数据，所以要处理下。但是貌似Chrome很长时间不会自动发ping。
+服务器收到close消息可以回一个消息应答一下，也可以直接关闭连接。
+集成到网络层
+在自己的socket里加一个WSProtocol对象，在收到消息的地方一般是HandleRecv函数里加一段WSProtocol判断和处理的代码就可以了，示例如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">handleRecv</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">len</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;&amp;</span> <span class="n">waitToSend</span> <span class="o">=</span> <span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">getSendPkg</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">waitToSend</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sp_</span><span class="o">-&gt;</span><span class="n">sendRaw</span><span class="p">(</span><span class="n">waitToSend</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">clearSendPkg</span><span class="p">();</span>
+
+    <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;&amp;</span> <span class="n">recvPkg</span> <span class="o">=</span> <span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">getRecvPkg</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">recvPkg</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">eachRecvPkg</span> <span class="o">=</span> <span class="n">recvPkg</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="kt">uint16_t</span> <span class="n">nCmd</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">m_message</span><span class="p">.</span><span class="n">getHead</span><span class="p">().</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">nCmd</span><span class="p">;</span>
+        <span class="n">m_message</span><span class="p">.</span><span class="n">appendToBody</span><span class="p">(</span><span class="n">eachRecvPkg</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">eachRecvPkg</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+        <span class="n">m_message</span><span class="p">.</span><span class="n">getHead</span><span class="p">().</span><span class="n">size</span> <span class="o">=</span> <span class="n">eachRecvPkg</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="k">this</span><span class="o">-&gt;</span><span class="n">post_msg</span><span class="p">(</span><span class="n">sp_</span><span class="p">);</span>
+        <span class="n">m_message</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">clearRecvPkg</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">m_oWSProtocol</span><span class="p">.</span><span class="n">isClose</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="n">sp_</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="总结">总结：</h2>
+<ul>
+  <li>本文实现的websocket为纯协议解析，不依赖网络层，这样想用老的网络层支持websocket就非常容易啦。</li>
+  <li>本实现就一个头文件，依赖OpenSSL（sha1加密）</li>
+  <li>Github地址 https://github.com/fanchy/h2engine/tree/master/fflib/net/wsprotocol.h</li>
+  <li>同时提供一个c#的版本https://github.com/fanchy/h2engine/blob/master/workercs/fflib/wsprotocol.cs</li>
+  <li>归属于项目：h2engine 地址：https://github.com/fanchy/h2engine，感兴趣的可以star。</li>
+  <li>这是我的github主页https://github.com/fanchy，有些有意思的分享。</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

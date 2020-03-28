@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>A星路径搜索</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="在人工智能中有一类问题是有确定解的，如路径、五子棋等，这样的问题非常适合使用搜索来解决。 路径搜索是一个很有趣的问题，在人工智能中算是很基础的问题。最近一直在读《Artificial Intelligence-A Modern Approach》，搜索部分看完印象最深的就是A星算法了，这个在游戏开发中也最常用。于是乎做个总结，明天就掀过这篇了。" />
+
+  <meta name="keywords" itemprop="tags" content="astar, 寻路算法"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="ai" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="A星路径搜索" />
+<meta name="twitter:description" content="在人工智能中有一类问题是有确定解的，如路径、五子棋等，这样的问题非常适合使用搜索来解决。 路径搜索是一个很有趣的问题，在人工智能中算是很基础的问题。最近一直在读《Artificial Intelligence-A Modern Approach》，搜索部分看完印象最深的就是A星算法了，这个在游戏开发中也最常用。于是乎做个总结，明天就掀过这篇了。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//ai/astarcpp.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="A星路径搜索" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//ai/astarcpp.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="在人工智能中有一类问题是有确定解的，如路径、五子棋等，这样的问题非常适合使用搜索来解决。 路径搜索是一个很有趣的问题，在人工智能中算是很基础的问题。最近一直在读《Artificial Intelligence-A Modern Approach》，搜索部分看完印象最深的就是A星算法了，这个在游戏开发中也最常用。于是乎做个总结，明天就掀过这篇了。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-04-04T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="astar" />
+  
+    <meta property="article:tag" content="寻路算法" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="ai" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/ai/astarcpp.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">A星路径搜索</h1>
+            <h2 class="project-tagline">A星路径搜索</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-04-04T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Apr 4, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">A星路径搜索</h1>
+    <p class="post-meta">
+      <time datetime="2012-04-04T00:00:00+08:00" itemprop="datePublished">
+        
+        Apr 4, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h1 id="a星路径搜索">A星路径搜索</h1>
+<h2 id="摘要">摘要:</h2>
+<p>　　在人工智能中有一类问题是有确定解的，如路径、五子棋等，这样的问题非常适合使用搜索来解决。 路径搜索是一个很有趣的问题，在人工智能中算是很基础的问题。最近一直在读《Artificial Intelligence-A Modern Approach》，搜索部分看完印象最深的就是A星算法了，这个在游戏开发中也最常用。于是乎做个总结，明天就掀过这篇了。</p>
+
+<h2 id="路径搜索算法">路径搜索算法：</h2>
+<h3 id="dijkstra">Dijkstra：</h3>
+<p>Dijkstra 最短路径算法，大学数据结构教科书上都讲过，这里也不赘述了。但是为了及和一下几个算法做比较，我google 了一个图，非常直接的显示Dijkstra算法的搜索过程：
+<img src="/assets/img/astarcpp/astarcpp1.png" alt=""></p>
+
+<p>图中以中心为起点，以辐射状不断向中心外搜索（每次取距离起点最近的点），一圈一圈向外扩张，直到逼近目标点，完成路径搜索。</p>
+
+<h2 id="best-first-search">Best-First-Search:</h2>
+<p><img src="/assets/img/astarcpp/astarcpp2.png" alt=""></p>
+
+<p>BSF 每次扩张节点，都选择最接近目标的节点。Dijkstra 是每次都选择据起点最近的节点。区别是到起点的距离总是已知的，而都终点的距离只能是估计的。所以BSF 提供了启发式函数h。常见的启发式函数h有：</p>
+
+<ul>
+  <li>基于绝对距离，计算当前节点到目标点的绝对距离（此时并不能知晓该路径是否可行，也许会有阻碍）</li>
+  <li>基于方向的，如果目标在东方，那么只向东南、东、东北三个方向扩展，在障碍物少的情况下，BSF可以非常快、非常直接的搜索到目标。如果因障碍阻塞，改变了路径方向，BSF找到的不一定是最近的路径。
+    <h2 id="a-星算法">A 星算法</h2>
+    <p>A 星算法兼具Dijkstra 准确和 BSF 的快速，在搜索路径时，通过启发式函数h 计算当前节点到目标节点的距离，而起点到当前点距离已知，则每次选择f = g + h 最小的节点。A星总是尝试找到最短的路径，阻碍物少的情况下性能接近BSF。</p>
+  </li>
+</ul>
+
+<h2 id="星算法原理">星算法原理</h2>
+<p><img src="/assets/img/astarcpp/astarcpp3.png" alt=""></p>
+
+<h2 id="星算法实现">星算法实现</h2>
+<h3 id="主逻辑实现">主逻辑实现：</h3>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">astar_t</span><span class="o">::</span><span class="n">search_path</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">from_index</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">to_index</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint32_t</span><span class="o">&gt;&amp;</span> <span class="n">path_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//! open 表中保存待扩展的节点</span>
+    <span class="c1">//! visited 保存此次搜索访问过的节点，待搜索完成，将其状态恢复到默认状态</span>
+    <span class="n">open_table_t</span>        <span class="n">open</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">map_node_t</span><span class="o">*&gt;</span> <span class="n">visited</span><span class="p">;</span>
+
+    <span class="n">search_node_t</span> <span class="n">current</span><span class="p">;</span>
+    <span class="n">search_node_t</span> <span class="n">neighbor_node</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">map_node_t</span><span class="o">*&gt;</span> <span class="n">neighbors</span><span class="p">;</span>
+
+    <span class="c1">//! 先将起始点加入到open 表中</span>
+    <span class="n">current</span><span class="p">.</span><span class="n">set_pos_index</span><span class="p">(</span><span class="n">from_index</span><span class="p">);</span>
+    <span class="n">open</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">current</span><span class="p">);</span>
+
+    <span class="n">visited</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">m_map</span><span class="p">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">()));</span>
+
+    <span class="c1">//! 大循环，直到open为空（找不到目标） 或 找到目标</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">open</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">open</span><span class="p">.</span><span class="n">pop_first</span><span class="p">(</span><span class="n">current</span><span class="p">);</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">()</span> <span class="o">==</span> <span class="n">to_index</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">//! 添加到close 表</span>
+        <span class="n">m_map</span><span class="p">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">())</span><span class="o">-&gt;</span><span class="n">set_closed</span><span class="p">();</span>
+    
+        <span class="c1">//! 找到当前节点的所有邻居节点， 不同的游戏中该函数实现可能不同</span>
+        <span class="c1">//! 有的游戏可以走斜线，而有些不能，如坦克大战就不能走斜线</span>
+        <span class="n">m_map</span><span class="p">.</span><span class="n">get_neighbors</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">(),</span> <span class="n">neighbors</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">neighbors</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">map_node_t</span><span class="o">*</span> <span class="n">neighbor_map_node</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="n">neighbor_node</span><span class="p">.</span><span class="n">set_pos_index</span><span class="p">(</span><span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">get_pos_index</span><span class="p">());</span>
+            
+            <span class="c1">//! 计算该点的 g 和 h 值</span>
+            <span class="n">neighbor_node</span><span class="p">.</span><span class="n">set_gval</span><span class="p">(</span><span class="n">m_map</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">(),</span> <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">get_pos_index</span><span class="p">()));</span>
+            <span class="n">neighbor_node</span><span class="p">.</span><span class="n">set_hval</span><span class="p">(</span><span class="n">m_map</span><span class="p">.</span><span class="n">heuristic</span><span class="p">(</span><span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">get_pos_index</span><span class="p">(),</span> <span class="n">to_index</span><span class="p">));</span>
+
+            <span class="c1">//! 如果该点已经在open表中，检查g值，若g值更小，说明当前路径更近，更新open表</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">true</span> <span class="o">==</span> <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">is_open</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">neighbor_node</span><span class="p">.</span><span class="n">get_gval</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">get_gval</span><span class="p">())</span>
+                <span class="p">{</span>
+                    <span class="n">open</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">get_fval</span><span class="p">(),</span> <span class="n">neighbor_node</span><span class="p">);</span>
+                    <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">set_gval</span><span class="p">(</span><span class="n">neighbor_node</span><span class="p">.</span><span class="n">get_gval</span><span class="p">());</span>
+                    <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">set_hval</span><span class="p">(</span><span class="n">neighbor_node</span><span class="p">.</span><span class="n">get_hval</span><span class="p">());</span>
+                    <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">set_parrent</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">());</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="c1">//! 如果该点既没有在open，也没有在close中，直接添加到open</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">false</span> <span class="o">==</span> <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">is_closed</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">open</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">neighbor_node</span><span class="p">);</span>
+                <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">set_open</span><span class="p">();</span>
+                <span class="n">neighbor_map_node</span><span class="o">-&gt;</span><span class="n">set_parrent</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">());</span>
+                <span class="n">visited</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">neighbor_map_node</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="c1">//! 如果已经在close 中，简单跳过</span>
+            <span class="k">else</span> <span class="p">{}</span> <span class="c1">//! closed ignore</span>
+        <span class="p">}</span>
+        <span class="n">neighbors</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">//! 找到了目标，逆序遍历，得到完整的路径</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">()</span> <span class="o">==</span> <span class="n">to_index</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">path_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">());</span>
+        <span class="kt">uint32_t</span> <span class="n">next</span> <span class="o">=</span> <span class="n">m_map</span><span class="p">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">get_pos_index</span><span class="p">())</span><span class="o">-&gt;</span><span class="n">get_parrent</span><span class="p">();</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">next</span> <span class="o">!=</span> <span class="n">from_index</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">path_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">next</span><span class="p">);</span>
+            <span class="n">next</span> <span class="o">=</span> <span class="n">m_map</span><span class="p">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">get_parrent</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">path_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">from_index</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="c1">//! 最后将所有的已访问过的节点状态清楚, 为下次搜索做准备</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">visited</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">visited</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">clear</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">visited</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="星数据结构">星数据结构</h2>
+<ul>
+  <li>open 表，维护待扩展的节点，每次从其中找到f = g + h 最小的节点，由pop_first 实现</li>
+  <li>open 表 是按照f = g + h 由大到小顺排序的，是一个multimap</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef multimap&lt;uint32_t, search_node_t&gt; table_t;
+    struct open_table_t
+    {
+        table_t nodes;
+        bool empty() { return nodes.empty(); }
+        int pop_first(search_node_t&amp; ret)
+        {
+            table_t::iterator it = nodes.begin();
+            ret = it-&gt;second;
+            nodes.erase(it);
+            return 0;
+        }
+        void insert(const search_node_t&amp; node_)
+        {
+            nodes.insert(make_pair(node_.get_fval(), node_));
+        }
+        void update(uint32_t old_, const search_node_t&amp; node_)
+        {
+            pair&lt;table_t::iterator, table_t::iterator&gt; ret = nodes.equal_range(old_);
+            table_t::iterator it = ret.first;
+            for (; it != ret.second; ++it)
+            {
+                if (it-&gt;second == node_)
+                {
+                    //! 可以优化， 如果前一个比该节点小，才需要删除
+                    nodes.erase(it);
+                }
+            }
+            this-&gt;insert(node_);
+        }
+    };
+</code></pre></div></div>
+
+<h2 id="map-管理器">map 管理器</h2>
+<p>map 管理器记录所有地图信息，记录某个坐标其相邻坐标信息，记录某个坐标是否可通行信息、地图的宽、高等、两点的距离等。map管理器中维护一个二维数组</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">map_mgr_t</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">width_</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">height_</span><span class="p">)</span><span class="o">:</span>
+            <span class="n">m_map_nodes</span><span class="p">(</span><span class="nb">NULL</span><span class="p">),</span>
+            <span class="n">m_width</span><span class="p">(</span><span class="n">width_</span><span class="p">),</span>
+            <span class="n">m_height</span><span class="p">(</span><span class="n">height_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">m_map_nodes</span> <span class="o">=</span> <span class="p">(</span><span class="n">map_node_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">m_width</span> <span class="o">*</span> <span class="n">m_height</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">map_node_t</span><span class="p">));</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">uint32_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m_height</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kt">uint32_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m_width</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">new</span><span class="p">(</span><span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">+</span> <span class="n">j</span><span class="p">)</span> <span class="n">map_node_t</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">+</span> <span class="n">j</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="获取邻居节点方法如下限制不能斜着走不同的游戏可能有不同的实现">获取邻居节点方法如下，限制不能斜着走，不同的游戏可能有不同的实现</h2>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">get_neighbors</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">pos_</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">map_node_t</span><span class="o">*&gt;&amp;</span> <span class="n">ret_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">map_node_t</span><span class="o">*</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">pos_</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;=</span> <span class="n">m_map_nodes</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span> <span class="o">&lt;</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">m_height</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">is_can_pass</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">ret_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">pos_</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;=</span> <span class="n">m_map_nodes</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span> <span class="o">&lt;</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">m_height</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">is_can_pass</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">ret_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">pos_</span> <span class="o">-</span> <span class="n">m_width</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;=</span> <span class="n">m_map_nodes</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span> <span class="o">&lt;</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">m_height</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">is_can_pass</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">ret_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">pos_</span> <span class="o">+</span> <span class="n">m_width</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">&gt;=</span> <span class="n">m_map_nodes</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span> <span class="o">&lt;</span> <span class="n">m_map_nodes</span> <span class="o">+</span> <span class="n">m_height</span> <span class="o">*</span> <span class="n">m_width</span> <span class="o">&amp;&amp;</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">is_can_pass</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="n">ret_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="启发式函数">启发式函数</h2>
+<p>由于不能斜着走，那么启发式函数h 只是获得x、y上偏移和。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="nf">heuristic</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">from_</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">to_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">distance</span><span class="p">(</span><span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">);</span>
+        <span class="p">}</span>
+</code></pre></div></div>
+<h2 id="todo">TODO：</h2>
+<ul>
+  <li>astar_t 应该模板化， heuristic、distance、get_neighbors都应该是可定制的</li>
+  <li>性能参数测试，如1000*1000地图上最坏情况的搜索开销</li>
+  <li>open表更新还可以优化，当更新g值后若小于迭代器前一个节点，才需要执行删除再插入</li>
+</ul>
+
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

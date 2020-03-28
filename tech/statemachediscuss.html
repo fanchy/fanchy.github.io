@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>状态机的实现探讨</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="状态机的实现探讨" />
+
+  <meta name="keywords" itemprop="tags" content="C++, ai, statemachine"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="状态机的实现探讨" />
+<meta name="twitter:description" content="状态机的实现探讨" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/statemachediscuss.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="状态机的实现探讨" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/statemachediscuss.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="状态机的实现探讨" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2011-04-11T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="C++" />
+  
+    <meta property="article:tag" content="ai" />
+  
+    <meta property="article:tag" content="statemachine" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/statemachediscuss.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">状态机的实现探讨</h1>
+            <h2 class="project-tagline">实现一个状态机很容易，但是实现一个好的状态机却不简单。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2011-04-11T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Apr 11, 2011
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">状态机的实现探讨</h1>
+    <p class="post-meta">
+      <time datetime="2011-04-11T00:00:00+08:00" itemprop="datePublished">
+        
+        Apr 11, 2011
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="状态机的实现探讨">状态机的实现探讨</h2>
+
+<h3 id="started">Started：</h3>
+
+<p>实现一个状态机很容易，但是实现一个好的状态机却不简单。一般实现状态机的时候会有如下的实现代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">switch</span> <span class="p">(</span><span class="n">state_</span><span class="p">)</span>
+ <span class="k">case</span> <span class="n">A</span><span class="p">:</span>
+    <span class="n">do_A</span><span class="p">();</span>
+ <span class="k">case</span> <span class="n">B</span><span class="p">:</span>
+    <span class="n">do_B</span><span class="p">();</span>
+<span class="n">end</span> <span class="k">switch</span>
+</code></pre></div></div>
+<p>当状态量少并且各个状态之间变化的逻辑比较简单时，这种方法无可厚非，但是它有如下缺点：</p>
+
+<ul>
+  <li>逻辑代码较混乱；如状态A到状态B的切换，如果需要验证有效性，那么代码会变得臃肿，不再那么直观；示例：</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="n">A</span><span class="p">:</span>
+ <span class="k">if</span> <span class="p">(</span><span class="n">current_state</span> <span class="o">!=</span> <span class="n">C</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+ <span class="k">else</span>
+   <span class="n">current_state</span> <span class="o">=</span> <span class="n">A</span><span class="p">;</span>
+   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">case</span> 
+</code></pre></div></div>
+
+<ul>
+  <li>难扩展；大部分状态的处理是相似的，而某些特殊的状态则要特殊处理，比如需要提供附加数据，
+比如在Task中设定一个状态为suspend，那么需要传递一个要挂起的时间。这种情况类似于GUI程序中的事件通知接口，如：</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">handle_event</span><span class="p">(</span><span class="n">EventId</span> <span class="n">event_</span><span class="p">,</span> <span class="n">Long</span> <span class="n">ext</span><span class="p">,...)</span>
+</code></pre></div></div>
+
+<p>ext实际上可以传递任何东西。比如触发了一个文件拖动到图标的事件dropOpen，那么可以将要open的文件路径的地址通过ext传入。
+这种方式挺万金油的，所以在实现状态机的时候，完全可以借鉴一下。</p>
+
+<h3 id="context">Context：</h3>
+<p>假设场景如下：实现任务Task，它是一个状态机，其状态变化如图：</p>
+
+<p><img src="/assets/img/statemachediscuss/statemachediscuss1.jpg" alt=""></p>
+
+<ul>
+  <li>Task被创建后假设获取了必须资源，进入Ready状态</li>
+  <li>Ready状态可以被任务队列执行run， 那么Task进入Running状态</li>
+  <li>Ready状态时可以被suspend挂起，挂起时需要标识挂起的时间</li>
+  <li>Running状态时可以被挂起</li>
+  <li>Suspended状态可以通过润使Task进入running状态</li>
+  <li>Running、Ready、Suspended状态都可以通过cancel，直接进入ended状态</li>
+</ul>
+
+<h3 id="question">Question:</h3>
+
+<ul>
+  <li>合理实现各个状态之间的切换</li>
+  <li>方便扩展，任务状态有可能会增加，任务的触发时间可能会改变等，状态机的实现必须能够快速适应逻辑的变化</li>
+</ul>
+
+<h3 id="solution">Solution：</h3>
+<p>下面探讨如下的实现方案：</p>
+
+<h4 id="设计基类">设计基类：</h4>
+
+<p>首先是用于传递扩展数据的万金油虚类</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef EVENT_DATA_H
+#define EVENT_DATA_H
+</span>
+<span class="k">class</span> <span class="nc">EventData</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">EventData</span><span class="p">()</span> <span class="p">{};</span> 
+    <span class="kt">void</span><span class="o">*</span>   <span class="n">data</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="cp">#endif //EVENT_DATA_H
+</span></code></pre></div></div>
+
+<p>状态的通用接口类StateMachine 接口, 此类不但定义了接口,其实其规定了状态机实现的模板,任何状态机的实现都可以按照此模板按部就班的实现.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
+</span>
+<span class="cp">#include &lt;stdio.h&gt;
+#include "EventData.h"
+</span>
+<span class="k">struct</span> <span class="n">StateStruct</span><span class="p">;</span>
+
+<span class="c1">// base class for state machines</span>
+<span class="k">class</span> <span class="nc">StateMachine</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">StateMachine</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxStates</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">StateMachine</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="nl">protected:</span>
+    <span class="k">enum</span> <span class="p">{</span> <span class="n">EVENT_IGNORED</span> <span class="o">=</span> <span class="mh">0xFE</span><span class="p">,</span> <span class="n">CANNOT_HAPPEN</span> <span class="p">};</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">currentState</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">ExternalEvent</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">,</span> <span class="n">EventData</span><span class="o">*</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">InternalEvent</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">,</span> <span class="n">EventData</span><span class="o">*</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="k">const</span> <span class="n">StateStruct</span><span class="o">*</span> <span class="n">GetStateMap</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="nl">private:</span>
+    <span class="k">const</span> <span class="kt">int</span> <span class="n">_maxStates</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">_eventGenerated</span><span class="p">;</span>
+    <span class="n">EventData</span><span class="o">*</span> <span class="n">_pEventData</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">StateEngine</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="n">StateMachine</span><span class="o">::*</span><span class="n">StateFunc</span><span class="p">)(</span><span class="n">EventData</span> <span class="o">*</span><span class="p">);</span>
+
+<span class="k">struct</span> <span class="n">StateStruct</span>
+<span class="p">{</span>
+    <span class="n">StateFunc</span> <span class="n">pStateFunc</span><span class="p">;</span>   
+<span class="p">};</span>
+
+<span class="cp">#define BEGIN_STATE_MAP \
+public:\
+const StateStruct* GetStateMap() {\
+    static const StateStruct StateMap[] = {
+#define STATE_MAP_ENTRY(entry)\
+    { reinterpret_cast&lt;StateFunc&gt;(entry) },
+#define END_STATE_MAP \
+    { reinterpret_cast&lt;StateFunc&gt;(NULL) }\
+    }; \
+    return &amp;StateMap[0]; }
+</span>
+<span class="cp">#define BEGIN_TRANSITION_MAP \
+    static const unsigned char TRANSITIONS[] = {\
+#define TRANSITION_MAP_ENTRY(entry)\
+    entry,
+#define END_TRANSITION_MAP(data) \
+    0 };\
+    ExternalEvent(TRANSITIONS[currentState], data);
+#endif //STATE_MACHINE_H
+</span></code></pre></div></div>
+
+<p>ExternalEvent接口是带有效性验证的接口,他首先判断状态的有效性,如果有效则调用InternalEvent, InternalEvent是没有验证的内部接口,
+它直接的修改状态。</p>
+
+<p>StateMachine 的实现；此实现为通用的逻辑模板，任何状态机的实现都可以套用此模板。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;assert.h&gt;
+#include "StateMachine.h"
+</span>
+<span class="n">StateMachine</span><span class="o">::</span><span class="n">StateMachine</span><span class="p">(</span><span class="kt">int</span> <span class="n">maxStates</span><span class="p">)</span> <span class="o">:</span>
+    <span class="n">_maxStates</span><span class="p">(</span><span class="n">maxStates</span><span class="p">),</span>
+    <span class="n">currentState</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">_eventGenerated</span><span class="p">(</span><span class="nb">false</span><span class="p">),</span>
+    <span class="n">_pEventData</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>   
+<span class="c1">// generates an external event. called once per external event</span>
+<span class="c1">// to start the state machine executing</span>
+<span class="kt">void</span> <span class="n">StateMachine</span><span class="o">::</span><span class="n">ExternalEvent</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">newState</span><span class="p">,</span>
+                                 <span class="n">EventData</span><span class="o">*</span> <span class="n">pData</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// if we are supposed to ignore this event</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newState</span> <span class="o">==</span> <span class="n">EVENT_IGNORED</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// just delete the event data, if any</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pData</span><span class="p">)</span> 
+            <span class="k">delete</span> <span class="n">pData</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">newState</span> <span class="o">==</span> <span class="n">CANNOT_HAPPEN</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//! throw exception("xxx");</span>
+        <span class="c1">//! or</span>
+        <span class="c1">//! logerror("....");</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// generate the event and execute the state engine</span>
+        <span class="n">InternalEvent</span><span class="p">(</span><span class="n">newState</span><span class="p">,</span> <span class="n">pData</span><span class="p">);</span>
+        <span class="n">StateEngine</span><span class="p">();</span>                 
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// generates an internal event. called from within a state</span>
+<span class="c1">// function to transition to a new state</span>
+<span class="kt">void</span> <span class="n">StateMachine</span><span class="o">::</span><span class="n">InternalEvent</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">newState</span><span class="p">,</span>
+                                 <span class="n">EventData</span><span class="o">*</span> <span class="n">pData</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">_pEventData</span> <span class="o">=</span> <span class="n">pData</span><span class="p">;</span>
+    <span class="n">_eventGenerated</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="n">currentState</span> <span class="o">=</span> <span class="n">newState</span><span class="p">;</span>
+
+<span class="p">}</span>
+<span class="c1">// the state engine executes the state machine states</span>
+<span class="kt">void</span> <span class="n">StateMachine</span><span class="o">::</span><span class="n">StateEngine</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">EventData</span><span class="o">*</span> <span class="n">pDataTemp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_eventGenerated</span><span class="p">)</span> <span class="p">{</span>        
+        <span class="n">pDataTemp</span> <span class="o">=</span> <span class="n">_pEventData</span><span class="p">;</span>  <span class="c1">// copy of event data pointer</span>
+        <span class="n">_pEventData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>       <span class="c1">// event data used up, reset ptr</span>
+        <span class="n">_eventGenerated</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>  <span class="c1">// event used up, reset flag</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">currentState</span> <span class="o">&lt;</span> <span class="n">_maxStates</span><span class="p">);</span>
+        <span class="c1">// execute the state passing in event data, if any</span>
+        <span class="k">const</span> <span class="n">StateStruct</span><span class="o">*</span> <span class="n">pStateMap</span> <span class="o">=</span> <span class="n">GetStateMap</span><span class="p">();</span>
+        <span class="p">(</span><span class="k">this</span><span class="o">-&gt;*</span><span class="n">pStateMap</span><span class="p">[</span><span class="n">currentState</span><span class="p">].</span><span class="n">pStateFunc</span><span class="p">)(</span><span class="n">pDataTemp</span><span class="p">);</span>
+        <span class="c1">// if event data was used, then delete it</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pDataTemp</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">delete</span> <span class="n">pDataTemp</span><span class="p">;</span>
+            <span class="n">pDataTemp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>在这里ExternalEvent判断该状态是否是有效的，如果是EVENT_IGNORED，那么可以直接忽略此操作，如果是CANNOT_HAPPEN，说明出现了逻辑错误。</p>
+
+<p>具体task的实现如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef TASK_H
+#define TASK_H
+#include "StateMachine.h"
+</span>
+<span class="k">struct</span> <span class="n">TaskData</span> <span class="o">:</span> <span class="k">public</span> <span class="n">EventData</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">xxx</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">Task</span> <span class="o">:</span> <span class="k">public</span> <span class="n">StateMachine</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">Task</span><span class="p">()</span> <span class="o">:</span> <span class="n">StateMachine</span><span class="p">(</span><span class="n">ST_MAX_STATES</span><span class="p">)</span> <span class="p">{}</span>
+    <span class="c1">// external events taken by this state machine</span>
+    <span class="kt">void</span> <span class="n">Suspend</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">Run</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">Cancel</span><span class="p">();</span>
+<span class="nl">private:</span>
+    <span class="c1">// state machine state functions</span>
+    <span class="kt">void</span> <span class="n">ST_Ready</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">ST_Running</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">ST_Suspended</span><span class="p">(</span><span class="n">TaskData</span><span class="o">*</span> <span class="n">pData</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">ST_Ended</span><span class="p">();</span>
+    <span class="c1">// state map to define state function order</span>
+    <span class="n">BEGIN_STATE_MAP</span>
+        <span class="n">STATE_MAP_ENTRY</span><span class="p">(</span><span class="n">ST_READY</span><span class="p">)</span>
+        <span class="n">STATE_MAP_ENTRY</span><span class="p">(</span><span class="n">ST_RUNNING</span><span class="p">)</span>
+        <span class="n">STATE_MAP_ENTRY</span><span class="p">(</span><span class="n">ST_SUSPENDED</span><span class="p">)</span>
+        <span class="n">STATE_MAP_ENTRY</span><span class="p">(</span><span class="n">ST_ENDED</span><span class="p">)</span>
+    <span class="n">END_STATE_MAP</span>
+
+    <span class="c1">// state enumeration order must match the order of state</span>
+    <span class="c1">// method entries in the state map</span>
+    <span class="k">enum</span> <span class="n">E_States</span> <span class="p">{</span>
+        <span class="n">ST_READY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">ST_RUNNING</span><span class="p">,</span>
+        <span class="n">ST_SUSPENDED</span><span class="p">,</span>
+        <span class="n">ST_ENDED</span><span class="p">,</span>
+        <span class="n">ST_MAX_STATES</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+
+<span class="cp">#endif //MOTOR_H
+</span></code></pre></div></div>
+
+<p>BEGIN_STATE_MAP 宏将自定义的状态函数注册到StateMap中，这样可以直接通过state值索引得到其对应的状态函数。</p>
+
+<p>Task的实现代码</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;assert.h&gt;
+#include "task.h"
+</span>
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">Suspend</span><span class="p">(</span><span class="n">MotorData</span><span class="o">*</span> <span class="n">pData</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">BEGIN_TRANSITION_MAP</span>                      <span class="c1">// - Current State -</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_Suspended</span><span class="p">)</span>   <span class="c1">// ST_READY</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_Suspended</span><span class="p">)</span>   <span class="c1">// ST_RUNNING</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">EVENT_IGNORED</span><span class="p">)</span>  <span class="c1">// ST_SUSPENDED</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">CANNOT_HAPPEN</span><span class="p">)</span>  <span class="c1">// ST_ENDED</span>
+    <span class="n">END_TRANSITION_MAP</span><span class="p">(</span><span class="n">pData</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">Run</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">BEGIN_TRANSITION_MAP</span>                      <span class="c1">// - Current State -</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_RUNNING</span><span class="p">)</span>     <span class="c1">// ST_READY</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">EVENT_IGNORED</span><span class="p">)</span>  <span class="c1">// ST_RUNNING</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_RUNNING</span><span class="p">)</span>     <span class="c1">// ST_SUSPENDED</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">CANNOT_HAPPEN</span><span class="p">)</span>  <span class="c1">// ST_ENDED</span>
+    <span class="n">END_TRANSITION_MAP</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">Cancel</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">BEGIN_TRANSITION_MAP</span>                      <span class="c1">// - Current State -</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_ENDED</span><span class="p">)</span>       <span class="c1">// ST_READY</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_ENDED</span><span class="p">)</span>       <span class="c1">// ST_RUNNING</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">ST_ENDED</span><span class="p">)</span>       <span class="c1">// ST_SUSPENDED</span>
+        <span class="n">TRANSITION_MAP_ENTRY</span> <span class="p">(</span><span class="n">EVENT_IGNORED</span><span class="p">)</span>        <span class="c1">// ST_ENDED</span>
+    <span class="n">END_TRANSITION_MAP</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">ST_Ready</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">InternalEvent</span><span class="p">(</span><span class="n">ST_READY</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">ST_Running</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">InternalEvent</span><span class="p">(</span><span class="n">ST_RUNNING</span><span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">ST_Suspended</span><span class="p">(</span><span class="n">MotorData</span><span class="o">*</span> <span class="n">pData</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">InternalEvent</span><span class="p">(</span><span class="n">ST_SUSPENDED</span><span class="p">,</span> <span class="n">pData</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">Task</span><span class="o">::</span><span class="n">ST_Ended</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">InternalEvent</span><span class="p">(</span><span class="n">ST_ENDED</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="总结">总结</h3>
+
+<p>在状态的处理上思路是：状态要么是有效的、要么是可以忽略的、要么是根本不会发生的。</p>
+
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

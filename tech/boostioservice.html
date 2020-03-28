@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>Boost::asio io_service 实现分析</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="io_servie 实现了一个任务队列，这里的任务就是void(void)的函数。Io_servie最常用的两个接口是post和run， post向任务队列中投递任务，run是执行队列中的任务， 直到全部执行完毕，并且run可以被N个线程调用。Io_service是完全线程安全的队列。" />
+
+  <meta name="keywords" itemprop="tags" content="boost, ASIO, io_service"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="Boost::asio io_service 实现分析" />
+<meta name="twitter:description" content="io_servie 实现了一个任务队列，这里的任务就是void(void)的函数。Io_servie最常用的两个接口是post和run， post向任务队列中投递任务，run是执行队列中的任务， 直到全部执行完毕，并且run可以被N个线程调用。Io_service是完全线程安全的队列。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/boostioservice.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="Boost::asio io_service 实现分析" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/boostioservice.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="io_servie 实现了一个任务队列，这里的任务就是void(void)的函数。Io_servie最常用的两个接口是post和run， post向任务队列中投递任务，run是执行队列中的任务， 直到全部执行完毕，并且run可以被N个线程调用。Io_service是完全线程安全的队列。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2011-09-04T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="boost" />
+  
+    <meta property="article:tag" content="ASIO" />
+  
+    <meta property="article:tag" content="io_service" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/boostioservice.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">Boost::asio io_service 实现分析</h1>
+            <h2 class="project-tagline">io_servie 实现了一个任务队列。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2011-09-04T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Sep 4, 2011
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Boost::asio io_service 实现分析</h1>
+    <p class="post-meta">
+      <time datetime="2011-09-04T00:00:00+08:00" itemprop="datePublished">
+        
+        Sep 4, 2011
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="boostasio-io_service-实现分析">Boost::asio io_service 实现分析</h2>
+
+<h3 id="io_service的作用">io_service的作用</h3>
+<p>io_servie 实现了一个任务队列，这里的任务就是void(void)的函数。Io_servie最常用的两个接口是post和run，post向任务队列中投递任务，run是执行队列中的任务，直到全部执行完毕，并且run可以被N个线程调用。Io_service是完全线程安全的队列。</p>
+
+<h3 id="io_servie的接口">Io_servie的接口</h3>
+<p>提供的接口有run、run_one、poll、poll_one、stop、reset、dispatch、post，最常用的是run、post、stop</p>
+
+<h3 id="io_servie-实现代码的基本类结构">Io_servie 实现代码的基本类结构：</h3>
+<ul>
+  <li>Io_servie是接口类，为实现跨平台，采用了策略模式，所有接口均有impl_type实现。根据平台不同impl_type分为</li>
+  <li>win_iocp_io_service Win版本的实现，这里主要分析Linux版本。</li>
+  <li>task_io_service 非win平台下的实现，其代码结构为：</li>
+  <li>detail/task_io_service_fwd.hpp 简单声明task_io_service名称</li>
+  <li>detail/task_io_service.hpp 声明task_io_service的方法和属性</li>
+  <li>detail/impl/task_io_service.ipp 具体实现文件</li>
+  <li>队列中的任务类型为opertioan，原型其实是typedef task_io_service_operation operation，其实现文件在detail/task_io_service_operation.hpp中，当队列中的任务被执行时，就是task_io_service_operation:: complete被调用的时候。</li>
+</ul>
+
+<h3 id="io_serviepost方法的实现">Io_servie::Post方法的实现</h3>
+<p>Post向队列中投递任务，然后激活空闲线程执行任务。其实现流程如下：</p>
+
+<ul>
+  <li>Post接收handler作为参数，实际上是个仿函数，通过此仿函数构造出completion_handler对象，completion_handler继承自operation。然后调用post_immediate_completion。</li>
+  <li>post_immediate_completion首先将outstanding_work_增加，然后调用post_deferred_completion。</li>
+  <li>post_deferred_completion首先加锁将任务入列，然后调用wake_one_thread_and_unlock</li>
+  <li>wake_one_thread_and_unlock尝试唤醒当前空闲的线程，其实现中特别之处在于，若没有空闲线程，但是有线程在执行task-&gt;run，即阻塞在epoll_wait上，那么先中断epoll_wait执行任务队列完成后再执行epoll_wait。</li>
+  <li>first_idle_thread_维护了所有当前空闲线程，实际上使用了Leader/Follower模式，每次唤醒时只唤醒空闲线程的第一个。</li>
+</ul>
+
+<h3 id="io_servierun方法的实现">Io_servie::run方法的实现</h3>
+<p>Run方法执行队列中的所有任务，直到任务执行完毕。</p>
+
+<ul>
+  <li>run方法首先构造一个idle_thread_info，和first_idle_thread_类型相同，即通过first_idle_thread_将所有线程串联起来，它这个串联不是立即串联的，当该线程无任务可做是加入到first_idle_thread_的首部，有任务执行时，从first_idle_thread_中断开。这很正常，因为first_idle_thread_维护的是当前空闲线程。</li>
+  <li>加锁，循环执行do_one方法，直到do_one返回false</li>
+  <li>do_one每次执行一个任务。首先检查队列是否为空，若空将此线程追加到first_idle_thread_的首部，然后阻塞在条件变量上，直到被唤醒。</li>
+  <li>当被唤醒或是首次执行，若stopped_为true（即此时stop方法被调用了），返回0</li>
+  <li>队列非空，pop出一个任务，检查队列无任务那么简单的解锁，若仍有，调用wake_one_thread_and_unlock尝试唤醒其他空闲线程执行。然后执行该任务，返回1.</li>
+  <li>实际上在执行队列任务时有一个特别的判断if (o == &amp;task_operation_)，那么将会执行task_-&gt;run，task_变量类型为reactor，在linux平台实现为epoll_reactor，实现代码文件为detail/impl/epoll_reactor.ipp，run方法实际上执行的是epoll_wait，run阻塞在epoll_wait上等待事件到来，并且处理完事件后将需要回调的函数push到io_servie的任务队列中，虽然epoll_wait是阻塞的，但是它提供了interrupt函数，该interrupt是如何实现的呢，它向epoll_wait添加一个文件描述符，该文件描述符中有8个字节可读，这个文件描述符是专用于中断epoll_wait的，他被封装到select_interrupter中，select_interrupter实际上实现是eventfd_select_interrupter，在构造的时候通过pipe系统调用创建两个文件描述符，然后预先通过write_fd写8个字节，这8个字节一直保留。在添加到epoll_wait中采用EPOLLET水平触发，这样，只要select_interrupter的读文件描述符添加到epoll_wait中，立即中断epoll_wait。很是巧妙。！！！实际上就是因为有了这个reactor，它才叫io_servie，否则就是一个纯的任务队列了。</li>
+  <li>Run方法的原则是：</li>
+  <li>有任务立即执行任务，尽量使所有的线程一起执行任务</li>
+  <li>若没有任务，阻塞在epoll_wait上等待io事件</li>
+  <li>若有新任务到来，并且没有空闲线程，那么先中断epoll_wait,先执行任务</li>
+  <li>若队列中有任务，并且也需要epoll_wait监听事件，那么非阻塞调用epoll_wait（timeout字段设置为0），待任务执行完毕在阻塞在epoll_wait上。</li>
+  <li>几乎对线程的使用上达到了极致。</li>
+  <li>从这个函数中可以知道，在使用ASIO时，io_servie应该尽量多，这样可以使其epoll_wait占用的时间片最多，这样可以最大限度的响应IO事件，降低响应时延。但是每个io_servie::run占用一个线程，所以io_servie最佳应该和CPU的核数相同。</li>
+</ul>
+
+<h3 id="io_serviestop的实现">Io_servie::stop的实现</h3>
+<ul>
+  <li>加锁，调用stop_all_threads</li>
+  <li>设置stopped_变量为true，遍历所有的空闲线程，依次唤醒</li>
+  <li>task_interrupted_设置为true，调用task_的interrupt方法</li>
+  <li>task_的类型为reactor，在run方法中已经做了分析</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

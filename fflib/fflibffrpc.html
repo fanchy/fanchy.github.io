@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++ FFLIB之FFRPC：多线程&amp;多进程的scalability探索</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="如何更好的使用多线程，或者说使用多线程应该遵循什么样的原则才能避免麻烦。 如果线程的资源不足以满足要求，那么如何利用多进程的资源但却不至于大范围的修改系统实现。" />
+
+  <meta name="keywords" itemprop="tags" content="fflib, c++, rpc"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++ FFLIB之FFRPC：多线程&amp;多进程的scalability探索" />
+<meta name="twitter:description" content="如何更好的使用多线程，或者说使用多线程应该遵循什么样的原则才能避免麻烦。 如果线程的资源不足以满足要求，那么如何利用多进程的资源但却不至于大范围的修改系统实现。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/fflibffrpc.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++ FFLIB之FFRPC：多线程&amp;多进程的scalability探索" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/fflibffrpc.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="如何更好的使用多线程，或者说使用多线程应该遵循什么样的原则才能避免麻烦。 如果线程的资源不足以满足要求，那么如何利用多进程的资源但却不至于大范围的修改系统实现。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-03-03T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="rpc" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/fflibffrpc.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++ FFLIB之FFRPC：多线程&amp;多进程的scalability探索</h1>
+            <h2 class="project-tagline">FFLIB网络框架单线程0.0.1版本-epoll_socket</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-03-03T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Mar 3, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++ FFLIB之FFRPC：多线程&amp;多进程的scalability探索</h1>
+    <p class="post-meta">
+      <time datetime="2013-03-03T00:00:00+08:00" itemprop="datePublished">
+        
+        Mar 3, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要：</h2>
+
+<p>近来在完成通用的数据分析系统ffcount时，使用了ffrpc完成了事件源和service的通信。顺便对ffrpc进行了优化和精简，接口也更易用一些。
+在跟一个朋友讨论多线程和多进程的问题时，引发了如何才能是系统更加scalability的思考。</p>
+
+<p>把自己的一些想法用ffrpc写了一个demo。无论是使用多线程还是多进程，并发都是为了使系统在吞吐量或响应延迟等特性上达到更佳的效果。
+那么什么样的设计能够尽量保证scalability呢？</p>
+
+<h4 id="如何更好的使用多线程或者说使用多线程应该遵循什么样的原则才能避免麻烦">如何更好的使用多线程，或者说使用多线程应该遵循什么样的原则才能避免麻烦。</h4>
+<p>如果线程的资源不足以满足要求，那么如何利用多进程的资源但却不至于大范围的修改系统实现。</p>
+<h4 id="关于多线程多进程">关于多线程&amp;多进程：</h4>
+
+<p>对应服务器开发人员来说，多线程编程是最重要的开发技术之一，但是随着实际开发中接触的多线程场景越多，反而越来越尽量少的使用多线程。
+多线程往往是看起来甜美，用起来苦涩。许多人过度的注意到了多线程的优点，而极大的忽视了其缺点。下面是一些多线程的技巧：</p>
+
+<ul>
+  <li>尽量不要使用多线程，如果有明确数据显示单线程无法达到要求，再考虑行之。</li>
+  <li>如果使用了多线程，多线程之间不要共享数据，哪怕是一点点。多线程之间的通讯使用任务队列或者消息队列之类的完成。</li>
+  <li>一般而言普通的cpu计算不需要多线程，若有io操作，并且业务可以并行，可以考虑使用异步加回调的方式使用多线程。</li>
+  <li>使用多线程，切勿因为多线程而多线程，如果业务是不可并行切分的，那么强行拆分则会得不偿失，甚至系统的正确和稳定都难以确保，更不要说后续的扩展和维护。</li>
+  <li>使用多进程可以避免以上的尴尬问题，多进程本身数据不共享，通讯只能使用消息通讯，这些硬性限制反而确保了多进程更加理想。但问题是管理多个进程往往让人不够情愿，尤其是只是用一台机器的时候。能不能有权衡二者的scalability方案？</li>
+</ul>
+
+<h3 id="ffrpc实现scalability">FFRPC实现scalability：</h3>
+
+<p>在设计ffrpc的时候，首先其适合类似于网游多进程架构的场景。幸运的是，ffrpc封装的是节点与节点之间的通讯，并不限制节点是否在同一个进程。
+这样在单进程内使用ffrpc开启多个服务实例，从而利用多线程。若实例开启在多个进程中，则又适配多进程环境。其demo设计为如下系统：</p>
+
+<p>client 请求logic_service，调用其test接口，根据uid的不同，调用不同的logic_service实例，从而实现logic_service并发。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_msg_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+<span class="n">test_msg_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+<span class="n">ffrpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">"logic_service"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">%</span> <span class="n">ffrpc</span><span class="p">.</span><span class="n">service_num</span><span class="p">(</span><span class="s">"logic_service"</span><span class="p">),</span> <span class="n">in</span><span class="p">,</span> <span class="n">out</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>logic_service的test接口被调用后，调用db_service接口，根据uid’不同调用的db_service实例也不同，从而实现db_service的并发。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">lambda_t</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="kt">void</span> <span class="n">async_callback</span><span class="p">(</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"logic_service_t 接收db_service的返回值 ret_bool=[%d]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">msg_</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="n">update_msg_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span><span class="p">;</span>
+<span class="n">ffrpc</span><span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="s">"db_service"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span> <span class="o">%</span> <span class="n">ffrpc</span><span class="o">-&gt;</span><span class="n">service_num</span><span class="p">(</span><span class="s">"db_service"</span><span class="p">),</span> <span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">async_callback</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>db_service的update被调用后，回调对应的logic_service的回调函数返回结果。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">update</span><span class="p">(</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in db_service_t::update[index=%d], 被logic_service调用uid[%ld]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">m_index</span><span class="p">,</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
+        <span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="示例源码">示例源码:</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+</span>
+<span class="cp">#include "count/ffcount.h"
+#include "rpc/broker_application.h"
+#include "base/daemon_tool.h"
+#include "base/arg_helper.h"
+#include "base/strtool.h"
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">ff</span><span class="p">;</span>
+<span class="kt">bool</span> <span class="n">g_run</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">test_msg_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">ffmsg_t</span><span class="o">&lt;</span><span class="n">test_msg_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">uid</span><span class="p">).</span><span class="n">get_buff</span><span class="p">()</span> <span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">virtual</span> <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uid</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">long</span>    <span class="n">uid</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">typedef</span> <span class="n">ffmsg_bool_t</span> <span class="n">out_t</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="n">update_msg_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">ffmsg_t</span><span class="o">&lt;</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">uid</span><span class="p">).</span><span class="n">get_buff</span><span class="p">()</span> <span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">virtual</span> <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uid</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kt">long</span>    <span class="n">uid</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">typedef</span> <span class="n">ffmsg_bool_t</span> <span class="n">out_t</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">logic_service_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">logic_service_t</span><span class="p">(</span><span class="n">ffrpc_t</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span> <span class="kt">int</span> <span class="n">i</span><span class="p">)</span><span class="o">:</span><span class="n">ffrpc</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">m_index</span><span class="p">(</span><span class="n">i</span><span class="p">){}</span>
+    <span class="kt">int</span> <span class="n">test</span><span class="p">(</span><span class="n">test_msg_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">test_msg_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in logic_service_t::test[index=%d], 被client调用 uid[%ld]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">m_index</span><span class="p">,</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
+
+        <span class="n">test_msg_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+        
+        <span class="k">struct</span> <span class="n">lambda_t</span>
+        <span class="p">{</span>
+            <span class="k">static</span> <span class="kt">void</span> <span class="n">async_callback</span><span class="p">(</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"logic_service_t 接收db_service的返回值 ret_bool=[%d]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">msg_</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+        <span class="n">update_msg_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+        <span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span><span class="p">;</span>
+        <span class="n">ffrpc</span><span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="s">"db_service"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span> <span class="o">%</span> <span class="n">ffrpc</span><span class="o">-&gt;</span><span class="n">service_num</span><span class="p">(</span><span class="s">"db_service"</span><span class="p">),</span> <span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">async_callback</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="n">ffrpc_t</span><span class="o">*</span> <span class="n">ffrpc</span><span class="p">;</span>
+    <span class="kt">int</span>      <span class="n">m_index</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">db_service_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">db_service_t</span><span class="p">(</span><span class="n">ffrpc_t</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span> <span class="kt">int</span> <span class="n">i</span><span class="p">)</span><span class="o">:</span><span class="n">ffrpc</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">m_index</span><span class="p">(</span><span class="n">i</span><span class="p">){}</span>
+    <span class="kt">int</span> <span class="n">update</span><span class="p">(</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in db_service_t::update[index=%d], 被logic_service调用uid[%ld]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">m_index</span><span class="p">,</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
+        <span class="n">update_msg_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="n">ffrpc_t</span><span class="o">*</span> <span class="n">ffrpc</span><span class="p">;</span>
+    <span class="kt">int</span>      <span class="n">m_index</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">start_logic_service</span><span class="p">(</span><span class="n">ffrpc_t</span><span class="o">&amp;</span> <span class="n">ffrpc</span><span class="p">,</span> <span class="n">logic_service_t</span><span class="o">&amp;</span> <span class="n">service</span><span class="p">,</span> <span class="n">arg_helper_t</span><span class="o">*</span> <span class="n">arg_helper_</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//printf("start_logic_service index[%d] begin\n", index_);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">ffrpc</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">arg_helper_</span><span class="o">-&gt;</span><span class="n">get_option_value</span><span class="p">(</span><span class="s">"-l"</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="s">"can't connnect to broker"</span><span class="p">);</span>
+
+    <span class="n">ffrpc</span><span class="p">.</span><span class="n">create_service</span><span class="p">(</span><span class="s">"logic_service"</span><span class="p">,</span> <span class="n">index_</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">service</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">logic_service_t</span><span class="o">::</span><span class="n">test</span><span class="p">);</span>
+    <span class="c1">//printf("start_logic_service index[%d] end\n", index_);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">start_db_service</span><span class="p">(</span><span class="n">ffrpc_t</span><span class="o">&amp;</span> <span class="n">ffrpc</span><span class="p">,</span> <span class="n">db_service_t</span><span class="o">&amp;</span> <span class="n">service</span><span class="p">,</span> <span class="n">arg_helper_t</span><span class="o">*</span> <span class="n">arg_helper_</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index_</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//printf("start_db_service index[%d] begin\n", index_);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">ffrpc</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">arg_helper_</span><span class="o">-&gt;</span><span class="n">get_option_value</span><span class="p">(</span><span class="s">"-l"</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="s">"can't connnect to broker"</span><span class="p">);</span>
+
+    <span class="n">ffrpc</span><span class="p">.</span><span class="n">create_service</span><span class="p">(</span><span class="s">"db_service"</span><span class="p">,</span> <span class="n">index_</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">service</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">db_service_t</span><span class="o">::</span><span class="n">update</span><span class="p">);</span>
+    <span class="c1">//printf("start_db_service index[%d] end\n", index_);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"usage: app -broker -client -l tcp://127.0.0.1:10241 -service db_service@1-4,logic_service@1-4</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">arg_helper_t</span> <span class="n">arg_helper</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">arg_helper</span><span class="p">.</span><span class="n">is_enable_option</span><span class="p">(</span><span class="s">"-broker"</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">broker_application_t</span><span class="o">::</span><span class="n">run</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">arg_helper</span><span class="p">.</span><span class="n">is_enable_option</span><span class="p">(</span><span class="s">"-d"</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">daemon_tool_t</span><span class="o">::</span><span class="n">daemon</span><span class="p">();</span>
+    <span class="p">}</span>
+    
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">all_service_name</span><span class="p">;</span>
+    <span class="n">strtool_t</span><span class="o">::</span><span class="n">split</span><span class="p">(</span><span class="n">arg_helper</span><span class="p">.</span><span class="n">get_option_value</span><span class="p">(</span><span class="s">"-service"</span><span class="p">),</span> <span class="n">all_service_name</span><span class="p">,</span> <span class="s">","</span><span class="p">);</span>
+    
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">ffrpc_t</span><span class="o">*&gt;</span>            <span class="n">vt_rpc</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">db_service_t</span><span class="o">*&gt;</span>       <span class="n">vt_db_service</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">logic_service_t</span><span class="o">*&gt;</span>    <span class="n">vt_logic_service</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">all_service_name</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">opts</span><span class="p">;</span>
+        <span class="n">strtool_t</span><span class="o">::</span><span class="n">split</span><span class="p">(</span><span class="n">all_service_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">opts</span><span class="p">,</span> <span class="s">"@"</span><span class="p">);</span>
+        <span class="kt">int</span> <span class="n">index_begin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">index_end</span>   <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">opts</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">vt_index</span><span class="p">;</span>
+            <span class="n">strtool_t</span><span class="o">::</span><span class="n">split</span><span class="p">(</span><span class="n">opts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">vt_index</span><span class="p">,</span> <span class="s">"-"</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">vt_index</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span> <span class="o">==</span> <span class="nb">false</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">index_begin</span> <span class="o">=</span> <span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">vt_index</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">c_str</span><span class="p">());</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">vt_index</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">index_end</span> <span class="o">=</span> <span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">vt_index</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">c_str</span><span class="p">());</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">index_end</span> <span class="o">&lt;</span> <span class="n">index_begin</span><span class="p">)</span> <span class="n">index_end</span> <span class="o">=</span> <span class="n">index_begin</span><span class="p">;</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"service includes&lt;%s:%d-%d&gt;</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">index_begin</span><span class="p">,</span> <span class="n">index_end</span><span class="p">);</span>
+        
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index_begin</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">index_end</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ffrpc_t</span><span class="o">*</span> <span class="n">ffrpc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ffrpc_t</span><span class="p">();</span>
+            <span class="n">vt_rpc</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">ffrpc</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">opts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"db_service"</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">db_service_t</span><span class="o">*</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">db_service_t</span><span class="p">(</span><span class="n">ffrpc</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+                <span class="n">start_db_service</span><span class="p">(</span><span class="o">*</span><span class="n">ffrpc</span><span class="p">,</span> <span class="o">*</span><span class="n">service</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">arg_helper</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+                <span class="n">vt_db_service</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">service</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">opts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"logic_service"</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">logic_service_t</span><span class="o">*</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">logic_service_t</span><span class="p">(</span><span class="n">ffrpc</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+                <span class="n">start_logic_service</span><span class="p">(</span><span class="o">*</span><span class="n">ffrpc</span><span class="p">,</span> <span class="o">*</span><span class="n">service</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">arg_helper</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+                <span class="n">vt_logic_service</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">service</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">arg_helper</span><span class="p">.</span><span class="n">is_enable_option</span><span class="p">(</span><span class="s">"-client"</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">ffrpc_t</span> <span class="n">ffrpc</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">"client 准备调用logic_service[index=%d]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+
+            <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">ffrpc</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">arg_helper</span><span class="p">.</span><span class="n">get_option_value</span><span class="p">(</span><span class="s">"-l"</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="s">"can't connnect to broker"</span><span class="p">);</span>
+
+            <span class="n">test_msg_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+            <span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+
+            <span class="n">test_msg_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+            <span class="n">ffrpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">"logic_service"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">in</span><span class="p">.</span><span class="n">uid</span> <span class="o">%</span> <span class="n">ffrpc</span><span class="p">.</span><span class="n">service_num</span><span class="p">(</span><span class="s">"logic_service"</span><span class="p">),</span> <span class="n">in</span><span class="p">,</span> <span class="n">out</span><span class="p">);</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">"logic_service[index=%d] 调用返回=%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">ffrpc</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">signal_helper_t</span><span class="o">::</span><span class="n">wait</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vt_rpc</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">vt_rpc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+        <span class="k">delete</span> <span class="n">vt_rpc</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vt_db_service</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">delete</span> <span class="n">vt_db_service</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vt_logic_service</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">delete</span> <span class="n">vt_logic_service</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>运行命令:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/fanchy/fflib
+<span class="nb">cd  cd </span>fflib/example/book/rpc/
+make
+</code></pre></div></div>
+<p>#运行4个db_service实例和4个logic_service实例</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./app_rpc <span class="nt">-client</span> <span class="nt">-broker</span> <span class="nt">-l</span> tcp://127.0.0.1:10241 <span class="nt">-service</span> db_service@1-4,logic_service@1-4
+</code></pre></div></div>
+
+<h2 id="总结">总结：</h2>
+
+<p>本例中logic_service和db_service集成到了一个程序中，使用ffrpc可以通过多线程实现并发，各个服务使用异步回调和消息通信，通过配置实例的个数，从而实现多线程的scalability。如果要把服务分别部署到其他机器上，只需启动多个app进程，例如:</p>
+
+<p>启动4个logic_service实例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./app_rpc <span class="nt">-broker</span> <span class="nt">-l</span> tcp://127.0.0.1:10241 <span class="nt">-service</span> logic_service@1-4
+</code></pre></div></div>
+<p>启动4个db_service实例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./app_rpc  <span class="nt">-l</span> tcp://127.0.0.1:10241 <span class="nt">-service</span> db_service@1-4 <span class="nt">-client</span>
+</code></pre></div></div>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

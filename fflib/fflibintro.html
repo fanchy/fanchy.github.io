@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++多进程并发框架FFLIB</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="封装了epoll和socket" />
+
+  <meta name="keywords" itemprop="tags" content="fflib, c++, socket, rpc"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflib" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++多进程并发框架FFLIB" />
+<meta name="twitter:description" content="封装了epoll和socket" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflib/fflibintro.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++多进程并发框架FFLIB" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflib/fflibintro.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="封装了epoll和socket" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-07-30T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+    <meta property="article:tag" content="c++" />
+  
+    <meta property="article:tag" content="socket" />
+  
+    <meta property="article:tag" content="rpc" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflib" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflib/fflibintro.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++多进程并发框架FFLIB</h1>
+            <h2 class="project-tagline">C++多进程并发框架FFLIB</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-07-30T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jul 30, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++多进程并发框架FFLIB</h1>
+    <p class="post-meta">
+      <time datetime="2012-07-30T00:00:00+08:00" itemprop="datePublished">
+        
+        Jul 30, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="简介">简介</h2>
+<p>三年来一直从事服务器程序开发，一直都是忙忙碌碌，不久前结束了职业生涯的第一份工作，有了一个礼拜的休息时间，终于可以写写总结了。
+于是把以前的开源代码做了整理和优化，这就是FFLIB。虽然这边总结看起来像日记，有很多废话，但是此文仍然是有很大针对性的。
+针对服务器开发中常见的问题，如多线程并发、消息转发、异步、性能优化、单元测试，提出自己的见解。</p>
+
+<h2 id="面对的问题">面对的问题</h2>
+<p>从事开发工程中，遇到过不少问题，很多时候由于时间紧迫，没有使用优雅的方案。在跟业内的一些朋友交流过程中，我也意识到有些问题是大家都存在的。简单列举如下：</p>
+
+<h2 id="多线程与并发">多线程与并发</h2>
+<ul>
+  <li>异步消息/接口调用</li>
+  <li>消息的序列化与Reflection</li>
+  <li>性能优化</li>
+  <li>单元测试</li>
+  <li>多线程与并发</li>
+</ul>
+
+<h4 id="现在是多核时代并发才能实现更高的吞吐量更快的响应但也是把双刃剑总结如下几个用法">现在是多核时代，并发才能实现更高的吞吐量、更快的响应，但也是把双刃剑。总结如下几个用法：</h4>
+
+<ul>
+  <li>多线程+显示锁；接口是被多线程调用的，当被调用时，显示加锁，再操作实体数据。悲剧的是，工程师为了优化会设计多个锁，以减少锁的粒度，甚至有些地方使用了原子操作。这些都为领域逻辑增加了额外的设计负担。最坏的情况是会出现死锁。</li>
+  <li>多线程+任务队列；接口被多线程调用，但请求会被暂存到任务队列，而任务队列会被单线程不断执行，典型生产者消费者模式。它的并发在于不同的接口可以使用不同的任务队列。这也是我最常用的并发方式。
+这是两种最常见的多线程并发，它们有个天生的缺陷——Scalability。一个机器的性能总是有瓶颈的。两个场景的逻辑虽然由多个线程实现了并发，但是运算量十分有可能是一台机器无法承载的。如果是多进程并发，那么可以分布式把其部署到其他机器（也可部署在一台机器）。所以多进程并发比多线程并发更加Scalability。另外采用多进程后，每个进程单线程设计，这样的程序更加Simplicity。多进程的其他优点如解耦、模块化、方便调试、方便重用等就不赘言了。</li>
+</ul>
+
+<h4 id="异步消息接口调用">异步消息/接口调用</h4>
+<p>提到分布式，就要说一下分布式的通讯技术。常用的方式如下：</p>
+
+<ul>
+  <li>类RPC；包括WebService、RPC、ICE等，特点是远程同步调用。远程的接口和本地的接口非常相似。但是游戏服务器程序一般非常在意延迟和吞吐量，所以这些阻塞线程的同步远程调用方式并不常用。但是我们必须意识到他的优点，就是非常利于调用和测试。</li>
+  <li>全异步消息；当调用远程接口的时候，异步发送请求消息，接口响应后返回一个结果消息，调用方的回调函数处理结果消息继续逻辑操作。所以有些逻辑就会被切割成ServiceStart和ServiceCallback两段。有时异步会讲领域逻辑变得支离破碎。另外消息处理函数中一般会写一坨的switch/case 处理不同的消息。最大的问题在于单元测试，这种情况传统单元测试根本束手无策。</li>
+  <li>消息的序列化与Reflection
+实现消息的序列化和反序列化的方式有很多，常见的有Struct、json、Protobuff等都有很成功的应用。我个人倾向于使用轻量级的二进制序列化，优点是比较透明和高效，一切在掌握之中。在FFLIB 中实现了bin_encoder_t 和 bin_decoder_t 轻量级的消息序列化，几十行代码而已。</li>
+</ul>
+
+<h4 id="性能优化">性能优化</h4>
+<p>已经写过关于性能方面的总结，参见
+http://www.cnblogs.com/zhiranok/archive/2012/06/06/cpp_perf.html</p>
+
+<p>有的网友提到profiler、cpuprofiler、callgrind等工具。这些工具我都使用过，说实话，对于我来说，我太认同它有很高的价值。第一他们只能用于开发测试阶段，可以初步得到一些性能上参考数据。第二它们如何实现跟踪人们无从得知。运行其会使程序变慢，不能反映真实数据。第三重要的是，开发测试阶段性能和上线后的能一样吗？Impossible ！
+关于性能，原则就是数据说话，详见博文，不在赘述。</p>
+
+<h4 id="单元测试">单元测试</h4>
+<p>关于单元测试，前边已经谈论了一些。游戏服务器程序一般都比较庞大，但是不可思议的是，鄙人从来没见有项目（c++ 后台架构的）有完整单元测试的。由于存在着异步和多线程，传统的单元测试框架无法胜任，而开发支持异步的测试框架又是不现实的。我们必须看到的是，传统的单元测试框架已经取得了非常大的成功。据我了解，使用web 架构的游戏后台已经对于单元测试的使用已经非常成熟，取得了极其好的效果。所以我的思路是利用现有的单元测试框架，将异步消息、多线程的架构做出调整。
+已经多次谈论单元测试了。其实在开发FFLIB的思路很大程度来源于此，否则可能只是一个c++ 网络库而已。我决定尝试去解决这个问题的时候，把FFLIB 定位于框架。
+先来看一段非常简单的单元测试的代码 ：
+Assert(2 == Add(1, 1));
+请允许我对这行代码做些解释，对Add函数输入参数，验证返回值是否是预期的结果。这不就是单元测试的本质吗？在想一下我们异步发送消息的过程，如果每个输入消息约定一个结果消息包，每次发送请求时都绑定一个回调函数接收和验证结果消息包。这样的话就恰恰满足了传统单元测试的步骤了。最后还需解决一个问题，Assert是不能处理异步的返回值的。幸运的是，future机制可以化异步为同步。不了解future 模式的可以参考这里：
+http://blog.chinaunix.net/uid-23093301-id-190969.html
+http://msdn.microsoft.com/zh-cn/library/dd764564.aspx#Y300</p>
+
+<p>来看一下在FFLIB框架下远程调用echo 服务的示例：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">lambda_t</span>
+<span class="p">{</span>
+<span class="err">　　</span><span class="k">static</span> <span class="kt">void</span> <span class="n">callback</span><span class="p">(</span><span class="n">echo_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">msg_</span><span class="p">)</span>
+<span class="err">　　</span><span class="p">{</span>
+<span class="err">　　　　</span><span class="n">echo_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="err">　　　　</span><span class="n">in</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">"XXX_echo_test_XXX"</span><span class="p">;</span>
+<span class="err">　　　　</span><span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+       <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"echo"</span><span class="p">)</span>
+       <span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">callback</span><span class="p">);</span>
+<span class="err">　　</span><span class="p">}</span>
+<span class="p">};</span>
+<span class="n">echo_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">"XXX_echo_test_XXX"</span><span class="p">;</span>
+<span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"echo"</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">async_call</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lambda_t</span><span class="o">::</span><span class="n">callback</span><span class="p">);</span>
+</code></pre></div></div>
+<p>当需要调用远程接口时，async_call(in, &amp;lambda_t::callback); 异步调用必须绑定一个回调函数，回调函数接收结果消息，可以触发后续操作。这样的话，如果对echo 的远程接口做单元测试，可以这样做：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rpc_future_t</span><span class="o">&lt;</span> <span class="n">echo_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;</span> <span class="n">rpc_future</span><span class="p">;</span>
+<span class="n">echo_t</span><span class="o">::</span><span class="n">in_t</span> <span class="n">in</span><span class="p">;</span>
+<span class="n">in</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">"XXX_echo_test_XXX"</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">echo_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&amp;</span> <span class="n">out</span> <span class="o">=</span> <span class="n">rpc_future</span><span class="p">.</span><span class="n">call</span><span class="p">(</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">()</span>
+        <span class="p">.</span><span class="n">get_service_group</span><span class="p">(</span><span class="s">"echo"</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">get_service</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">in</span><span class="p">);</span>
+<span class="n">Assert</span><span class="p">(</span><span class="n">in</span><span class="p">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">out</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</code></pre></div></div>
+<p>这样所有的远程接口都可以被单元测试覆盖。</p>
+
+<h3 id="fflib-介绍">FFLIB 介绍</h3>
+<h3 id="fflib-结构图">FFLIB 结构图</h3>
+
+<p><img src="/assets/img/fflibintro/fflibintro1.jpg" alt=""></p>
+
+<p>如图所示，Client 不会直接和Service 相连接，而是通过Broker 中间层完成了消息传递。关于Broker 模式可以参见：http://blog.chinaunix.net/uid-23093301-id-90459.html</p>
+
+<p>进程间通信采用TPC，而不是多线程使用的共享内存方式。Service 一般是单线程架构的，通过启动多进程实现相对于多线程的并发。由于Broker模式天生石分布式的，所以有很好的Scalability。</p>
+
+<h3 id="消息时序图">消息时序图</h3>
+<p><img src="/assets/img/fflibintro/fflibintro2.jpg" alt=""></p>
+
+<h4 id="如何注册服务和接口">如何注册服务和接口</h4>
+<p>来看一下Echo 服务的实现：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">echo_service_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">echo</span><span class="p">(</span><span class="n">echo_t</span><span class="o">::</span><span class="n">in_t</span><span class="o">&amp;</span> <span class="n">in_msg_</span><span class="p">,</span> <span class="n">rpc_callcack_t</span><span class="o">&lt;</span><span class="n">echo_t</span><span class="o">::</span><span class="n">out_t</span><span class="o">&gt;&amp;</span> <span class="n">cb_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">logtrace</span><span class="p">((</span><span class="n">FF</span><span class="p">,</span> <span class="s">"echo_service_t::echo done value&lt;%s&gt;"</span><span class="p">,</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">c_str</span><span class="p">()));</span>
+        <span class="n">echo_t</span><span class="o">::</span><span class="n">out_t</span> <span class="n">out</span><span class="p">;</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">in_msg_</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+        <span class="n">cb_</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+ 
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">g_index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">g_index</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="s">"tcp://%s:%s"</span><span class="p">,</span> <span class="s">"127.0.0.1"</span><span class="p">,</span> <span class="s">"10241"</span><span class="p">);</span>
+    
+    <span class="n">msg_bus_t</span> <span class="n">msg_bus</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">open</span><span class="p">(</span><span class="s">"tcp://127.0.0.1:10241"</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="s">"can't connnect to broker"</span><span class="p">);</span>
+ 
+    <span class="n">echo_service_t</span> <span class="n">f</span><span class="p">;</span>
+ 
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service_group</span><span class="p">(</span><span class="s">"echo"</span><span class="p">);</span>
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">create_service</span><span class="p">(</span><span class="s">"echo"</span><span class="p">,</span> <span class="n">g_index</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">bind_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">f</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">echo_service_t</span><span class="o">::</span><span class="n">echo</span><span class="p">);</span>
+    
+    <span class="n">signal_helper_t</span><span class="o">::</span><span class="n">wait</span><span class="p">();</span>
+ 
+    <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_bus_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">close</span><span class="p">();</span>
+    <span class="c1">//usleep(1000);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span><span class="s">"</span><span class="se">\n</span><span class="s">oh end</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>create_service_group 创建一个服务group，一个服务组可能有多个并行的实例
+create_service 以特定的id 创建一个服务实例
+reg 为该服务注册接口
+接口的定义规范为void echo(echo_t::in_t&amp; in_msg_, rpc_callcack_t&lt;echo_t::out_t&gt;&amp; cb_)，第一个参数为输入的消息struct，第二个参数为回调函数的模板特例，模板参数为返回消息的struct 类型。接口无需知道发送消息等细节，只需将结果callback 即可。
+注册到Broker 后，所有Client都可获取该服务
+消息定义的规范
+    我们约定每个接口（远程或本地都应满足）都包含一个输入消息和一个结果消息。来看一下echo 服务的消息定义：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">echo_t</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">in_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">in_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"echo_t::in_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">virtual</span> <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        
+        <span class="n">string</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">struct</span> <span class="n">out_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">msg_i</span>
+    <span class="p">{</span>
+        <span class="n">out_t</span><span class="p">()</span><span class="o">:</span>
+            <span class="n">msg_i</span><span class="p">(</span><span class="s">"echo_t::out_t"</span><span class="p">)</span>
+        <span class="p">{}</span>
+        <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">init_encoder</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">).</span><span class="n">get_buff</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">virtual</span> <span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">src_buff_</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">init_decoder</span><span class="p">(</span><span class="n">src_buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="p">}</span>
+        
+        <span class="n">string</span> <span class="n">value</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>每个接口必须包含in_t消息和out_t消息，并且他们定义在接口名（如echo _t）的内部
+所有消息都继承于msg_i, 其封装了二进制的序列化、反序列化等。构造时赋予类型名作为消息的名称。
+每个消息必须实现encode 和 decode 函数
+　　这里需要指出的是，FFLIB 中不需要为每个消息定义对应的CMD。当接口如echo向Broker 注册时，reg接口通过C++ 模板的类型推断会自动将该msg name 注册给Broker， Broker为每个msg name 分配唯一的msg_id。Msg_bus 中自动维护了msg_name 和msg_id 的映射。Msg_i 的定义如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">msg_i</span> <span class="o">:</span> <span class="k">public</span> <span class="n">codec_i</span>
+<span class="p">{</span>
+    <span class="n">msg_i</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">msg_name_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">uuid</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">service_group_id</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">service_id</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">msg_id</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">msg_name</span><span class="p">(</span><span class="n">msg_name_</span><span class="p">)</span>
+    <span class="p">{}</span>
+    
+    <span class="kt">void</span> <span class="n">set</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">group_id</span><span class="p">,</span> <span class="kt">uint16_t</span> <span class="n">id_</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">uuid_</span><span class="p">,</span> <span class="kt">uint16_t</span> <span class="n">msg_id_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">service_group_id</span> <span class="o">=</span> <span class="n">group_id</span><span class="p">;</span>
+        <span class="n">service_id</span>       <span class="o">=</span> <span class="n">id_</span><span class="p">;</span>
+        <span class="n">uuid</span>             <span class="o">=</span> <span class="n">uuid_</span><span class="p">;</span>
+        <span class="n">msg_id</span>           <span class="o">=</span> <span class="n">msg_id_</span><span class="p">;</span>
+    <span class="p">}</span>
+ 
+    <span class="kt">uint16_t</span> <span class="n">cmd</span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="n">get_group_id</span><span class="p">()</span>   <span class="k">const</span><span class="p">{</span> <span class="k">return</span> <span class="n">service_group_id</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">uint16_t</span> <span class="n">get_service_id</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span> <span class="k">return</span> <span class="n">service_id</span><span class="p">;</span>       <span class="p">}</span>
+    <span class="kt">uint32_t</span> <span class="n">get_uuid</span><span class="p">()</span>       <span class="k">const</span><span class="p">{</span> <span class="k">return</span> <span class="n">uuid</span><span class="p">;</span>             <span class="p">}</span>
+    
+    <span class="kt">uint16_t</span> <span class="n">get_msg_id</span><span class="p">()</span>     <span class="k">const</span><span class="p">{</span> <span class="k">return</span> <span class="n">msg_id</span><span class="p">;</span>           <span class="p">}</span>
+    <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">get_name</span><span class="p">()</span>  <span class="k">const</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">msg_name</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span> <span class="o">==</span> <span class="nb">false</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="n">msg_name</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">singleton_t</span><span class="o">&lt;</span><span class="n">msg_name_store_t</span><span class="o">&gt;::</span><span class="n">instance</span><span class="p">().</span><span class="n">id_to_name</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_msg_id</span><span class="p">());</span>
+    <span class="p">}</span>
+    
+    <span class="kt">void</span>     <span class="n">set_uuid</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id_</span><span class="p">)</span>   <span class="p">{</span> <span class="n">uuid</span> <span class="o">=</span> <span class="n">id_</span><span class="p">;</span>  <span class="p">}</span>
+    <span class="kt">void</span>     <span class="n">set_msg_id</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">id_</span><span class="p">)</span> <span class="p">{</span> <span class="n">msg_id</span> <span class="o">=</span> <span class="n">id_</span><span class="p">;}</span>
+    <span class="kt">void</span>     <span class="n">set_sgid</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">sgid_</span><span class="p">)</span> <span class="p">{</span> <span class="n">service_group_id</span> <span class="o">=</span> <span class="n">sgid_</span><span class="p">;}</span>
+    <span class="kt">void</span>     <span class="n">set_sid</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">sid_</span><span class="p">)</span>   <span class="p">{</span> <span class="n">service_id</span> <span class="o">=</span> <span class="n">sid_</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">uint32_t</span> <span class="n">uuid</span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="n">service_group_id</span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="n">service_id</span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="n">msg_id</span><span class="p">;</span>
+    <span class="n">string</span>   <span class="n">msg_name</span><span class="p">;</span>
+ 
+    <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">cmd_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">this</span><span class="o">-&gt;</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd_</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">encode</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">virtual</span> <span class="n">string</span> <span class="n">encode</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">bin_encoder_t</span><span class="o">&amp;</span> <span class="n">init_encoder</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">encoder</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>  <span class="o">&lt;&lt;</span> <span class="n">uuid</span> <span class="o">&lt;&lt;</span> <span class="n">service_group_id</span> <span class="o">&lt;&lt;</span> <span class="n">service_id</span><span class="o">&lt;&lt;</span> <span class="n">msg_id</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">bin_encoder_t</span><span class="o">&amp;</span> <span class="n">init_encoder</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">cmd_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">encoder</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">cmd_</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">uuid</span> <span class="o">&lt;&lt;</span> <span class="n">service_group_id</span> <span class="o">&lt;&lt;</span> <span class="n">service_id</span> <span class="o">&lt;&lt;</span> <span class="n">msg_id</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">bin_decoder_t</span><span class="o">&amp;</span> <span class="n">init_decoder</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">buff_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">decoder</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">buff_</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">uuid</span> <span class="o">&gt;&gt;</span> <span class="n">service_group_id</span> <span class="o">&gt;&gt;</span> <span class="n">service_id</span> <span class="o">&gt;&gt;</span> <span class="n">msg_id</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">bin_decoder_t</span> <span class="n">decoder</span><span class="p">;</span>
+    <span class="n">bin_encoder_t</span> <span class="n">encoder</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<h3 id="关于性能">关于性能</h3>
+<p>由于远程接口的调用必须通过Broker， Broker会为每个接口自动生成性能统计数据，并每10分钟输出到perf.txt 文件中。文件格式为CSV，参见:</p>
+
+<p>http://www.cnblogs.com/zhiranok/archive/2012/06/06/cpp_perf.html</p>
+
+<h2 id="总结">总结</h2>
+<p>FFLIB框架拥有如下的特点：</p>
+
+<ul>
+  <li>使用多进程并发。Broker 把Client 和Service 的位置透明化</li>
+  <li>Service 的接口要注册到Broker， 所有连接Broker的Client 都可以调用（publisher/ subscriber）</li>
+  <li>远程调用必须绑定回调函数</li>
+  <li>利用future 模式实现同步，从而支持单元测试</li>
+  <li>消息定义规范简单直接高效</li>
+  <li>所有service的接口性能监控数据自动生成，免费的午餐</li>
+  <li>Service 单线程话，更simplicity
+    <h4 id="源代码">源代码：</h4>
+    <p>Svn co http://ffown.googlecode.com/svn/trunk/</p>
+  </li>
+</ul>
+
+<h4 id="运行示例">运行示例：</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Cd example/broker <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> ./app_broker –l http://127.0.0.1:10241
+Cd example/echo_server <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> ./app_echo_server
+Cd example/echo_client <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> ./app_echo_client
+</code></pre></div></div>
+<h4 id="相关连接">相关连接</h4>
+<ul>
+  <li>文档 http://h2cloud.org</li>
+  <li>源码 https://github.com/fanchy/h2engine</li>
+  <li>介绍 http://www.cnblogs.com/zhiranok/p/ffengine.html</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

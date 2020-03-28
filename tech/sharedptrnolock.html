@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>智能指针shared_ptr【无锁设计基于GCC】</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="使用过Boost的话对shared_ptr一定有很深的印象。多个shared_ptr指向同一个对象，每个shared_ptr会使对象的引用计数加+1，当引用计数为0时， 对象将被析构" />
+
+  <meta name="keywords" itemprop="tags" content="sharedptr, 智能指针, cpp"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="智能指针shared_ptr【无锁设计基于GCC】" />
+<meta name="twitter:description" content="使用过Boost的话对shared_ptr一定有很深的印象。多个shared_ptr指向同一个对象，每个shared_ptr会使对象的引用计数加+1，当引用计数为0时， 对象将被析构" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/sharedptrnolock.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="智能指针shared_ptr【无锁设计基于GCC】" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/sharedptrnolock.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="使用过Boost的话对shared_ptr一定有很深的印象。多个shared_ptr指向同一个对象，每个shared_ptr会使对象的引用计数加+1，当引用计数为0时， 对象将被析构" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-02-12T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="sharedptr" />
+  
+    <meta property="article:tag" content="智能指针" />
+  
+    <meta property="article:tag" content="cpp" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/sharedptrnolock.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">智能指针shared_ptr【无锁设计基于GCC】</h1>
+            <h2 class="project-tagline">每个shared_ptr会使对象的引用计数加+1，当引用计数为0时，对象将被析构</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-02-12T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Feb 12, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">智能指针shared_ptr【无锁设计基于GCC】</h1>
+    <p class="post-meta">
+      <time datetime="2012-02-12T00:00:00+08:00" itemprop="datePublished">
+        
+        Feb 12, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="shared_ptr-介绍">shared_ptr 介绍</h2>
+<p>使用过Boost的话对shared_ptr一定有很深的印象。多个shared_ptr指向同一个对象，每个shared_ptr会使对象的引用计数加+1，当引用计数为0时，
+对象将被析构。本文实现一个简洁版本的shared_ptr，并没有太多跨平台特性，实现代码可以再GCC上运行。</p>
+
+<p>本文中的引用计数由ref_count_t类实现，参见下文的详细分析。
+详文另见：
+代码详见：http://ffown.sinaapp.com/?p=49
+svn co http://ffown.googlecode.com/svn/trunk/fflib/lib</p>
+
+<h2 id="shared_ptr-的构造">shared_ptr 的构造</h2>
+<p>我们期望shared_ptr的行为尽量的接近原始指针的行为。所以shared_ptr应该支持三种构造方式</p>
+
+<ul>
+  <li>空构造类似与void* p =NULL;</li>
+  <li>shared_ptr可以通过原始对象指针构造，类似于void* p = q;</li>
+  <li>shared_ptr 可以通过已存在的shared_ptr构造。</li>
+</ul>
+
+<p>首先shared_ptr是一个模板类，其由连个属性。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">private:</span>
+    <span class="n">object_t</span><span class="o">*</span>       <span class="n">m_dest_ptr</span><span class="p">;</span>
+    <span class="n">ref_count_t</span><span class="o">*</span>    <span class="n">m_ref_count</span><span class="p">;</span>
+<span class="err">}</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>其中m_dest_ptr 指向目标对象, m_ref_count 用来记录该对象的引用计数。为了简单，shared_ptr类遵循一个原则m_dest_ptr和m_ref_count  同时为NULL，或同时不为NULL。</p>
+
+<p>其中 object_t 为模板类型的别名。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">shared_ptr_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="k">typedef</span> <span class="n">T</span>               <span class="n">object_t</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">self_type_t</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="空构造目标对象和引用计数默认都为空">空构造目标对象和引用计数默认都为空。</h3>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">shared_ptr_t</span><span class="p">(</span><span class="n">object_t</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">m_dest_ptr</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+    <span class="n">m_ref_count</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_ref_count</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ref_count_t</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="err">　　</span><span class="n">share_ptr_t</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">p</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="支持原始对象指针作为构造函数参数">支持原始对象指针作为构造函数参数</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">shared_ptr_t</span><span class="p">(</span><span class="n">object_t</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">m_dest_ptr</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+    <span class="n">m_ref_count</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_ref_count</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ref_count_t</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>用例：share_ptr_t<int> p(new int());</int></p>
+
+<h3 id="使用已存在的shared_ptr-构造">使用已存在的shared_ptr 构造</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">shared_ptr_t</span><span class="p">(</span><span class="n">self_type_t</span><span class="o">&amp;</span> <span class="n">p</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">m_dest_ptr</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">get</span><span class="p">()),</span>
+    <span class="n">m_ref_count</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ger_ref_count</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">m_ref_count</span><span class="o">-&gt;</span><span class="n">inc</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>用例： share_ptr_t<int> q(p);</int></p>
+
+<h2 id="shared_ptr-获取引用计数或原始指针">shared_ptr 获取引用计数或原始指针</h2>
+<p>有时需要知道shared_ptr当前引用计数的值，通过shared_ptr获取原始指针理所当然。So：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">size_t</span>       <span class="n">ref_count</span><span class="p">()</span> <span class="k">const</span>       <span class="p">{</span> <span class="k">return</span> <span class="n">m_ref_count</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="o">?</span> <span class="p">(</span><span class="kt">size_t</span><span class="p">)</span><span class="n">m_ref_count</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">()</span><span class="o">:</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+<span class="n">object_t</span><span class="o">*</span>    <span class="n">get</span><span class="p">()</span> <span class="k">const</span>             <span class="p">{</span> <span class="k">return</span> <span class="n">m_dest_ptr</span><span class="p">;</span> <span class="p">}</span>
+</code></pre></div></div>
+<p>所以很容易验证shared_ptr的行为：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shared_ptr_t</span> <span class="nf">p</span><span class="p">(</span><span class="k">new</span> <span class="kt">int</span><span class="p">());</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ref_count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">q</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">ref_count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+</code></pre></div></div>
+<h2 id="减少引用计数">减少引用计数</h2>
+<p>shared_ptr需要显示的析构对象，所以提供reset接口，当目标对象已经创建并且引用计数达到零时（即不再有shared_ptr保存目标对象的控制权），析构目标对象。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">reset</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">m_dest_ptr</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">true</span> <span class="o">==</span> <span class="n">m_ref_count</span><span class="o">-&gt;</span><span class="n">dec_and_check_zero</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">delete</span> <span class="n">m_ref_count</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">m_dest_ptr</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">m_ref_count</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">m_dest_ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="shared_ptr-的析构">shared_ptr 的析构</h2>
+<p>很简单，减少引用计数。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::~</span><span class="n">shared_ptr_t</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">reset</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="像原始指针一样使用shared_ptr">像原始指针一样使用shared_ptr</h2>
+
+<p>可以这样使用shared_ptr</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">foo_t</span> <span class="p">{</span> <span class="kt">int</span> <span class="n">a</span><span class="p">;</span> <span class="p">}</span>
+<span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="o">&gt;</span> <span class="n">p</span><span class="p">(</span><span class="k">new</span> <span class="nf">foo_t</span><span class="p">());</span>
+<span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">).</span><span class="n">a</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="n">p</span><span class="o">-&gt;</span><span class="n">a</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"p not null!</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</code></pre></div></div>
+<p>所以提供如下接口：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">typename</span> <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">object_t</span><span class="o">&amp;</span>    <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">assert</span><span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">*</span><span class="n">m_dest_ptr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">typename</span> <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">object_t</span><span class="o">*</span>    <span class="n">shared_ptr_t</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">-&gt;</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">assert</span><span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m_dest_ptr</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">operator</span> <span class="kt">bool</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_dest_ptr</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<h3 id="lock-free引用计数实现">Lock Free引用计数实现</h3>
+<p>GCC中已经定义了一些atomic operation，但是查阅资料后，应该是对Intel的平台支持较好，其他平台支持不确定。故把atomic操作封装成宏。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define ATOMIC_ADD(src_ptr, v)                         (void)__sync_add_and_fetch(src_ptr, v)
+#define ATOMIC_SUB_AND_FETCH(src_ptr, v)  __sync_sub_and_fetch(src_ptr, v)
+</span></code></pre></div></div>
+<p>ref_count_t 实现很简单：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ref_count_t</span>
+<span class="p">{</span>
+    <span class="k">typedef</span>  <span class="k">volatile</span> <span class="kt">long</span> <span class="n">atomic_t</span><span class="p">;</span>
+<span class="nl">public:</span>
+    <span class="n">ref_count_t</span><span class="p">()</span><span class="o">:</span>
+        <span class="n">m_ref_num</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">{}</span>
+    <span class="o">~</span><span class="n">ref_count_t</span><span class="p">()</span>
+    <span class="p">{}</span>
+
+    <span class="kr">inline</span> <span class="kt">void</span> <span class="n">inc</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">ATOMIC_ADD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">m_ref_num</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">inline</span> <span class="kt">bool</span> <span class="n">dec_and_check_zero</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">ATOMIC_SUB_AND_FETCH</span><span class="p">(</span><span class="o">&amp;</span><span class="n">m_ref_num</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kr">inline</span> <span class="n">atomic_t</span> <span class="n">size</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">m_ref_num</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="nl">private:</span>
+    <span class="n">atomic_t</span> <span class="n">m_ref_num</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="cp">#endif
+</span></code></pre></div></div>
+<h3 id="线程安全性">线程安全性</h3>
+
+<ul>
+  <li>单线程多个shared_ptr指向不同的对象，安全。</li>
+  <li>单线程多个shared_ptr指向相同的对象，安全。</li>
+  <li>多线程多个操作不同的shared_ptr， 指向不同的对象，安全。</li>
+  <li>多线程多个操作不同的shared_ptr， 指向相同对象，shared_ptr安全（也就是引用计数维护正确），对于原始对象操作依赖于用户。</li>
+</ul>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

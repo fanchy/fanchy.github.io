@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>RedRabbit——基于BrokerPattern服务器框架</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="BrokerPattern服务器框架" />
+
+  <meta name="keywords" itemprop="tags" content="游戏服务器架构, 经典网游服务器架构, BrokerPattern服务器框架, 服务器c++"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="gamedev" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="RedRabbit——基于BrokerPattern服务器框架" />
+<meta name="twitter:description" content="BrokerPattern服务器框架" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//gamedev/redrabbit.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="RedRabbit——基于BrokerPattern服务器框架" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//gamedev/redrabbit.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="BrokerPattern服务器框架" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-07-07T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="游戏服务器架构" />
+  
+    <meta property="article:tag" content="经典网游服务器架构" />
+  
+    <meta property="article:tag" content="BrokerPattern服务器框架" />
+  
+    <meta property="article:tag" content="服务器c++" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="gamedev" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/gamedev/redrabbit.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">RedRabbit——基于BrokerPattern服务器框架</h1>
+            <h2 class="project-tagline">经典网游服务器架构</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-07-07T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jul 7, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">RedRabbit——基于BrokerPattern服务器框架</h1>
+    <p class="post-meta">
+      <time datetime="2013-07-07T00:00:00+08:00" itemprop="datePublished">
+        
+        Jul 7, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h3 id="经典网游服务器架构">经典网游服务器架构</h3>
+
+<p><img src="/assets/img/redrabbit/redrabbit1.jpg" alt=""></p>
+
+<p>该图省略了专门用途的dbserver、guildserver等用于专门功能的server，该架构的优点有：</p>
+
+<ul>
+  <li>LoginGate相当于DNS，可以动态的保证GameGate之间负载均衡。</li>
+  <li>由于Clientt的逻辑操作都是由GameServer处理的，而Client的消息请求都被GameGate转发到GameServer上，所以在不同的GameGate上的client仍能出现在相同的场景里。若在不同的场景，又可以将其分布在不公的GameServer处理，从而实现了GameServer的Scalability。</li>
+  <li>GameServer一般是由C++与脚本结合实现的。由于数据都是在内存中处理而且大部分的IO操作（网络、数据库等）都被异步化，所以保证了非常高的实时性。</li>
+</ul>
+
+<h3 id="缺点是">缺点是：</h3>
+
+<ul>
+  <li>各个节点之间通过socket进行异步通信，测试过程叫复杂。</li>
+  <li>各个节点往往都需要交互，这时就涉及到了谁连谁的问题，理解和设计架构的网络拓扑也变得不太容易，相应的配置也会叫繁琐，排错的难度也较大。</li>
+  <li>GameServer由于是C++主语言实现，不免会涉及到崩溃和内存泄露问题，采用C++与脚本结合很大程度上缓解了这个问题，实际上越来越多的逻辑操作都是放到脚本中实现。</li>
+  <li>由于该架构必须正确的配置连接关系，否则不能正常工作，对于运维而言也并不轻松。</li>
+</ul>
+
+<p>讨论完经典网游的服务器架构，今天的主题也呼之欲出了，但在此之前，先说一下该架构的核心思想，
+如果你读过《面向模式的软件架构.第4卷,分布式计算的模式语言》你也许想到了BrokerPattern，其核心思想是通过Broker代理层，
+促使Server的位置对于Client保持透明，client通过Broker找到对应的Server处理请求，Serverr是如何分布的、数量多少，</p>
+
+<p>Client都不受影响。Broker可以存在两种模式，一种是类似于DNS提供的LookUp服务，它只是帮助Client定位到Server的位置，
+Client直接连接到Serverr进行通信。LoginGate扮演的就是这种Broker。</p>
+
+<p>另外一种Broker直接将Client请求投递给Serverr，GameGate就是扮演的这种Broker。总的来说BrokerPattern中，Broker具有如下功能：</p>
+
+<ul>
+  <li>LookUp服务，帮助Client定位Server</li>
+  <li>Route服务，实现Client和Server之间的消息转发</li>
+  <li>注册服务，Server必须要注册到Broker上这样Broker才能提供LookUp和Route功能。
+BrokerPattern示意图：</li>
+</ul>
+
+<p><img src="/assets/img/redrabbit/redrabbit2.jpg" alt=""></p>
+
+<p>所以今天的主题是如何利用BrokerPattern构建实时的服务器框架。</p>
+
+<h3 id="redrabbit目标">RedRabbit目标：</h3>
+
+<ul>
+  <li>节点之间通信采用异步消息、回调模式</li>
+  <li>Server必须很容易注册到Broker上</li>
+  <li>C++/EPOOL实现网络通信，保证实时性，支持逻辑层python实现，支持热更新</li>
+  <li>该框架能够容易的构建单个区组的构架</li>
+  <li>该框架支持跨区组通信，这也是Broker模式的优势，节点之间通信不需要知道对方的位置，只需要知道对方的名称</li>
+</ul>
+
+<p>这个框架的名字叫RedRabbit。</p>
+
+<h4 id="ffrpc">FFRPC</h4>
+<p>首先介绍RedRabbit的通信组件ffrpc，ffrpc中有如下5种角色：</p>
+
+<ul>
+  <li>BrokerMaster，负责管理所有的BrokerSlave，所有Slave需要注册到BrokerMaster上，BrokerMaster同步所有信息给所有节点。</li>
+  <li>BrokerSlave负责转发Client和Service之间的消息。</li>
+  <li>Client为调用Service接口的一方，它通过Broker于Service通信，Client不知道Service的具体位置，它只是知道当前与之通信的Service名称。</li>
+  <li>Service提供给Client调用的接口，并把接口注册到Broker上，Service若调用了其他的Service的接口，则相对于其他Service其为Client角色。</li>
+  <li>BrokerBridge负责桥接各个brokerMaster，每一个BrokerMaster负责一组服务，BrokerBridge使Client调用其他组接口和调用本组的接口一样容易，因为只需要指定对方服务名称即可。
+各个角色示意图：</li>
+</ul>
+
+<p><img src="/assets/img/redrabbit/redrabbit3.jpg" alt=""></p>
+
+<p>使用FFRPC实现的Echo服务实例代码：</p>
+
+<p>http://www.cnblogs.com/zhiranok/archive/2013/06/06/ffrpc.html</p>
+
+<h3 id="redrabbit中的其他组件gate和scene">RedRabbit中的其他组件Gate和Scene</h3>
+<h4 id="gate">Gate</h4>
+<p>外网接入的client有些特殊，需要一定的安全处理。Gate是专门用于接入外部Client的组件。Gate的作用有：</p>
+
+<ul>
+  <li>Client的第一个消息必须为验证消息，Gate 并没有验证Client的能力，它调用Scene@0的接口处理</li>
+  <li>Scene@0通过验证后将Client将被分配唯一的SessionId。</li>
+  <li>Client的所有消息都被Gate转发到对应的Scene上，Scene可以控制Gate接口切换某个Client到其他Scene上</li>
+  <li>Gate提供转发消息、多播、广播、断开连接等接口公scene调用。</li>
+</ul>
+
+<p>需要特别指出的是，Gate和Scene只是RedRabbit的组件，RedRabbit通过制定不同的启动参数来确定开启哪些组件。示例：</p>
+
+<ul>
+  <li>./app_redrabbit -gate gate@0 -broker tcp://127.0.0.1:10241 -gate_listen tcp://121.199.21.238:10242</li>
+  <li>-gate 表示gate的名称，scene通过名称调用其接口</li>
+  <li>-gate_listen表示gate监听的ip、port</li>
+  <li>-brkoker表示作为BrokerMaster启动，一组服务中必须有一个BrokerMaster，如果Broker和Client和Service在同一进程中，Broker专门做了优化，消息会直接从内存间实现传递，避免了网络转发的开销。
+    <h4 id="scene">Scene</h4>
+    <p>在RedRabbit中的所有Service都是运行在Scene组件之下的。Scene提供了通用的接口，可以和Gate和其他Scene通信，并把接口导入到了python中。Scene接收的Client的请求都交由Python处理，所以可以用Scene+Python实现GameServer、DbServer等各种专用的服务器。Scene组件提供的功能有：</p>
+  </li>
+  <li>验证Client有效性，scene@0必须提供此接口</li>
+  <li>处理Client Enter消息，Scene第一次进入该Scene，触发此事件</li>
+  <li>处理Client Offline消息，Client下线，触发此事件</li>
+  <li>Scene提供转发、多播、广播、关闭连接等接口给python</li>
+  <li>Scene提供定时器接口给python</li>
+  <li>Scene提供异步操作Mysql、Sqlite的接口，采用异步加回调，从而避免阻塞主线程</li>
+  <li>Scene提供了一套消息派发框架，支持client和python通信的协议包括json、thrift、protobuf。
+使用RedRabbit构建的聊天室demo示例：</li>
+</ul>
+
+<p>http://ffown.sinaapp.com/flash/</p>
+
+<p>修改名称，点击flash的连接按钮，进入聊天室发消息，右侧的python脚本为服务器python的实现，修改右侧脚本点保存按钮，在flash中输入reload即可实现热更新!!!!</p>
+
+<p>该聊天室服务器启动的参数是:</p>
+
+<p>./app_redrabbit -gate gate@0 -broker tcp://127.0.0.1:10241 -gate_listen tcp://121.199.21.238:10242 -python_path ./ -scene scene@0</p>
+
+<p>该示例中把gate和scene启动到了一个服务器程序上，实际上通过调整参数，二者可以启动到不同进程中，RedRabbit通过参数开启组件，而组件之间是通过Broker建立联系的。</p>
+
+<p>对应的python代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># coding=UTF-8
+</span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">ffext</span>
+
+<span class="k">def</span> <span class="nf">GetNowTime</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">'</span><span class="si">%</span><span class="s">Y-</span><span class="si">%</span><span class="s">m-</span><span class="si">%</span><span class="s">d </span><span class="si">%</span><span class="s">H:</span><span class="si">%</span><span class="s">M:</span><span class="si">%</span><span class="s">S'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+
+<span class="k">class</span> <span class="nc">player_mgr_t</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_players</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id_</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_players</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">session_id_</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id_</span><span class="p">):</span>
+        <span class="k">del</span>  <span class="bp">self</span><span class="o">.</span><span class="n">all_players</span><span class="p">[</span><span class="n">session_id_</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id_</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_players</span><span class="p">[</span><span class="n">session_id_</span><span class="p">]</span> <span class="o">=</span> <span class="n">player</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_players</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">idlist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_players</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">player_t</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">session_id_</span><span class="p">;</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span>
+
+<span class="c1">#这个修饰器的意思是注册process_chat函数接收cmd=1的消息
+</span><span class="o">@</span><span class="n">ffext</span><span class="o">.</span><span class="n">session_call</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">process_chat</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="s">'reload'</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">'./update_code.sh'</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ffext</span><span class="o">.</span><span class="nb">reload</span><span class="p">(</span><span class="s">'main'</span><span class="p">)</span><span class="c1">#重载此脚本
+</span>        <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'&lt;b&gt;&lt;font color="#ff0000"&gt; main.py已完成重载'</span>\
+                                       <span class="s">'</span><span class="si">%</span><span class="s">s&lt;/font&gt;&lt;/b&gt;'</span><span class="o">%</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ret</span><span class="p">)))</span>
+        <span class="k">return</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">"process_chat session_id=</span><span class="si">%</span><span class="s">s content=</span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">content</span><span class="p">))</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="s">'&lt;font color="#008000"&gt;[</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s]:&lt;/font&gt;</span><span class="si">%</span><span class="s">s'</span><span class="o">%</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">GetNowTime</span><span class="p">(),</span> <span class="n">content</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+
+
+<span class="c1">#这个修饰器的意思是注册下面函数处理验证client账号密码，
+#session_key为账号密码组合体，client第一个包必为登陆包
+</span><span class="o">@</span><span class="n">ffext</span><span class="o">.</span><span class="n">session_verify_callback</span>
+<span class="k">def</span> <span class="nf">my_session_verify</span><span class="p">(</span><span class="n">session_key</span><span class="p">,</span> <span class="n">online_time</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">gate_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">session_key</span><span class="p">]</span><span class="c1">#需要返回数组，验证成功，第一个元素为分配的id，
+</span>                        <span class="c1">#第二个元素可以不设置，若设置gate会返回给client，login gate的时候
+</span>                        <span class="c1">#需要第二个元素返回分配的game gate
+</span>
+<span class="c1">#此修饰器的作用是注册下面函数处理用户下线 
+</span><span class="o">@</span><span class="n">ffext</span><span class="o">.</span><span class="n">session_offline_callback</span>
+<span class="k">def</span> <span class="nf">my_session_offline</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">online_time</span><span class="p">):</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="s">'&lt;font color="#ff0000"&gt;[</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s] offline &lt;/font&gt;'</span><span class="o">%</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">GetNowTime</span><span class="p">())</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">singleton</span><span class="p">(</span><span class="n">player_mgr_t</span><span class="p">)</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'&lt;font color="#ff0000"&gt;当前在线:&lt;/font&gt;'</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ffext</span><span class="o">.</span><span class="n">singleton</span><span class="p">(</span><span class="n">player_mgr_t</span><span class="p">)</span><span class="o">.</span><span class="n">idlist</span><span class="p">())</span>
+
+<span class="c1">#此修饰器的作用是注册下面函数处理client切换到此场景服务器
+</span><span class="o">@</span><span class="n">ffext</span><span class="o">.</span><span class="n">session_enter_callback</span>
+<span class="k">def</span> <span class="nf">my_session_enter</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">from_scene</span><span class="p">,</span> <span class="n">extra_data</span><span class="p">):</span>
+    <span class="c1">#单播接口
+</span>    <span class="n">ffext</span><span class="o">.</span><span class="n">send_msg_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">'&lt;font color="#ff0000"&gt;测试单播接口！欢迎你！'</span>\
+                                             <span class="s">'&lt;/font&gt;'</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="s">'&lt;font color="#ff0000"&gt;[</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s] online &lt;/font&gt;'</span><span class="o">%</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">GetNowTime</span><span class="p">())</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+    <span class="n">player</span> <span class="o">=</span> <span class="n">player_t</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">singleton</span><span class="p">(</span><span class="n">player_mgr_t</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">player</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'&lt;font color="#ff0000"&gt;当前在线:&lt;/font&gt;'</span><span class="p">)</span>
+    <span class="n">ffext</span><span class="o">.</span><span class="n">broadcast_msg_session</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ffext</span><span class="o">.</span><span class="n">singleton</span><span class="p">(</span><span class="n">player_mgr_t</span><span class="p">)</span><span class="o">.</span><span class="n">idlist</span><span class="p">())</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"loading......."</span><span class="p">)</span>                                                        
+</code></pre></div></div>
+
+<h2 id="总结">总结：</h2>
+<ul>
+  <li>Ffrpc是基于BrokerPattern思想实现的异步消息+回调通讯库。</li>
+  <li>使用python构建实时服务器完全可以做到，在一些页游和手游项目尤其适合。确保高实时性的建议一是把数据在内存中操作，二是io操作异步化。</li>
+  <li>RedRabbit支持Client与Python的通信协议有Json、thrift、protobuf。我个人最喜欢thrift。</li>
+  <li>RedRabbit支持跨区组通信，通过BrokerBridge把GroupA和GroupB的BrokerMaster连通起来。示例：
+启动BrokerBridge：</li>
+</ul>
+
+<p>./app_redrabbit  -broker tcp://127.0.0.1:10241</p>
+
+<p>启动GroupA的BrokerMaster:</p>
+
+<p>./app_redrabbit  -broker tcp://127.0.0.1:10242 -bridge_broker GroupA@tcp://127.0.0.1:10241</p>
+
+<p>启动GroupB的BrokerMaster:</p>
+
+<p>./app_redrabbit  -broker tcp://127.0.0.1:10242 -bridge_broker GroupB@tcp://127.0.0.1:10241</p>
+
+<p>在GroupA的python中就可以这样调用GroupB的接口：</p>
+
+<p>Ffext.bridge_call(‘GroupB’, cmd, msg, callback)</p>
+
+<p>项目源码：</p>
+
+<p>https://github.com/fanchy/RedRabbit</p>
+
+<p>TODO:
+构建跨服的demo示例, 下一篇。</p>
+
+<p>更多精彩文章 http://h2cloud.org</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

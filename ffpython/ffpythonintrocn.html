@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>C++使用ffpython嵌入和扩展python</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，与C++结合非常的适合。" />
+
+  <meta name="keywords" itemprop="tags" content="python, c++嵌入python, 服务器嵌入python"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="ffpython" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="C++使用ffpython嵌入和扩展python" />
+<meta name="twitter:description" content="在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，与C++结合非常的适合。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//ffpython/ffpythonintrocn.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="C++使用ffpython嵌入和扩展python" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//ffpython/ffpythonintrocn.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，与C++结合非常的适合。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-05-09T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="python" />
+  
+    <meta property="article:tag" content="c++嵌入python" />
+  
+    <meta property="article:tag" content="服务器嵌入python" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="ffpython" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/ffpython/ffpythonintrocn.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">C++使用ffpython嵌入和扩展python</h1>
+            <h2 class="project-tagline">针对前面使用boost asio 中遇到的问题，对asio进行封装</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-05-09T00:00:00+08:00" itemprop="datePublished">
+                    
+                    May 9, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">C++使用ffpython嵌入和扩展python</h1>
+    <p class="post-meta">
+      <time datetime="2013-05-09T00:00:00+08:00" itemprop="datePublished">
+        
+        May 9, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要:</h2>
+<p>在服务器编程中，经常会用到python脚本技术。Python是最流行的脚本之一，并且python拥有定义良好的C API接口，同时又有丰富的文档，与C++结合非常的适合。通常情况下使用C++封装机制，而用python脚本实现策略或者是控制。使用python和C++结合的技术拥有如下优势：</p>
+
+<ul>
+  <li>主体系统使用C++实现，保持系统的高效。</li>
+  <li>控制部分使用python，增加开发效率，python的内存垃圾回收，丰富的类库都使C++开发者获益匪浅。</li>
+  <li>Python脚本可以运行期重载，可以实现控制部分不停机热更新。</li>
+</ul>
+
+<p>C++与python的编程范式有很大不同，当使用python C API调用python时，python中的一些特有机制会给C++开发者带来很多困惑。常常使用python C API时需要注意如下几点:</p>
+
+<ul>
+  <li>Python 使用引用计数管理内存，调用python C API时对于返回值返回的是借用的引用还是新的引用，需要根据文档仔细确认。否则轻则出现内存泄露，重则程序崩溃。</li>
+  <li>Python中的数据结构与C++的有很大不同。Python常用的有tuple，list，dict。而c++常用的事vector，list，map，并且c++是强类型的。当c++与python进行交互时，C++层希望操作python数据结构就像操作c++ STL一样方便，而在python脚本层，又希望c++传入的参数或返回值都是原生的python数据</li>
+  <li>C++中常用的指针传递对象，当嵌入python时，需要把c++对象传递到python中。</li>
+</ul>
+
+<p>Ffpython是专门方便C++嵌入python开发的类库，基于ffpython一方面可以轻松的将python集成到C++系统，另一方面，C++对象或接口也可以很容易被python使用，总之ffpython简化了c++与python的交互操作。</p>
+
+<h2 id="嵌入python">嵌入python</h2>
+<p>最简单的使用python的方式是把python脚本当作配置，如获取脚本中的一个字符串变量。Python的脚本文件会被python虚拟机import为module，和python的标准库的module实际上是相似的概念。Ffpython封装了获取python module中的变量的操作。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">printf</span><span class="p">(</span><span class="s">"sys.version=%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffpython</span><span class="p">.</span><span class="n">get_global_var</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"sys"</span><span class="p">,</span> <span class="s">"version"</span><span class="p">).</span><span class="n">c_str</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>上面的代码获取python标准库中sys的version变量值，ffpython通过模板函数的自动将python的str类型自动适配到c++的string类型。get_global_var是获取变量的接口，与之对应的是设置变量的借口get_global_var：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ffpython</span><span class="p">.</span><span class="n">get_global_var</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"global_var"</span><span class="p">,</span> <span class="s">"OhNice"</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"fftest.global_var=%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffpython</span><span class="p">.</span><span class="n">get_global_var</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"global_var"</span><span class="p">).</span><span class="n">c_str</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>调用python函数是嵌入python非常常用的操作，ffpython中提供了call接口用于调用python中的module的函数：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">printf</span><span class="p">(</span><span class="s">"time.asctime=%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"time"</span><span class="p">,</span> <span class="s">"asctime"</span><span class="p">).</span><span class="n">c_str</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>上面的代码调用time模块的asctime方法，我们也可以使用call接口调用我们自己编写的函数：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">a1</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="kt">float</span> <span class="n">a2</span> <span class="o">=</span> <span class="mf">3.14</span><span class="n">f</span><span class="p">;</span> <span class="n">string</span> <span class="n">a3</span> <span class="o">=</span> <span class="s">"OhWell"</span><span class="p">;</span>
+<span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_base"</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Call被定义为模版函数，传入的参数会自动适配到python相应的类型。对应的python函数为：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_base</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
+       <span class="k">print</span><span class="p">(</span><span class="s">'test_base'</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
+       <span class="k">return</span> <span class="mi">0</span>
+</code></pre></div></div>
+
+<p>上面的python函数接受三个参数，c++传入了三个标准类型参数，实际上call接口最多支持9个泛型参数，常用的stl 参数是被支持的：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">test_stl</span><span class="p">(</span><span class="n">ffpython_t</span><span class="o">&amp;</span> <span class="n">ffpython</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">a1</span><span class="p">;</span><span class="n">a1</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span><span class="n">a1</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+    <span class="n">list</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">a2</span><span class="p">;</span> <span class="n">a2</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">"Oh"</span><span class="p">);</span><span class="n">a2</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">"Nice"</span><span class="p">);</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">list</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">a3</span><span class="p">;</span><span class="n">a3</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">a2</span><span class="p">);</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_stl"</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>对应调用的python函数为：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_stl</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
+       <span class="k">print</span><span class="p">(</span><span class="s">'test_stl'</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
+       <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>不但STL泛型被支持，嵌套定义的类似vector&lt;list<string> &gt; 的结构都是被支持的，vector和list都会转换成python的list结构，而map则转换为dict结构。</string></p>
+
+<p>调用call接口必须指定接收的返回值类型，可以使用void忽略返回值，除了可以使用标准类型，stl接口也可以被使用，python中的tuple和list可以转换成vector和list，dict则可以被转换成map。需要注意的是，若类型没有匹配，call函数将会抛出异常。用户可以catch标准异常，what接口返回的字符串包含了异常的traceback信息方便排查错误。示例如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">try</span><span class="p">{</span>
+    <span class="p">......</span>
+
+       <span class="p">}</span>
+       <span class="k">catch</span><span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span>
+       <span class="p">{</span>
+              <span class="n">printf</span><span class="p">(</span><span class="s">"exception traceback %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">());</span>
+       <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="扩展python">扩展python</h2>
+<p>Ffpython 可以注册static函数到python中，全局的C风格的static函数和类中定义的static函数都可以被注册到python中，示例如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">int</span> <span class="nf">print_val</span><span class="p">(</span><span class="kt">int</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">float</span> <span class="n">a2</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">a3</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&amp;</span> <span class="n">a4</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%s[%d,%f,%s,%d]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">a4</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">struct</span> <span class="n">ops_t</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="n">list</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">return_stl</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">list</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">ret</span><span class="p">;</span><span class="n">ret</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">test_reg_function</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">ffpython_t</span> <span class="n">ffpython</span><span class="p">;</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">print_val</span><span class="p">,</span> <span class="s">"print_val"</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ops_t</span><span class="o">::</span><span class="n">return_stl</span><span class="p">,</span> <span class="s">"return_stl"</span><span class="p">);</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="s">"ext1"</span><span class="p">);</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_reg_function"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>以上代码注册了两个接口给python，然后调用fftest文件中的test_reg_function测试两个接口，fftest.py中定义测试代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_reg_function</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">ext1</span>
+    <span class="n">ext1</span><span class="o">.</span><span class="n">print_val</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="mf">45.6</span> <span class="p">,</span> <span class="s">"----789---"</span><span class="p">,</span> <span class="p">[</span><span class="mf">3.14</span><span class="p">])</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">ext1</span><span class="o">.</span><span class="n">return_stl</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'test_reg_function'</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+ 
+</code></pre></div></div>
+<p>这两个接口虽然简单，但是说明了ffpython注册的接口支持多个参数，参数类型可以是标准C++类型，也可以是STL泛型。同样返回值的类型也是如此。</p>
+
+<p>使用ffpython 注册C++的对象也很容易，ffpython支持注册c++类的构造函数，成员变量，成员方法到python，示例代码如下：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">foo_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">foo_t</span><span class="p">(</span><span class="kt">int</span> <span class="n">v_</span><span class="p">)</span><span class="o">:</span><span class="n">m_value</span><span class="p">(</span><span class="n">v_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">foo_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">get_value</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">m_value</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">set_value</span><span class="p">(</span><span class="kt">int</span> <span class="n">v_</span><span class="p">)</span> <span class="p">{</span> <span class="n">m_value</span> <span class="o">=</span> <span class="n">v_</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">test_stl</span><span class="p">(</span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">list</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&gt;&amp;</span> <span class="n">v_</span><span class="p">)</span> 
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">m_value</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">dumy_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">foo_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">dumy_t</span><span class="p">(</span><span class="kt">int</span> <span class="n">v_</span><span class="p">)</span><span class="o">:</span><span class="n">foo_t</span><span class="p">(</span><span class="n">v_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">dumy_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">dump</span><span class="p">()</span> 
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+
+<span class="k">static</span> <span class="n">foo_t</span><span class="o">*</span> <span class="nf">obj_test</span><span class="p">(</span><span class="n">dumy_t</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">test_register_base_class</span><span class="p">(</span><span class="n">ffpython_t</span><span class="o">&amp;</span> <span class="n">ffpython</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">reg_class</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="p">,</span> <span class="n">PYCTOR</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"foo_t"</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">get_value</span><span class="p">,</span> <span class="s">"get_value"</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">set_value</span><span class="p">,</span> <span class="s">"set_value"</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">test_stl</span><span class="p">,</span> <span class="s">"test_stl"</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">reg_property</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">m_value</span><span class="p">,</span> <span class="s">"m_value"</span><span class="p">);</span>
+
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">reg_class</span><span class="o">&lt;</span><span class="n">dumy_t</span><span class="p">,</span> <span class="n">PYCTOR</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"dumy_t"</span><span class="p">,</span> <span class="s">"dumy_t class inherit foo_t ctor &lt;int&gt;"</span><span class="p">,</span> <span class="s">"foo_t"</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dumy_t</span><span class="o">::</span><span class="n">dump</span><span class="p">,</span> <span class="s">"dump"</span><span class="p">);</span>
+
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">obj_test</span><span class="p">,</span> <span class="s">"obj_test"</span><span class="p">);</span>
+
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">init</span><span class="p">();</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_register_base_class"</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>当c++类型被注册到python中后，python中使用该类型就像python内建的类型一样方便，需要注意的是，如果python中动态的创建了c++对象，那么他是被python的GC管理生命周期的，所以当变量不在被引用时，c++对象的析构函数被调用。对应的fftest.py中测试的脚本代码为：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_register_base_class</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">ext2</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">ext2</span><span class="o">.</span><span class="n">foo_t</span><span class="p">(</span><span class="mi">20130426</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"test_register_base_class get_val:"</span><span class="p">,</span> <span class="n">foo</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">778899</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"test_register_base_class get_val:"</span><span class="p">,</span> <span class="n">foo</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">foo</span><span class="o">.</span><span class="n">m_value</span><span class="p">)</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">test_stl</span><span class="p">({</span><span class="s">"key"</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span> <span class="p">})</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'test_register_base_class test_register_base_class'</span><span class="p">,</span> <span class="n">foo</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>同前边所诉的原则相同，支持C++ 标准内建类型和STL 泛型。当这个python函数返回时，foo_t的析构函数会被调用。</p>
+
+<p>dumy_t是foo_t的子类。使用ffpython可以方便表示两个类型的关系。如果基类已经定义的接口，子类不需要重复定义，比如要注册子类：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ffpython</span><span class="p">.</span><span class="n">reg_class</span><span class="o">&lt;</span><span class="n">dumy_t</span><span class="p">,</span> <span class="n">PYCTOR</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"dumy_t"</span><span class="p">,</span> <span class="s">"dumy_t class inherit foo_t ctor &lt;int&gt;"</span><span class="p">,</span> <span class="s">"foo_t"</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dumy_t</span><span class="o">::</span><span class="n">dump</span><span class="p">,</span> <span class="s">"dump"</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">test_register_inherit_class</span><span class="p">(</span><span class="n">ffpython_t</span><span class="o">&amp;</span> <span class="n">ffpython</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_register_inherit_class"</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>只需要单独注册一下子类特有的接口，其他接口自动从foo_t基类中继承而来，相应的测试python脚本代码为：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_register_inherit_class</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">ext2</span>
+    <span class="n">dumy</span> <span class="o">=</span> <span class="n">ext2</span><span class="o">.</span><span class="n">dumy_t</span><span class="p">(</span><span class="mi">20130426</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"test_register_inherit_class get_val:"</span><span class="p">,</span> <span class="n">dumy</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+    <span class="n">dumy</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">778899</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"test_register_inherit_class get_val:"</span><span class="p">,</span> <span class="n">dumy</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">dumy</span><span class="o">.</span><span class="n">m_value</span><span class="p">)</span>
+    <span class="n">dumy</span><span class="o">.</span><span class="n">test_stl</span><span class="p">({</span><span class="s">"key"</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span> <span class="p">})</span>
+    <span class="n">dumy</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'test_register_inherit_class'</span><span class="p">,</span> <span class="n">dumy</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Ffpython中一个非常用用的特性是，c++创建的对象可以传递到python中，而python使用起来就像正常的python对象一样，另外python创建的c++对象也可以传递到c++中，简单示例代码：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ffpython</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">obj_test</span><span class="p">,</span> <span class="s">"obj_test"</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">test_cpp_obj_to_py</span><span class="p">(</span><span class="n">ffpython_t</span><span class="o">&amp;</span> <span class="n">ffpython</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">foo_t</span> <span class="n">tmp_foo</span><span class="p">(</span><span class="mi">2013</span><span class="p">);</span>
+    <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_cpp_obj_to_py"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tmp_foo</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">test_cpp_obj_py_obj</span><span class="p">(</span><span class="n">ffpython_t</span><span class="o">&amp;</span> <span class="n">ffpython</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">dumy_t</span> <span class="n">tmp_foo</span><span class="p">(</span><span class="mi">2013</span><span class="p">);</span>
+    
+    <span class="n">foo_t</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">ffpython</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="o">*&gt;</span><span class="p">(</span><span class="s">"fftest"</span><span class="p">,</span> <span class="s">"test_cpp_obj_py_obj"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tmp_foo</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>相应的fftest.py中的测试脚本代码为：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">def</span> <span class="n">test_cpp_obj_to_py</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">import</span> <span class="n">ext2</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">"test_cpp_obj_to_py get_val:"</span><span class="p">,</span> <span class="n">foo</span><span class="p">.</span><span class="n">get_value</span><span class="p">())</span>
+    <span class="n">foo</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">778899</span><span class="p">)</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">"test_cpp_obj_to_py get_val:"</span><span class="p">,</span> <span class="n">foo</span><span class="p">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">foo</span><span class="p">.</span><span class="n">m_value</span><span class="p">)</span>
+    <span class="n">foo</span><span class="p">.</span><span class="n">test_stl</span><span class="p">({</span><span class="s">"key"</span><span class="o">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span> <span class="p">})</span>
+    <span class="n">print</span><span class="p">(</span><span class="err">'</span><span class="n">test_cpp_obj_to_py</span> <span class="n">test_register_base_class</span><span class="err">'</span><span class="p">,</span> <span class="n">foo</span><span class="p">)</span>
+
+<span class="n">def</span> <span class="n">test_cpp_obj_py_obj</span><span class="p">(</span><span class="n">dumy</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">import</span> <span class="n">ext2</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">"test_cpp_obj_py_obj get_val:"</span><span class="p">,</span> <span class="n">dumy</span><span class="p">.</span><span class="n">get_value</span><span class="p">())</span>
+    <span class="n">dumy</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">778899</span><span class="p">)</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">"test_cpp_obj_py_obj get_val:"</span><span class="p">,</span> <span class="n">dumy</span><span class="p">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">dumy</span><span class="p">.</span><span class="n">m_value</span><span class="p">)</span>
+    <span class="n">dumy</span><span class="p">.</span><span class="n">test_stl</span><span class="p">({</span><span class="s">"key"</span><span class="o">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span> <span class="p">})</span>
+    <span class="n">dumy</span><span class="p">.</span><span class="n">dump</span><span class="p">()</span>
+    <span class="n">ext2</span><span class="p">.</span><span class="n">obj_test</span><span class="p">(</span><span class="n">dumy</span><span class="p">)</span>
+    <span class="n">print</span><span class="p">(</span><span class="err">'</span><span class="n">test_cpp_obj_py_obj</span><span class="err">'</span><span class="p">,</span> <span class="n">dumy</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">dumy</span>
+</code></pre></div></div>
+
+<h2 id="总结">总结：</h2>
+<ul>
+  <li>Ffpython 支持c++调用python函数，获取和设置模块内的变量</li>
+  <li>Ffpython call接口最多支持9个泛型参数，支持的类型包括c++内建的类型和STL 泛型。以及已经被注册的c++类的指针类型。返回值的类型约束同样如此。c++ STL中的vector和list对应于python的tuple和list，map类型则对应于dict。</li>
+  <li>Ffpython支持将c++的静态函数注册到python中。</li>
+  <li>Ffpython支持c++类的注册，并且支持继承。Python中操作c++对象就像操作原生python对象一样。</li>
+  <li>Ffpython注册的c++类在python中被创建后，将会由python GC负责回收内存。</li>
+  <li>Ffpython 类库只有一个文件，并且不依赖其他第三方库，非常容易集成到项目中。而且ffpython遵从开源协议。</li>
+  <li>Ffpython使用c++模板技术，封装了python C API的使用细节，保持精巧和简洁，效率和完全的python C API编写的代码几乎相同。Ffpython的实现可以作为非常好的python C API的示例。</li>
+  <li>Github项目地址：https://github.com/fanchy/ffpython</li>
+</ul>
+
+<p>更多精彩文章 http://h2cloud.org</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>Base PyQt4, Simple Web APP Framwork</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="Base PyQt4, Simple Web APP Framwork" />
+
+  <meta name="keywords" itemprop="tags" content="PyQt4, python, webkit"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="tech" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="Base PyQt4, Simple Web APP Framwork" />
+<meta name="twitter:description" content="Base PyQt4, Simple Web APP Framwork" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//tech/pyqt4web.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="Base PyQt4, Simple Web APP Framwork" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//tech/pyqt4web.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="Base PyQt4, Simple Web APP Framwork" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2012-01-15T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="PyQt4" />
+  
+    <meta property="article:tag" content="python" />
+  
+    <meta property="article:tag" content="webkit" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="tech" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/tech/pyqt4web.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">Base PyQt4, Simple Web APP Framwork</h1>
+            <h2 class="project-tagline">Base PyQt4, Simple Web APP Framwork</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2012-01-15T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jan 15, 2012
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Base PyQt4, Simple Web APP Framwork</h1>
+    <p class="post-meta">
+      <time datetime="2012-01-15T00:00:00+08:00" itemprop="datePublished">
+        
+        Jan 15, 2012
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="介绍">介绍</h2>
+<p>长时间以来，一直针对Linux 服务器开发后台程序，每天面对的是黑框框，输出只有日志文件。偶尔需要模拟客户端测试，要么是写几行php代码，在浏览器上点一点，要么是写个小Python脚本在shell中执行一下。写了一些测试用的小脚本以后，越来越钟爱这种脚本测试方式了。想到什么测试case，三下五除二改改脚本就能测了。测试小脚本多多少少也写了十来个了。其实自己Php和Python的底子都不好，只是略懂一二，居然大部分问题都能google一下轻松解决，主要是也不需要使用神马高级特性哈哈。
+最近的项目的测试却让我犯难了，要搞GUI程序！哥身为Linux服务器下C++程序员，向来不屑写GUI，也闲麻烦（也闲自己不太会哈哈）。我们开发了一个基于地图的游戏，现在一是要测试稳定性模拟N个用户随机的移动，二是测试服务器性能，当用户相对集中在地图上某个区域时，服务器的响应效率如何。这个是当前最主要的需求，我们需要搞一个GUI程序显示地图上所有人的移动。设计的方案是将整个地图缩小到只有一屏，把用户显示为一个红点，可以动态的增加用户，还可以实时显示服务器当前各个区域的负载图。除了这个需求外，以前也碰到过一些需要GUI工具的需求，如检查任务定义的excel，检查地图配置的xml的有效性等。这些目前都是通过Web或Flash帮忙做了，但其实这些工具最好是后台程序员维护，毕竟一些限制、检查后台开发是最清楚的。
+于是乎N年来第一次这么想写GUI程序，哥不搞则以，一搞惊人哈哈！即整就整一个通用点的吧！！整理需求如下：</p>
+
+<p>常用的工具程序一般要经常修改，So GUI工具程序一定要用脚本写
+使用工具的人大致为开发、策划、运维，知道她们都用神马系统吗？普通青年用window，文艺青年用Mac，二逼青年用Linux，So Gui工具还要跨平台
+世界上最容易编写的GUI是神马？我的答案是HTML，大学里尽JB写web了，要是能让哥能用HTML+JQuery，那效率绝对是杠杆的。但是如果直接写Php页面有一些缺陷，一是他不能长期运行，点一下运行一下，二是普通Html+Jquery是不能访问本地文件系统的，更不能自己发起socket连接到服务器。
+经过一二两条，剩下的就是Lua和python了，但是Lua库太少，果断排除。加上第三条，经过艰苦的google加demo测试剩下python +widget、 和 python + Qt。刚开始苦逼的选择了wxpython，普通HTML页面鼓捣几个小时就搞出来了，这时才悲剧的发现塔不支持CSS 和 Javascript，连表单都不支持，我自己给其扩展了一下好不容易支持按钮了，但是不支持javascript太让我不甘心了。So 果断丢弃代码。
+最后PyQt成为我最后的选择，稍微看了一下Qt库，就不禁感叹，这库太JB牛逼了，外国佬揍是牛逼，这么牛逼的库开源出来。Qt中包含了N多方面的封装，其中Webkit就是专门用来渲染HTML的，Chrome、Safari等都是基于webkit引擎渲染，怪不人家能有这么帅的浏览器，人家基础库搞的好，长期技术积累啊。咋没见国人搞神马渲染引擎。这真是造福人类的好东东。我一直认为最牛逼的软件就是QT、Webkit这样的，开发此软件的人牛逼，连使用这些软件的人都觉的能够使用这样牛逼的软件，觉得自己也牛逼。除qt，webkit外，还有mysql、Linux、memcache、gcc 。我见过N过精通Oracle的人牛逼哄哄的样子，Oracle的作者我没见过，应该是更牛逼哄哄吧。
+下面详述一下我的实现：主要基于window平台（注：目前是个普通青年）</p>
+
+<h3 id="安装python">安装python</h3>
+
+<p>window 下载安装包，一路下一步即可，下载地址python.org，推荐下载python2.7 32位版本，推荐连接
+python-2.7.1.zip
+linux：yum/apt 一键安装</p>
+
+<h3 id="安装pyqt4">安装pyqt4</h3>
+
+<p>win下下载相应的安装包，注意和python版本对应，推荐下载</p>
+
+<p>PyQt-Py2.7-x86-gpl-4.9-1.exe	Windows 32 bit installer
+http://www.riverbankcomputing.co.uk/software/pyqt/download</p>
+
+<p>linux yum/apt 或者下载tar包自己安装，二逼青年总是会麻烦一点。</p>
+
+<h3 id="下载偶的示例代码">下载偶的示例代码：</h3>
+
+<p>svn co https://ffown.googlecode.com/svn/trunk/python</p>
+
+<h3 id="运行">运行</h3>
+<p>双击main.py即可运行，运行效果图如下，主要包括通过google下载图片的例子、jquery控制按钮例子，javascript通过python访问文件系统例子，url重定向例子，还有一个html5动画的例子。</p>
+
+<p><img src="/assets/img/pyqt4web/pyqt4web1.jpg" alt=""></p>
+
+<h3 id="框架详解">框架详解：</h3>
+
+<p>要用pyqt实现一个浏览器，最少只需如下几行代码：参见pylib/simple.py</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtWebKit</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+
+<span class="n">web</span> <span class="o">=</span> <span class="n">QWebView</span><span class="p">()</span>
+<span class="n">web</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">QUrl</span><span class="p">(</span><span class="s">"http://www.cnblogs.com/zhiranok"</span><span class="p">))</span>
+<span class="n">web</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="nb">exit</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>我自己将PyQtWebkit封装到pylib下的ffqt.py
+和上面不同的是1我封装了几个函数供Javascript调用。2我默认调用html目录下的index.html文本即可，若要修改GUI只需修改index.html文件即可。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PythonJS</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__pyqtSignals__</span> <span class="o">=</span> <span class="p">(</span><span class="s">"contentChanged(const QString &amp;)"</span><span class="p">)</span>
+    <span class="o">@</span><span class="n">pyqtSignature</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="s">"QString"</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_image_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">search_url</span> <span class="o">=</span> <span class="s">'http://ffown.sinaapp.com/get_image_url.php'</span>
+            <span class="n">search_ret</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">search_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">search_ret</span>
+        <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">dest</span>
+    <span class="o">@</span><span class="n">pyqtSignature</span><span class="p">(</span><span class="s">"QString"</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="s">"QString"</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">readfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="s">"file not exist!"</span> <span class="o">+</span> <span class="n">path</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ret</span>
+    <span class="o">@</span><span class="n">pyqtSignature</span><span class="p">(</span><span class="s">"QString"</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="s">"QString"</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">select_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="s">"*"</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">""</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="s">"FileDialog"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">re</span>
+</code></pre></div></div>
+<p>这里PythonJS就是为javascript封装的扩展函数库，每个成员方法javascript都可以直接调用，如读取文件内容的readfile在javascript中调用方式为
+python.readfile(file_path)
+这样javascript不方便做的如访问文件系统、socket连接、数据库访问等，都可以交个python来做。利用HTML加Jquery很容易写出一个很实用的GUI程序。</p>
+
+<p>please Try it，欢迎文艺青年、二逼青年、普通青年测试、报bug。</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    

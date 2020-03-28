@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    
+    
+    <!-- Non social metatags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    
+    <title>FFLIB之FFLUA——C++嵌入Lua&amp;扩展Lua利器</title>
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Place this data between the <head> tags of your website -->
+
+<meta name="description" content="在使用C++做服务器开发中，经常会使用到脚本技术，Lua是最优秀的嵌入式脚本之一。Lua的轻量、小巧、概念之简单， 都使他变得越来越受欢迎。fflua是c++嵌入lua的封装库。" />
+
+  <meta name="keywords" itemprop="tags" content="lua, fflua, C++嵌入lua, 服务器, 服务器lua"/>
+
+
+
+  <meta name="keywords" itemprop="categories" content="fflua" />
+
+
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+<meta name="twitter:title" content="FFLIB之FFLUA——C++嵌入Lua&amp;扩展Lua利器" />
+<meta name="twitter:description" content="在使用C++做服务器开发中，经常会使用到脚本技术，Lua是最优秀的嵌入式脚本之一。Lua的轻量、小巧、概念之简单， 都使他变得越来越受欢迎。fflua是c++嵌入lua的封装库。" />
+
+
+  <meta name="twitter:creator" content="@evanown" />
+
+
+<!-- Twitter summary card with large image must be at least 280x150px -->
+
+  <meta name="twitter:image:src" content="http://h2cloud.com/thumbnail-jumbo.png" />
+  <meta name="twitter:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta name="twitter:url" content="http://h2cloud.com//fflua/ffluaintro.html" />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="FFLIB之FFLUA——C++嵌入Lua&amp;扩展Lua利器" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://h2cloud.com//fflua/ffluaintro.html" />
+
+
+  <meta property="og:image" content="http://h2cloud.com/thumbnail-jumbo.png" />
+
+<meta property="og:description" content="在使用C++做服务器开发中，经常会使用到脚本技术，Lua是最优秀的嵌入式脚本之一。Lua的轻量、小巧、概念之简单， 都使他变得越来越受欢迎。fflua是c++嵌入lua的封装库。" />
+<meta property="og:site_name" content="h2cloud" />
+
+
+<meta property="og:locale" content="" />
+
+
+  <meta property="article:published_time" content="2013-01-27T00:00:00+08:00" />
+
+
+
+
+  
+    <meta property="article:tag" content="lua" />
+  
+    <meta property="article:tag" content="fflua" />
+  
+    <meta property="article:tag" content="C++嵌入lua" />
+  
+    <meta property="article:tag" content="服务器" />
+  
+    <meta property="article:tag" content="服务器lua" />
+  
+
+
+
+
+
+  
+    <meta property="article:tag" content="fflua" />
+  
+
+
+
+
+    
+    
+    <link rel="canonical" href="http://h2cloud.com/fflua/ffluaintro.html">
+    
+    
+    
+    <link rel="shortcut icon" href="http://h2cloud.com/favicon.ico">
+    
+    <meta name="robots" content="noarchive">
+    
+    <!-- <link rel="alternate" media="only screen and (max-width: 640px)" href="">
+        <link rel="alternate" media="handheld" href=""> -->
+        
+        
+        <link rel="stylesheet" href="http://h2cloud.com/assets/css/style.css?v=">
+    </head>
+    <body>
+        
+        <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+
+    
+      <a class="site-title" href="http://h2cloud.com/">h2cloud</a>
+    
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/h2engine.html">H2engine</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflib.html">FFlib</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/fflua.html">FFlua</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ffpython.html">FFpython</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/gamedev.html">Gamedev</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/ai.html">AI</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/tech.html">Tech</a>
+              
+            
+          
+            
+            
+              
+                <a class="page-link" href="http://h2cloud.com/about.html">About</a>
+              
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+        
+        
+        
+        
+        
+        <section class="page-header">
+            <h1 class="project-name">FFLIB之FFLUA——C++嵌入Lua&amp;扩展Lua利器</h1>
+            <h2 class="project-tagline">在使用C++做服务器开发中，经常会使用到脚本技术，Lua是最优秀的嵌入式脚本之一。</h2>
+            
+            <!-- Post tagline -->
+            
+            <h2 class="project-date">
+                <time datetime="2013-01-27T00:00:00+08:00" itemprop="datePublished">
+                    
+                    Jan 27, 2013
+                </time>
+                
+                
+                • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Evan Zhao</span></span>
+                
+            </h2>
+            
+            <!-- End: Post tagline -->
+        </section>
+        
+        <section class="main-content">
+            
+            <article itemscope itemtype="http://schema.org/BlogPosting">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">FFLIB之FFLUA——C++嵌入Lua&amp;扩展Lua利器</h1>
+    <p class="post-meta">
+      <time datetime="2013-01-27T00:00:00+08:00" itemprop="datePublished">
+        
+        Jan 27, 2013
+      </time>
+      </p>
+  </header> -->
+
+  <div itemprop="articleBody">
+    <h2 id="摘要">摘要:</h2>
+<p>在使用C++做服务器开发中，经常会使用到脚本技术，Lua是最优秀的嵌入式脚本之一。Lua的轻量、小巧、概念之简单，都使他变得越来越受欢迎。本人也使用过python做嵌入式脚本，二者各有特点，关于python之后会写相关的文章，python对于我而言更喜欢用来编写工具，我前边一些相关的算法也是用python来实现的。今天主要讲Lua相关的开发技术。Lua具有如下特点：</p>
+
+<ul>
+  <li>Lua 拥有虚拟机的概念，而其全部用标准C实现，不依赖任何库即可编译安装，更令人欣喜的是，整个Lua 的实现代码并不算多，可以直接继承到项目中，并且对项目的编译时间几乎没有什么影响</li>
+  <li>Lua的虚拟机是线程安全的，这里讲的线程安全级别指得是STL的线程安全级别，即一个lua虚拟机被一个线程访问是安全的，多个lua虚拟机被多个线程分别访问也是安全的，一个lua虚拟机被多个线程访问是不安全的。</li>
+  <li>Lua的概念非常少，数据结构只有table，这样当使用Lua作为项目的配置文件时，即使没有编程功底的策划也可以很快上手编写。</li>
+  <li>Lua没有原生的对象，没有class的关键字，这也保障了其概念简单，但是仍然是可以使用Lua面向对象编程的。</li>
+  <li>Lua尽管小巧，却支持比较先进的编程范式，lua 中的匿名函数和闭包会让代码写起来更加 优雅和高效，如果某人使用的C++ 编译器还比较老套，不支持C++11，那么可以尽快感受一下lua的匿名函数和闭包。</li>
+  <li>Lua是最高效的嵌入式脚本之一（如果不能说最的话，目前证据显示是最）。</li>
+  <li>Lua的垃圾回收也可以让C++程序收益匪浅，这也是C++结合脚本技术的重要优势之一。</li>
+  <li>Lua 的嵌入非常的容易，CAPI 相对比较简洁，而且文档清晰，当然Lua的Capi需要掌握Lua中独特的堆栈的概念，但仍然足够简单。</li>
+  <li>Lua的扩展也非常的容易，将C++是对象、函数导入到lua中会涉及到一些技巧，如果纯粹使用lua CAPI会稍显繁杂，幸运的是一些第三方库简化了这些操作，而FFLUA绝对是最好用的之一。</li>
+</ul>
+
+<h2 id="嵌入lua">嵌入Lua：</h2>
+
+<p>嵌入lua脚本，必须要把lua脚本载入lua虚拟机，lua中的概念称之为dofile，FFLUA中封装了dofile的操作，由于lua文件可能集中放在某个目录，
+FFLUA中也提供了设置lua脚本目录的接口：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span>  <span class="n">add_package_path</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">str_</span><span class="p">)</span>
+<span class="kt">int</span>  <span class="n">load_file</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">file_name_</span><span class="p">)</span> <span class="k">throw</span> <span class="p">(</span><span class="n">lua_exception_t</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>load_file就是执行dofile操作，若出错，则throw异常对象，可以使用exception引用目标对象使用what接口输出代码出错的traceback。</p>
+
+<p>当嵌入lua时，最简单的情况是把lua脚本当成配置使用，那么需要获取lua脚本中的变量和设置lua变量，FFLUA封装了两个接口用于此操作。lua是动态语言，变量可以被赋值为任何lua支持的类型，但C++是强类型的，所以两个接口都是范型的：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">template</span><span class="o">&lt;</span><span class="n">typenameT</span><span class="o">&gt;</span>
+    <span class="kt">int</span>  <span class="nf">get_global_variable</span><span class="p">(</span><span class="n">conststring</span><span class="o">&amp;</span> <span class="n">field_name_</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">ret_</span><span class="p">);</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="n">typenameT</span><span class="o">&gt;</span>
+    <span class="kt">int</span>  <span class="nf">get_global_variable</span><span class="p">(</span><span class="n">constchar</span><span class="o">*</span> <span class="n">field_name_</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">ret_</span><span class="p">);</span>
+</code></pre></div></div>
+<p>有时需要直接执行一些lua语句，lua中有dostring的概念，FFLUA中封装了单独的接口run_string：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">run_string</span><span class="p">(</span><span class="n">constchar</span><span class="o">*</span> <span class="n">str_</span><span class="p">)</span> <span class="k">throw</span> <span class="p">(</span><span class="n">lua_exception_t</span><span class="p">)</span>
+</code></pre></div></div>
+<p>嵌入lua时最一般的情况是调用lua中的函数，lua的函数比C++更灵活，可以支持任意多个参数，若未赋值，自动设置为nil，
+并且可以返回多个返回值。无论如何，从C++角度讲，当你嵌入lua调用lua函数时，</p>
+
+<p>你总希望lua的使用方式跟C++越像越好，你不希望繁复的处理调用函数的参数问题，比如C++数据转换成lua能处理的数据，即无趣又容易出错。</p>
+
+<p>正也正是FFLUA需要做到，封装调用lua函数的操作，把赋值参数，调用函数，接收返回值的细节做到透明，
+C++调用者就像调用普通的C++函数一样。使用FFLUA中调用lua函数使用call接口：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">call</span><span class="p">(</span><span class="n">constchar</span><span class="o">*</span> <span class="n">func_name_</span><span class="p">)</span> <span class="k">throw</span> <span class="p">(</span><span class="n">lua_exception_t</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>当调用出错时，异常信息记录了traceback。</p>
+
+<p>实际上，FFLUA重载了9个call函数，以来自动适配调用9个参数的lua函数。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">RET</span><span class="o">&gt;</span>
+     <span class="n">RET</span> <span class="nf">call</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">func_name_</span><span class="p">)</span> <span class="k">throw</span> <span class="p">(</span><span class="n">lua_exception_t</span><span class="p">);</span>
+    <span class="p">......</span>
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">RET</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG1</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG2</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG3</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG4</span><span class="p">,</span>
+             <span class="k">typename</span> <span class="n">ARG5</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG6</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG7</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG8</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ARG9</span><span class="o">&gt;</span>
+    <span class="n">RET</span> <span class="nf">call</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">func_name_</span><span class="p">,</span> <span class="n">ARG1</span> <span class="n">arg1_</span><span class="p">,</span> <span class="n">ARG2</span> <span class="n">arg2_</span><span class="p">,</span> <span class="n">ARG3</span> <span class="n">arg3_</span><span class="p">,</span>
+             <span class="n">ARG4</span> <span class="n">arg4_</span><span class="p">,</span> <span class="n">ARG5</span> <span class="n">arg5_</span><span class="p">,</span> <span class="n">ARG6</span> <span class="n">arg6_</span><span class="p">,</span> <span class="n">ARG7</span> <span class="n">arg7_</span><span class="p">,</span>
+             <span class="n">ARG8</span> <span class="n">arg8_</span><span class="p">,</span> <span class="n">ARG9</span> <span class="n">arg9_</span><span class="p">)</span> <span class="k">throw</span> <span class="p">(</span><span class="n">lua_exception_t</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="需要注明的是">需要注明的是：</h3>
+
+<ul>
+  <li>call接口的参数是范型的，自动会使用范型traits机制转换成lua类型，并push到lua堆栈中</li>
+  <li>call接口的返回值也是范式的，这就要求使用call时必须提供返回值的类型，如果lua函数不返回值会怎样？lua中有个特性，只有nil和false的布尔值为false，所以当lua函数返回空时，你仍然可以使用bool类型接收参数，只是调用者忽略其返回值就行了。</li>
+  <li>call只支持一个返回值，虽然lua可以返回多个值，但是call会忽略其他返回值，这也是为了尽可能像是调用C++函数，若要返回多个值，完全可以用table返回。</li>
+</ul>
+
+<h2 id="扩展lua">扩展LUA：</h2>
+
+<p>这也是非常重要的操作，嵌入lua总是和扩展lua相伴相行。lua若要操作C++中的对象或函数，那么必须先把C++对应的接口注册都lua中。Lua CAPI提供了一系列的接口拥有完成此操作，但是关于堆栈的操作总是会稍显头疼，fflua极大的简化了注册C++对象和接口的操作，可以说是最简单的注册方式之一（如果不准说最的话）。首先我们整理一下需要哪些注册操作：</p>
+
+<ul>
+  <li>C++ 静态函数注册为lua中的全局函数，这样在lua中调用C++函数就像是调用C++全局函数</li>
+  <li>C++对象注册成Lua中的对象，可以通过new接口在lua中创建C++对象</li>
+  <li>C++类中的属性注册到lua，lua访问对象的属性就像是访问table中的属性一样。</li>
+  <li>C++类中的函数注册到lua中，lua调用其接口就像是调用talbe中的接口一样。</li>
+</ul>
+
+<p>FFLUA中提供了一个范型接口，适配于注册C++相关数据：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="kt">void</span>  <span class="n">fflua_t</span><span class="o">::</span><span class="n">reg</span><span class="p">(</span><span class="n">T</span> <span class="n">a</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">a</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_lua_state</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样，若要对lua进行注册操作，只需要提供一个仿函数即可，这样可以批量在注册所有的C++数据，当然FFLUA中提供了工具类用于生成仿函数中应该完成的注册操作：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">CLASS_TYPE</span> <span class="o">=</span> <span class="n">op_tool_t</span><span class="p">,</span> <span class="k">typename</span> <span class="n">CTOR_TYPE</span> <span class="o">=</span> <span class="kt">void</span><span class="p">()</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">fflua_register_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">fflua_register_t</span><span class="p">(</span><span class="n">lua_State</span><span class="o">*</span> <span class="n">ls_</span><span class="p">)</span><span class="o">:</span><span class="n">m_ls</span><span class="p">(</span><span class="n">ls_</span><span class="p">){}</span>
+    <span class="n">fflua_register_t</span><span class="p">(</span><span class="n">lua_State</span><span class="o">*</span> <span class="n">ls_</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">class_name_</span><span class="p">,</span> <span class="n">string</span> <span class="n">inherit_name_</span> <span class="o">=</span> <span class="s">""</span><span class="p">);</span>
+
+
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">FUNC_TYPE</span><span class="o">&gt;</span>
+    <span class="n">fflua_register_t</span><span class="o">&amp;</span> <span class="n">def</span><span class="p">(</span><span class="n">FUNC_TYPE</span> <span class="n">func</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s_</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fflua_register_router_t</span><span class="o">&lt;</span><span class="n">FUNC_TYPE</span><span class="o">&gt;::</span><span class="n">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">s_</span><span class="p">);</span>
+        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>刚才提到的像lua中的所有注册操作，都可以使用def操作完成。 示例如下：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//! 注册子类，ctor(int) 为构造函数， foo_t为类型名称， base_t为继承的基类名称</span>
+    <span class="n">fflua_register_t</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="p">,</span> <span class="n">ctor</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ls</span><span class="p">,</span> <span class="s">"foo_t"</span><span class="p">,</span> <span class="s">"base_t"</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print</span><span class="p">,</span> <span class="s">"print"</span><span class="p">)</span>        <span class="c1">//! 子类的函数</span>
+                <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">a</span><span class="p">,</span> <span class="s">"a"</span><span class="p">);</span>               <span class="c1">//! 子类的字段</span>
+</code></pre></div></div>
+
+<p>尤其特别的是，C++中的继承可以在注册到lua中被保持这样注册过基类的接口，子类就不需要重复注册。</p>
+
+<p>高级特性：</p>
+
+<p>通过以上的介绍，也许你已经了解了FFLUA的设计原则，即：当在编写C++代码时，希望使用LUA就像使用C++本地的代码一样，
+而在lua中操作C++的数据和接口的时候，又希望C++用起来完全跟table一个样。这样可以大大减轻程序开发的工作，从而把精力更多放大设计和逻辑上。</p>
+
+<p>那么做到如何lua才算像C++，C++做到如何才算像lua呢？我们知道二者毕竟相差甚远，
+我们只需要把常见的操作封装成一直即可，不常见操作则特殊处理。常见操作有：</p>
+
+<ul>
+  <li>C++ 调用lua函数，FFLUA已经封装了call函数，保障了调用lua函数就像调用本地C++函数一样方便</li>
+  <li>C++注册接口和对象到lua中，lua中操作对象就像操作table一样直接。</li>
+  <li>C++中除了自定义对象，STL是用的最多的了，C++希望lua中能够接收STL的参数，或者能够返回STL数据结构</li>
+  <li>Lua中只有table数据结构，Lua希望C++的参数的数据结构支持table，并且lua可以直接把table作为返回值。</li>
+  <li>C++的指针需要传递到lua中，同时也希望某些操作，lua可以把C++对象指针作为返回值</li>
+</ul>
+
+<p>以上前两者已经介绍了，而后三者FFLUA也是给予 完美支持。通过范型的C++封装，可以将C++ STL完美的转换成luatable，</p>
+
+<p>同时在lua返回table的时候，自动根据返回值类型将lua的table转换成C++ STL。FFLUA中只要被注册过的C++对象，都可以把其指针作为参数赋值给lua，</p>
+
+<p>甚至在lua中保存。当我讲述以上特性的时候，都是在保证类型安全的前提下。重要的类型检查有：</p>
+
+<p>STL转成Luatable时，STL中的类型必须是lua支持的，包括基本类型和已经注册过的C++对象指针。</p>
+
+<p>并且STL可以嵌套使用，如vector&lt;list<int> &gt;,  不要惊讶，这是支持的，不管嵌套多少层，都是支持的，使用C++模板的递归机制，
+该特性得到了完美支持。vector、list、set都会转换成table的数组模式，key从1开始累加。而map类型自动适配为table字典。</int></p>
+
+<p>LUA中的table可以被当成返回值转换成C++ STL，转换跟上边刚好是对应的，当然有一个限制，由于C++的STL类型必须是唯一的，如vector<int>的返回值就要求lua中的table所有值都是int。否则FFLUA会返回出错，并提示类型转换失败
+无论死调用lua中使用C++对象指针，还是LuA中返回C++对象指针，该对象必须是lua可以识别的，即已经被注册的，否则FFLUA会提示转换类型失败。</int></p>
+
+<h3 id="关于重载">关于重载：</h3>
+<p>关于重载LUA 可以使用lua中内部自己的reload，也可以将fflua对象销毁后，重先创建一个，创建fflua对象的开销和创建lua虚拟机的开销一直，不会有附加开销。</p>
+
+<h2 id="总结">总结：</h2>
+
+<ul>
+  <li>FFLUA是简化C++嵌入绑定lua脚本的类库</li>
+  <li>FFLUA只有三个头文件，不依赖除lua之外的任何的类库，开发者可以非常容易的使用FFLUA</li>
+  <li>FFLUA 对于常用的STL数据结构进行了支持</li>
+  <li>FFLUA 即使拥有了这么多特性，仍然保持了轻量，只要用过C++，只要用过lua，FFLUA的代码就可以非常清晰的看清其实现，当你了解其内部实现时，你会发现FFLUA已经做到了极简，范型模板展开后的代码就跟你自己原生LUA CAPI 编写的一样直接。</li>
+  <li>FFLUA的开源代码：https://github.com/fanchy/fflua</li>
+</ul>
+
+<h3 id="完整的c示例代码">完整的C++示例代码：</h3>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;assert.h&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cp">#include "lua/fflua.h"
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">ff</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">base_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">base_t</span><span class="p">()</span><span class="o">:</span><span class="n">v</span><span class="p">(</span><span class="mi">789</span><span class="p">){}</span>
+    <span class="kt">void</span> <span class="n">dump</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in %s a:%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">v</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">class</span> <span class="nc">foo_t</span><span class="o">:</span> <span class="k">public</span> <span class="n">base_t</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">foo_t</span><span class="p">(</span><span class="kt">int</span> <span class="n">b</span><span class="p">)</span><span class="o">:</span><span class="n">a</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in %s b:%d this=%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">foo_t</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">void</span> <span class="n">print</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">a</span><span class="p">,</span> <span class="n">base_t</span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in foo_t::print a:%ld p:%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">static</span> <span class="kt">void</span> <span class="n">dumy</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"in %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">//! lua talbe 可以自动转换为stl 对象</span>
+<span class="kt">void</span> <span class="nf">dumy</span><span class="p">(</span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span> <span class="n">ret</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">list</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">b</span><span class="p">,</span> <span class="n">set</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"in %s begin ------------</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span>  <span class="n">ret</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">ret</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"map:%s, val:%s:</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">first</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"in %s end ------------</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">lua_reg</span><span class="p">(</span><span class="n">lua_State</span><span class="o">*</span> <span class="n">ls</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//! 注册基类函数, ctor() 为构造函数的类型</span>
+    <span class="n">fflua_register_t</span><span class="o">&lt;</span><span class="n">base_t</span><span class="p">,</span> <span class="n">ctor</span><span class="p">()</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ls</span><span class="p">,</span> <span class="s">"base_t"</span><span class="p">)</span>  <span class="c1">//! 注册构造函数</span>
+                    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">base_t</span><span class="o">::</span><span class="n">dump</span><span class="p">,</span> <span class="s">"dump"</span><span class="p">)</span>     <span class="c1">//! 注册基类的函数</span>
+                    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">base_t</span><span class="o">::</span><span class="n">v</span><span class="p">,</span> <span class="s">"v"</span><span class="p">);</span>          <span class="c1">//! 注册基类的属性</span>
+
+    <span class="c1">//! 注册子类，ctor(int) 为构造函数， foo_t为类型名称， base_t为继承的基类名称</span>
+    <span class="n">fflua_register_t</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="p">,</span> <span class="n">ctor</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ls</span><span class="p">,</span> <span class="s">"foo_t"</span><span class="p">,</span> <span class="s">"base_t"</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">print</span><span class="p">,</span> <span class="s">"print"</span><span class="p">)</span>        <span class="c1">//! 子类的函数</span>
+                <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_t</span><span class="o">::</span><span class="n">a</span><span class="p">,</span> <span class="s">"a"</span><span class="p">);</span>               <span class="c1">//! 子类的字段</span>
+
+    <span class="n">fflua_register_t</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dumy</span><span class="p">,</span> <span class="s">"dumy"</span><span class="p">);</span>                <span class="c1">//! 注册静态函数</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+
+    <span class="n">fflua_t</span> <span class="n">fflua</span><span class="p">;</span>
+    <span class="k">try</span> 
+    <span class="p">{</span>
+        <span class="c1">//! 注册C++ 对象到lua中</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">reg</span><span class="p">(</span><span class="n">lua_reg</span><span class="p">);</span>
+        
+        <span class="c1">//! 载入lua文件</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">add_package_path</span><span class="p">(</span><span class="s">"./"</span><span class="p">);</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">"test.lua"</span><span class="p">);</span>
+        
+        <span class="c1">//! 获取全局变量</span>
+        <span class="kt">int</span> <span class="n">var</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">fflua</span><span class="p">.</span><span class="n">get_global_variable</span><span class="p">(</span><span class="s">"test_var"</span><span class="p">,</span> <span class="n">var</span><span class="p">));</span>
+        <span class="c1">//! 设置全局变量</span>
+        <span class="n">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">fflua</span><span class="p">.</span><span class="n">set_global_variable</span><span class="p">(</span><span class="s">"test_var"</span><span class="p">,</span> <span class="o">++</span><span class="n">var</span><span class="p">));</span>
+
+        <span class="c1">//! 执行lua 语句</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">run_string</span><span class="p">(</span><span class="s">"print(</span><span class="se">\"</span><span class="s">exe run_string!!</span><span class="se">\"</span><span class="s">)"</span><span class="p">);</span>
+        
+        <span class="c1">//! 调用lua函数, 基本类型作为参数</span>
+        <span class="kt">int32_t</span> <span class="n">arg1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">float</span>   <span class="n">arg2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="kt">double</span>  <span class="n">arg3</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="n">string</span>  <span class="n">arg4</span> <span class="o">=</span> <span class="s">"4"</span><span class="p">;</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"test_func"</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span>  <span class="n">arg4</span><span class="p">);</span>
+        
+        <span class="c1">//! 调用lua函数，stl类型作为参数， 自动转换为lua talbe</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">;</span>        <span class="n">vec</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+        <span class="n">list</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">lt</span><span class="p">;</span>         <span class="n">lt</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mf">99.99</span><span class="p">);</span>
+        <span class="n">set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">st</span><span class="p">;</span>         <span class="n">st</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="s">"OhNIce"</span><span class="p">);</span>
+        <span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">mp</span><span class="p">;</span>    <span class="n">mp</span><span class="p">[</span><span class="s">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"test_stl"</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">lt</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span>  <span class="n">mp</span><span class="p">);</span>
+        
+        <span class="c1">//! 调用lua 函数返回 talbe，自动转换为stl结构</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="s">"test_return_stl_vector"</span><span class="p">);</span>
+        <span class="n">lt</span>  <span class="o">=</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">list</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="s">"test_return_stl_list"</span><span class="p">);</span>
+        <span class="n">st</span>  <span class="o">=</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="s">"test_return_stl_set"</span><span class="p">);</span>
+        <span class="n">mp</span>  <span class="o">=</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="s">"test_return_stl_map"</span><span class="p">);</span>
+        
+        <span class="c1">//! 调用lua函数，c++ 对象作为参数, foo_t 必须被注册过</span>
+        <span class="n">foo_t</span><span class="o">*</span> <span class="n">foo_ptr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">foo_t</span><span class="p">(</span><span class="mi">456</span><span class="p">);</span>
+        <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"test_object"</span><span class="p">,</span> <span class="n">foo_ptr</span><span class="p">);</span>
+        
+        <span class="c1">//! 调用lua函数，c++ 对象作为返回值, foo_t 必须被注册过 </span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">foo_ptr</span> <span class="o">==</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">foo_t</span><span class="o">*&gt;</span><span class="p">(</span><span class="s">"test_ret_object"</span><span class="p">,</span> <span class="n">foo_ptr</span><span class="p">));</span>
+        <span class="c1">//! 调用lua函数，c++ 对象作为返回值, 自动转换为基类</span>
+        <span class="n">base_t</span><span class="o">*</span> <span class="n">base_ptr</span> <span class="o">=</span> <span class="n">fflua</span><span class="p">.</span><span class="n">call</span><span class="o">&lt;</span><span class="n">base_t</span><span class="o">*&gt;</span><span class="p">(</span><span class="s">"test_ret_base_object"</span><span class="p">,</span> <span class="n">foo_ptr</span><span class="p">);</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">base_ptr</span> <span class="o">==</span> <span class="n">foo_ptr</span><span class="p">);</span>
+ 
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"exception:%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">());</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="完整的lua示例代码">完整的LUA示例代码：</h3>
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_var</span> <span class="o">=</span> <span class="mi">99</span>
+
+<span class="k">function</span> <span class="nf">dump_table</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span> <span class="n">str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="kc">nil</span> <span class="o">==</span> <span class="n">str</span> <span class="k">then</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">end</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="k">in</span> <span class="nb">pairs</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+    <span class="k">do</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1">-- 测试调用lua</span>
+<span class="k">function</span> <span class="nf">test_func</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="n">arg4</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"in test_func:"</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="n">arg4</span><span class="p">)</span>
+    <span class="n">mp</span> <span class="o">=</span> <span class="p">{[</span><span class="s2">"k"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"v"</span><span class="p">}</span>
+    <span class="n">vc</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span>
+    <span class="n">lt</span> <span class="o">=</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">}</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="p">{</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">}</span>
+    <span class="n">dumy</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">vc</span><span class="p">,</span> <span class="n">lt</span><span class="p">,</span> <span class="n">st</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- 接受stl参数</span>
+<span class="k">function</span> <span class="nf">test_stl</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">lt</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">mp</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"--------------dump_table begin ----------------"</span><span class="p">)</span>
+    <span class="n">dump_table</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="s2">"vec"</span><span class="p">)</span>
+    <span class="n">dump_table</span><span class="p">(</span><span class="n">lt</span><span class="p">,</span> <span class="s2">"lt"</span><span class="p">)</span>
+    <span class="n">dump_table</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="s2">"st"</span><span class="p">)</span>
+    <span class="n">dump_table</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="s2">"mp"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"--------------dump_table end ----------------"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"ok"</span>
+<span class="k">end</span>
+
+<span class="c1">-- 返回stl 参数</span>
+<span class="k">function</span> <span class="nf">test_return_stl_vector</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+<span class="k">end</span>
+<span class="k">function</span> <span class="nf">test_return_stl_list</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+<span class="k">end</span>
+<span class="k">function</span> <span class="nf">test_return_stl_set</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+<span class="k">end</span>
+<span class="k">function</span> <span class="nf">test_return_stl_map</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">124</span>
+    <span class="p">}</span>
+<span class="k">end</span>
+<span class="c1">-- 测试接受C++对象</span>
+<span class="k">function</span> <span class="nf">test_object</span><span class="p">(</span><span class="n">foo_obj</span><span class="p">)</span>
+    <span class="c1">--测试构造</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">base_t</span><span class="p">:</span><span class="n">new</span><span class="p">()</span>
+    <span class="c1">-- 每个对象都有一个get_pointer获取指针</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"base ptr:"</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span><span class="n">get_pointer</span><span class="p">())</span>
+    <span class="c1">-- 测试C++对象函数</span>
+    <span class="n">foo_obj</span><span class="p">:</span><span class="nb">print</span><span class="p">(</span><span class="mi">12333</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">base</span><span class="p">:</span><span class="n">delete</span><span class="p">()</span>
+    <span class="c1">--基类的函数</span>
+    <span class="n">foo_obj</span><span class="p">:</span><span class="n">dump</span><span class="p">()</span>
+    <span class="c1">-- 测试C++ 对象属性</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"foo property"</span><span class="p">,</span> <span class="n">foo_obj</span><span class="p">.</span><span class="n">a</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"base property"</span><span class="p">,</span> <span class="n">foo_obj</span><span class="p">.</span><span class="n">v</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1">-- 测试返回C++对象</span>
+<span class="k">function</span> <span class="nf">test_ret_object</span><span class="p">(</span><span class="n">foo_obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">foo_obj</span>
+<span class="k">end</span>
+
+<span class="c1">-- 测试返回C++对象</span>
+<span class="k">function</span> <span class="nf">test_ret_base_object</span><span class="p">(</span><span class="n">foo_obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">foo_obj</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>更多精彩文章 http://h2cloud.org</p>
+
+  </div>
+
+  
+</article>
+
+            
+            <footer class="site-footer">
+                <!-- SVG icons from https://iconmonstr.com -->
+                
+                <!-- Github icon -->
+                <span class="my-span-icon">
+                    <a href="https://github.com/fanchy" aria-label="fanchy's GitHub" title="fanchy's GitHub" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- Twitter icon -->
+                <span class="my-span-icon">
+                    <a href="https://twitter.com/evanown" aria-label="fanchy's Twitter" title="fanchy's Twitter" target="_blank" rel="noopener noreferrer nofollow">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- RSS icon -->
+                
+                
+                <!-- Contact icon -->
+                
+                
+                <span class="my-span-icon">
+                    <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy">
+                        <svg class="my-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 .02c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.99 6.98l-6.99 5.666-6.991-5.666h13.981zm.01 10h-14v-8.505l7 5.673 7-5.672v8.504z"></path></svg>
+                    </a>
+                </span>
+                
+                <!-- <span class="my-span-icon" style="padding-bottom:5px;"> -->
+                    <!-- <a href="http://h2cloud.com/contact" aria-label="Contact" title="Contact fanchy"> -->
+                    <!-- 沪ICP备17021230号-1 -->
+                    <!-- </a> -->
+                <!-- </span> -->
+            </footer>
+        </section>
+        
+        <script>
+            var menu = document.querySelector("nav.site-nav");
+            var checkbox = document.getElementById("nav-trigger");
+            
+            // close menu if click outside menu
+            document.addEventListener("click", function(e) {
+                if (menu != e.target &&
+                        !isDescendant(menu, e.target)) {
+                    checkbox.checked = false;
+                }
+            }, false);
+            
+            function isDescendant(parent, child) {
+                var node = child.parentNode;
+                while (node != null) {
+                    if (node == parent) {
+                        return true;
+                    }
+                    node = node.parentNode;
+                }
+                return false;
+            }  
+        </script>
+        
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b0b03911bf3e050f9177fccd1e24775";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-124179560-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    </body>
+    </html>
+    
