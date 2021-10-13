@@ -1,9 +1,8 @@
+# coding = utf-8
+
 import requests
 import os
-import pandas as pd
-from pandas import DataFrame,Series
 import json
-import numpy as np
 import time
 import datetime
 import sqlite3
@@ -18,8 +17,9 @@ from selenium.webdriver.support.wait import WebDriverWait  # 等待页面加载�
     
 def TestChrome():
     # 往百度发送请求
+    driver = GetBrowser()
     driver.get('https://www.baidu.com/')
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(5)
     
     # 1、find_element_by_link_text  通过链接文本去找
     # 根据登录
@@ -66,14 +66,7 @@ def TodayAsInt2(dayOffset = 0):
     nowTm = datetime.datetime.now() + datetime.timedelta(days=dayOffset)
     ret = '%d-%02d-%02d'%(nowTm.year, nowTm.month, nowTm.day)
     return ret
-def get_excel(url,path,page1,page2):
-    
 
-    print(Data)
-    #label = ["基金代码", "基金简称", "日期", "单位净值", "累计净值", "日增长率", "近1周", "近1月", "近3月", "近6月",
-             #"近1年", "近2年", "近3年", "今年来", "成立来", "自定义", "手续费"]
-    #df = DataFrame(Data, columns=label)
-    #df.to_excel(path, index=False)
 START_TIME = TodayAsInt2(-365)
 END_TIME = TodayAsInt2()
 WORK_PATH=os.getcwd()
